@@ -16,7 +16,7 @@ public class DemoActivity extends ExampleActivity {
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.simple_activity);
+    setContentView(R.layout.demo_activity);
   }
 
   @OnClick({ R.id.hello, R.id.hey, R.id.hi })
