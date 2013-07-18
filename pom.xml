@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+
+  <groupId>com.jakewharton.timber</groupId>
+  <artifactId>timber-parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Timber (Parent)</name>
+  <description>No-nonsense injectable logging.</description>
+  <url>http://github.com/JakeWharton/timber/</url>
+  <inceptionYear>2013</inceptionYear>
+
+  <modules>
+    <module>timber</module>
+    <module>timber-sample</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <java.version>1.6</java.version>
+    <android.version>4.1.1.4</android.version>
+    <android.platform>16</android.platform>
+    <dagger.version>1.0.1</dagger.version>
+    <butterknife.version>2.0.0</butterknife.version>
+  </properties>
+
+  <scm>
+    <url>http://github.com/JakeWharton/timber/</url>
+    <connection>scm:git:git://github.com/JakeWharton/timber.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/JakeWharton/timber.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>http://github.com/JakeWharton/timber/issues</url>
+  </issueManagement>
+
+  <licenses>
+    <license>
+      <name>Apache 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.google.android</groupId>
+        <artifactId>android</artifactId>
+        <version>${android.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.jakewharton</groupId>
+        <artifactId>butterknife</artifactId>
+        <version>${butterknife.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.dagger</groupId>
+        <artifactId>dagger</artifactId>
+        <version>${dagger.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.dagger</groupId>
+        <artifactId>dagger-compiler</artifactId>
+        <version>${dagger.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <showWarnings>true</showWarnings>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.10</version>
+        <configuration>
+          <failsOnError>true</failsOnError>
+          <configLocation>checkstyle.xml</configLocation>
+          <consoleOutput>true</consoleOutput>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>checkstyle</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+          <artifactId>android-maven-plugin</artifactId>
+          <version>3.6.0</version>
+          <configuration>
+            <sdk>
+              <platform>${android.platform}</platform>
+            </sdk>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>

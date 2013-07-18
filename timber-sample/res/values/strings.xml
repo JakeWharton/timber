@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+  <string name="app_name">Timber</string>
+
+  <string name="hello">Hello</string>
+  <string name="hi">Hi</string>
+  <string name="hey">Hey</string>
+</resources>
