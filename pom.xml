@@ -11,7 +11,7 @@
 
   <groupId>com.jakewharton.timber</groupId>
   <artifactId>timber-parent</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Timber (Parent)</name>
@@ -38,7 +38,7 @@
     <url>http://github.com/JakeWharton/timber/</url>
     <connection>scm:git:git://github.com/JakeWharton/timber.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/JakeWharton/timber.git</developerConnection>
-    <tag>timber-parent-1.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <issueManagement>
