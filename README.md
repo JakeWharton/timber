@@ -37,6 +37,10 @@ Download [the latest JAR][2] or grab via Maven:
   <version>(insert latest version)</version>
 </dependency>
 ```
+or Gradle:
+```groovy
+compile 'com.jakewharton.timber:timber:1.0.+'
+```
 
 
 License
