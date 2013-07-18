@@ -9,7 +9,6 @@ import timber.log.Timber;
 @Module(injects = DemoActivity.class)
 public class ExampleModule {
   @Provides @Singleton Timber provideTimber() {
-    //noinspection ConstantConditions
     return BuildConfig.DEBUG ? Timber.DEBUG : Timber.PROD;
   }
 }
