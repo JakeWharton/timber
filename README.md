@@ -1,5 +1,4 @@
-Timber
-======
+![Timber](logo.png)
 
 This is a logger with a small API, tag inference, and is injection friendly. Since the tags vary,
 it works really well when coupled with a log reader like [Pidcat][1].
