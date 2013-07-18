@@ -22,7 +22,9 @@ Two easy steps:
  1. Figure out if you want `Timber.DEBUG` or `Timber.PROD` and bind it.
  2. Inject an instance of `Timber` everywhere you want to log.
 
-See the sample app in `timber-sample/` to see it in action.
+Check out the sample app in `timber-sample/` to see it in action. It uses [Dagger][3] and
+[Butter Knife][4] to make it the worlds smallest application with both dependency injection and
+view "injection".
 
 
 Download
@@ -64,3 +66,5 @@ License
 
  [1]: http://github.com/JakeWharton/pidcat/
  [2]: http://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.jakewharton.timber&a=timber&v=LATEST
+ [3]: http://square.github.io/dagger/
+ [4]: http://jakewharton.github.io/butterknife/
