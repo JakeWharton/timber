@@ -21,7 +21,7 @@ public class DemoActivity extends ExampleActivity {
 
   @OnClick({ R.id.hello, R.id.hey, R.id.hi })
   public void greetingClicked(Button button) {
-    timber.i("A button with ID %s was clicked to say '%s'.", button.getId(), button.getText());
+    timber.autoTaggedI("A button with ID %s was clicked to say '%s'.", button.getId(), button.getText());
     Toast.makeText(this, "Check logcat for a greeting!", LENGTH_SHORT).show();
   }
 }
