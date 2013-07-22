@@ -41,7 +41,7 @@ public interface Timber {
     }
 
     @Override public void d(Throwable t, String message, Object... args) {
-      Log.e(className(), String.format(message, args), t);
+      Log.d(className(), String.format(message, args), t);
     }
 
     @Override public void i(String message, Object... args) {
@@ -49,7 +49,7 @@ public interface Timber {
     }
 
     @Override public void i(Throwable t, String message, Object... args) {
-      Log.e(className(), String.format(message, args), t);
+      Log.i(className(), String.format(message, args), t);
     }
 
     @Override public void w(String message, Object... args) {
@@ -57,7 +57,7 @@ public interface Timber {
     }
 
     @Override public void w(Throwable t, String message, Object... args) {
-      Log.e(className(), String.format(message, args), t);
+      Log.w(className(), String.format(message, args), t);
     }
 
     @Override public void e(String message, Object... args) {
