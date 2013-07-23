@@ -22,10 +22,13 @@ public interface Timber {
   void e(String message, Object... args);
   /** Log an error exception and a message with optional format args. */
   void e(Throwable t, String message, Object... args);
+  /** Sets a custom tag on the next logged message */
+  Timber tag(String tag);
 
   /** A {@link Timber} for debug builds. Automatically infers the tag from the calling class. */
   Timber DEBUG = new Timber() {
     private final Pattern anonymousClass = Pattern.compile("\\$\\d+$");
+    private String tag;
 
     private String className() {
       String className = Thread.currentThread().getStackTrace()[4].getClassName();
@@ -37,35 +40,48 @@ public interface Timber {
     }
 
     @Override public void d(String message, Object... args) {
-      Log.d(className(), String.format(message, args));
+      Log.d(tag == null? className() : tag, String.format(message, args));
+      tag = null;
     }
 
     @Override public void d(Throwable t, String message, Object... args) {
-      Log.d(className(), String.format(message, args), t);
+      Log.d(tag == null? className() : tag, String.format(message, args), t);
+      tag = null;
     }
 
     @Override public void i(String message, Object... args) {
-      Log.i(className(), String.format(message, args));
+      Log.i(tag == null? className() : tag, String.format(message, args));
+      tag = null;
     }
 
     @Override public void i(Throwable t, String message, Object... args) {
-      Log.i(className(), String.format(message, args), t);
+      Log.i(tag == null? className() : tag, String.format(message, args), t);
+      tag = null;
     }
 
     @Override public void w(String message, Object... args) {
-      Log.w(className(), String.format(message, args));
+      Log.w(tag == null? className() : tag, String.format(message, args));
+      tag = null;
     }
 
     @Override public void w(Throwable t, String message, Object... args) {
-      Log.w(className(), String.format(message, args), t);
+      Log.w(tag == null? className() : tag, String.format(message, args), t);
+      tag = null;
     }
 
     @Override public void e(String message, Object... args) {
-      Log.e(className(), String.format(message, args));
+      Log.e(tag == null? className() : tag, String.format(message, args));
+      tag = null;
     }
 
     @Override public void e(Throwable t, String message, Object... args) {
-      Log.e(className(), String.format(message, args), t);
+      Log.e(tag == null? className() : tag, String.format(message, args), t);
+      tag = null;
+    }
+    
+    @Override public Timber tag(String tag) {
+      this.tag = tag;
+      return this;
     }
   };
 
