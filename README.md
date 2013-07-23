@@ -41,7 +41,7 @@ Download [the latest JAR][2] or grab via Maven:
 ```
 or Gradle:
 ```groovy
-compile 'com.jakewharton.timber:timber:1.0.+'
+compile 'com.jakewharton.timber:timber:1.1.+'
 ```
 
 

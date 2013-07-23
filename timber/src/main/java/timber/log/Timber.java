@@ -22,50 +22,64 @@ public interface Timber {
   void e(String message, Object... args);
   /** Log an error exception and a message with optional format args. */
   void e(Throwable t, String message, Object... args);
+  /** Set a one-time tag for use on the next logging call. */
+  Timber tag(String tag);
 
   /** A {@link Timber} for debug builds. Automatically infers the tag from the calling class. */
   Timber DEBUG = new Timber() {
     private final Pattern anonymousClass = Pattern.compile("\\$\\d+$");
+    private String nextTag;
 
-    private String className() {
-      String className = Thread.currentThread().getStackTrace()[4].getClassName();
-      Matcher m = anonymousClass.matcher(className);
-      if (m != null && m.find()) {
-        className = m.replaceAll("");
+    private String getTag() {
+      String tag = nextTag;
+      if (tag != null) {
+        nextTag = null;
+        return tag;
       }
-      return className.substring(className.lastIndexOf('.') + 1);
+
+      tag = Thread.currentThread().getStackTrace()[4].getClassName();
+      Matcher m = anonymousClass.matcher(tag);
+      if (m != null && m.find()) {
+        tag = m.replaceAll("");
+      }
+      return tag.substring(tag.lastIndexOf('.') + 1);
     }
 
     @Override public void d(String message, Object... args) {
-      Log.d(className(), String.format(message, args));
+      Log.d(getTag(), String.format(message, args));
     }
 
     @Override public void d(Throwable t, String message, Object... args) {
-      Log.d(className(), String.format(message, args), t);
+      Log.d(getTag(), String.format(message, args), t);
     }
 
     @Override public void i(String message, Object... args) {
-      Log.i(className(), String.format(message, args));
+      Log.i(getTag(), String.format(message, args));
     }
 
     @Override public void i(Throwable t, String message, Object... args) {
-      Log.i(className(), String.format(message, args), t);
+      Log.i(getTag(), String.format(message, args), t);
     }
 
     @Override public void w(String message, Object... args) {
-      Log.w(className(), String.format(message, args));
+      Log.w(getTag(), String.format(message, args));
     }
 
     @Override public void w(Throwable t, String message, Object... args) {
-      Log.w(className(), String.format(message, args), t);
+      Log.w(getTag(), String.format(message, args), t);
     }
 
     @Override public void e(String message, Object... args) {
-      Log.e(className(), String.format(message, args));
+      Log.e(getTag(), String.format(message, args));
     }
 
     @Override public void e(Throwable t, String message, Object... args) {
-      Log.e(className(), String.format(message, args), t);
+      Log.e(getTag(), String.format(message, args), t);
+    }
+
+    @Override public Timber tag(String tag) {
+      nextTag = tag;
+      return this;
     }
   };
 
@@ -93,6 +107,10 @@ public interface Timber {
     }
 
     @Override public void e(Throwable t, String message, Object... args) {
+    }
+
+    @Override public Timber tag(String tag) {
+      return this;
     }
   };
 }
