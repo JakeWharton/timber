@@ -37,7 +37,7 @@ public interface Timber {
         return tag;
       }
 
-      tag = Thread.currentThread().getStackTrace()[4].getClassName();
+      tag = new Throwable().getStackTrace()[3].getClassName();
       Matcher m = anonymousClass.matcher(tag);
       if (m != null && m.find()) {
         tag = m.replaceAll("");
