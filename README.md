@@ -1,16 +1,19 @@
 ![Timber](logo.png)
 
-This is a logger with a small API, tag inference, and is injection friendly. Since the tags vary,
-it works really well when coupled with a log reader like [Pidcat][1].
+This is a logger with a small, extensible API which provides utility on top of Android's normal
+`Log` class.
 
 I copy this class into all the little apps I make. I'm tired of doing it. Now it's a library.
 
-It has two implementations: `Timber.DEBUG` and `Timber.PROD`.
+Behavior is added through `Tree` instances. You can install an instance by calling `Timber.plant`.
+Installation of `Tree`s should be done as early as possible. The `onCreate` of your application is
+the most logical choice.
 
-The debug implementation will automatically figure out which class it's being called from and use
-that as its tag. The API also does string formatting for you.
+The `DebugTree` implementation will automatically figure out from which class it's being called and
+use that class name as its tag. Since the tags vary, it works really well when coupled with a log
+reader like [Pidcat][1].
 
-The production implementation does nothing. Like, nothing. Every time you log in production, a
+There are no `Tree` implementations installed by default because every time you log in production, a
 puppy dies.
 
 
@@ -19,12 +22,10 @@ Usage
 
 Two easy steps:
 
- 1. Figure out if you want `Timber.DEBUG` or `Timber.PROD` and bind it.
- 2. Inject an instance of `Timber` everywhere you want to log.
+ 1. Install any `Tree` instances you want in the `onCreate` of your application class.
+ 2. Call `Timber`'s static methods everywhere throughout your app.
 
-Check out the sample app in `timber-sample/` to see it in action. It uses [Dagger][3] and
-[Butter Knife][4] to make it the worlds smallest application with both dependency injection and
-view "injection".
+Check out the sample app in `timber-sample/` to see it in action.
 
 
 Download
@@ -41,7 +42,7 @@ Download [the latest JAR][2] or grab via Maven:
 ```
 or Gradle:
 ```groovy
-compile 'com.jakewharton.timber:timber:1.1.+'
+compile 'com.jakewharton.timber:timber:2.0.+'
 ```
 
 
