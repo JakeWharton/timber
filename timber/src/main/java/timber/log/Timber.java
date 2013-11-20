@@ -133,8 +133,7 @@ public final class Timber {
 
       tag = new Throwable().getStackTrace()[3].getClassName();
       Matcher m = ANONYMOUS_CLASS.matcher(tag);
-      // TODO: IDE says m can never be null here, unnecessary null check?
-      if (m != null && m.find()) {
+      if (m.find()) {
         tag = m.replaceAll("");
       }
       return tag.substring(tag.lastIndexOf('.') + 1);
