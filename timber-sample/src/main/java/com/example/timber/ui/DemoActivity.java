@@ -16,6 +16,8 @@ public class DemoActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.demo_activity);
     Views.inject(this);
+    Timber.tag("LifeCycles");
+    Timber.d("Activity Created");
   }
 
   @OnClick({ R.id.hello, R.id.hey, R.id.hi })
