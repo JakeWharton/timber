@@ -1,6 +1,7 @@
 package timber.log;
 
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
@@ -64,12 +65,23 @@ public final class Timber {
     }
   }
 
+  /** Set a one-time tag for use on the next logging call. */
+  public static void tag(String tag) {
+    for (int index = 0, size = TAGGED_TREES.size(); index < size; index++) {
+      ((TaggedTree) FOREST.get(TAGGED_TREES.keyAt(index))).tag(tag);
+    }
+  }
+
   /** Add a new logging tree. */
   public static void plant(Tree tree) {
+    if (tree instanceof TaggedTree) {
+      TAGGED_TREES.append(FOREST.size(), true);
+    }
     FOREST.add(tree);
   }
 
   private static final List<Tree> FOREST = new CopyOnWriteArrayList<Tree>();
+  private static final SparseBooleanArray TAGGED_TREES = new SparseBooleanArray();
 
   private Timber() {
   }
@@ -101,14 +113,27 @@ public final class Timber {
     void e(Throwable t, String message, Object... args);
   }
 
-  /** A {@link Tree} for debug builds. Automatically infers the tag from the calling class. */
-  public static class DebugTree implements Tree {
-    private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
+  /** A facade for attaching tags to logging calls. Install instances via {@link #plant} */
+  public interface TaggedTree extends Tree {
+    /** Set a one-time tag for use on the next logging call. */
+    void tag(String tag);
+  }
 
-    private static String createTag() {
-      String tag = new Throwable().getStackTrace()[3].getClassName();
+  /** A {@link Tree} for debug builds. Automatically infers the tag from the calling class. */
+  public static class DebugTree implements TaggedTree {
+    private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
+    private String nextTag;
+
+    private String createTag() {
+      String tag = nextTag;
+      if (tag != null) {
+        nextTag = null;
+        return tag;
+      }
+
+      tag = new Throwable().getStackTrace()[3].getClassName();
       Matcher m = ANONYMOUS_CLASS.matcher(tag);
-      if (m != null && m.find()) {
+      if (m.find()) {
         tag = m.replaceAll("");
       }
       return tag.substring(tag.lastIndexOf('.') + 1);
@@ -144,6 +169,10 @@ public final class Timber {
 
     @Override public void e(Throwable t, String message, Object... args) {
       Log.e(createTag(), String.format(message, args), t);
+    }
+
+    @Override public void tag(String tag) {
+      nextTag = tag;
     }
   }
 
