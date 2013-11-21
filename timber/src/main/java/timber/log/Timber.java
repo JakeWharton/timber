@@ -11,65 +11,50 @@ import java.util.regex.Pattern;
 public final class Timber {
   /** Log a debug message with optional format args. */
   public static void d(String message, Object... args) {
-    for (Tree tree : FOREST) {
-      tree.d(message, args);
-    }
+    TREE_OF_SOULS.d(message, args);
   }
 
   /** Log a debug exception and a message with optional format args. */
   public static void d(Throwable t, String message, Object... args) {
-    for (Tree tree : FOREST) {
-      tree.d(t, message, args);
-    }
+    TREE_OF_SOULS.d(t, message, args);
   }
 
   /** Log an info message with optional format args. */
   public static void i(String message, Object... args) {
-    for (Tree tree : FOREST) {
-      tree.i(message, args);
-    }
+    TREE_OF_SOULS.i(message, args);
   }
 
   /** Log an info exception and a message with optional format args. */
   public static void i(Throwable t, String message, Object... args) {
-    for (Tree tree : FOREST) {
-      tree.i(t, message, args);
-    }
+    TREE_OF_SOULS.i(t, message, args);
   }
 
   /** Log a warning message with optional format args. */
   public static void w(String message, Object... args) {
-    for (Tree tree : FOREST) {
-      tree.w(message, args);
-    }
+    TREE_OF_SOULS.w(message, args);
   }
 
   /** Log a warning exception and a message with optional format args. */
   public static void w(Throwable t, String message, Object... args) {
-    for (Tree tree : FOREST) {
-      tree.w(t, message, args);
-    }
+    TREE_OF_SOULS.w(t, message, args);
   }
 
   /** Log an error message with optional format args. */
   public static void e(String message, Object... args) {
-    for (Tree tree : FOREST) {
-      tree.e(message, args);
-    }
+    TREE_OF_SOULS.e(message, args);
   }
 
   /** Log an error exception and a message with optional format args. */
   public static void e(Throwable t, String message, Object... args) {
-    for (Tree tree : FOREST) {
-      tree.e(t, message, args);
-    }
+    TREE_OF_SOULS.e(t, message, args);
   }
 
   /** Set a one-time tag for use on the next logging call. */
-  public static void tag(String tag) {
+  public static Tree tag(String tag) {
     for (int index = 0, size = TAGGED_TREES.size(); index < size; index++) {
       ((TaggedTree) FOREST.get(TAGGED_TREES.keyAt(index))).tag(tag);
     }
+    return TREE_OF_SOULS;
   }
 
   /** Add a new logging tree. */
@@ -80,8 +65,59 @@ public final class Timber {
     FOREST.add(tree);
   }
 
-  private static final List<Tree> FOREST = new CopyOnWriteArrayList<Tree>();
-  private static final SparseBooleanArray TAGGED_TREES = new SparseBooleanArray();
+  static final List<Tree> FOREST = new CopyOnWriteArrayList<Tree>();
+  static final SparseBooleanArray TAGGED_TREES = new SparseBooleanArray();
+
+  /** A {@link Tree} that delegates to all planted trees in the {@link #FOREST forest}. */
+  private static final Tree TREE_OF_SOULS = new Tree() {
+    @Override public void d(String message, Object... args) {
+      for (Tree tree : FOREST) {
+        tree.d(message, args);
+      }
+    }
+
+    @Override public void d(Throwable t, String message, Object... args) {
+      for (Tree tree : FOREST) {
+        tree.d(t, message, args);
+      }
+    }
+
+    @Override public void i(String message, Object... args) {
+      for (Tree tree : FOREST) {
+        tree.i(message, args);
+      }
+    }
+
+    @Override public void i(Throwable t, String message, Object... args) {
+      for (Tree tree : FOREST) {
+        tree.i(t, message, args);
+      }
+    }
+
+    @Override public void w(String message, Object... args) {
+      for (Tree tree : FOREST) {
+        tree.w(message, args);
+      }
+    }
+
+    @Override public void w(Throwable t, String message, Object... args) {
+      for (Tree tree : FOREST) {
+        tree.w(t, message, args);
+      }
+    }
+
+    @Override public void e(String message, Object... args) {
+      for (Tree tree : FOREST) {
+        tree.e(message, args);
+      }
+    }
+
+    @Override public void e(Throwable t, String message, Object... args) {
+      for (Tree tree : FOREST) {
+        tree.e(t, message, args);
+      }
+    }
+  };
 
   private Timber() {
   }
@@ -131,7 +167,7 @@ public final class Timber {
         return tag;
       }
 
-      tag = new Throwable().getStackTrace()[3].getClassName();
+      tag = new Throwable().getStackTrace()[4].getClassName();
       Matcher m = ANONYMOUS_CLASS.matcher(tag);
       if (m.find()) {
         tag = m.replaceAll("");
