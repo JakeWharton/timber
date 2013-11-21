@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 2.1.0 *(2013-11-21)*
+----------------------------
+
+ * New: `tag` method allows specifying custom one-time tag. Redux!
+
+
 Version 2.0.0 *(2013-10-21)*
 ----------------------------
 
