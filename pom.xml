@@ -22,6 +22,7 @@
   <modules>
     <module>timber</module>
     <module>timber-sample</module>
+    <module>timber-lint</module>
   </modules>
 
   <properties>
@@ -34,6 +35,7 @@
     <junit.version>4.10</junit.version>
     <robolectric.version>2.2</robolectric.version>
     <fest.version>2.0M10</fest.version>
+    <lint.version>22.4.0</lint.version>
   </properties>
 
   <scm>
@@ -81,6 +83,11 @@
         <groupId>org.easytesting</groupId>
         <artifactId>fest-assert-core</artifactId>
         <version>${fest.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.android.tools.lint</groupId>
+        <artifactId>lint</artifactId>
+        <version>${lint.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
