@@ -186,12 +186,12 @@ public final class Timber {
   /** A {@link Tree} for debug builds. Automatically infers the tag from the calling class. */
   public static class DebugTree implements TaggedTree {
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
-    private String nextTag;
+    private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
 
-    private String createTag() {
-      String tag = nextTag;
+    private static String createTag() {
+      String tag = NEXT_TAG.get();
       if (tag != null) {
-        nextTag = null;
+        NEXT_TAG.remove();
         return tag;
       }
 
@@ -244,7 +244,7 @@ public final class Timber {
     }
 
     @Override public void tag(String tag) {
-      nextTag = tag;
+      NEXT_TAG.set(tag);
     }
   }
 
