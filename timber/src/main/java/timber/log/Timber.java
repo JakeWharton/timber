@@ -9,6 +9,16 @@ import java.util.regex.Pattern;
 
 /** Logging for lazy people. */
 public final class Timber {
+  /** Log a verbose message with optional format args. */
+  public static void v(String message, Object... args) {
+    TREE_OF_SOULS.v(message, args);
+  }
+
+  /** Log a verbose exception and a message with optional format args. */
+  public static void v(Throwable t, String message, Object... args) {
+    TREE_OF_SOULS.v(t, message, args);
+  }
+
   /** Log a debug message with optional format args. */
   public static void d(String message, Object... args) {
     TREE_OF_SOULS.d(message, args);
@@ -70,6 +80,18 @@ public final class Timber {
 
   /** A {@link Tree} that delegates to all planted trees in the {@link #FOREST forest}. */
   private static final Tree TREE_OF_SOULS = new Tree() {
+    @Override public void v(String message, Object... args) {
+      for (Tree tree : FOREST) {
+        tree.v(message, args);
+      }
+    }
+
+    @Override public void v(Throwable t, String message, Object... args) {
+      for (Tree tree : FOREST) {
+        tree.v(t, message, args);
+      }
+    }
+
     @Override public void d(String message, Object... args) {
       for (Tree tree : FOREST) {
         tree.d(message, args);
@@ -124,6 +146,12 @@ public final class Timber {
 
   /** A facade for handling logging calls. Install instances via {@link #plant}. */
   public interface Tree {
+    /** Log a verbose message with optional format args. */
+    void v(String message, Object... args);
+
+    /** Log a verbose exception and a message with optional format args. */
+    void v(Throwable t, String message, Object... args);
+
     /** Log a debug message with optional format args. */
     void d(String message, Object... args);
 
@@ -175,6 +203,14 @@ public final class Timber {
       return tag.substring(tag.lastIndexOf('.') + 1);
     }
 
+    @Override public void v(String message, Object... args) {
+      Log.v(createTag(), String.format(message, args));
+    }
+
+    @Override public void v(Throwable t, String message, Object... args) {
+      Log.v(createTag(), String.format(message, args), t);
+    }
+
     @Override public void d(String message, Object... args) {
       Log.d(createTag(), String.format(message, args));
     }
@@ -214,6 +250,12 @@ public final class Timber {
 
   /** A {@link Tree} which does nothing. Useful for extending. */
   public static class HollowTree implements Tree {
+    @Override public void v(String message, Object... args) {
+    }
+
+    @Override public void v(Throwable t, String message, Object... args) {
+    }
+
     @Override public void d(String message, Object... args) {
     }
 
