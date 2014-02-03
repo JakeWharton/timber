@@ -5,6 +5,7 @@ Version 2.2.0 *(2014-02-02)*
 ----------------------------
 
  * New: verbose log level added (`v()`).
+ * New: `timber-lint` module adds lint check to ensure you are calling `Timber` and not `Log`.
 
 
 Version 2.1.0 *(2013-11-21)*
