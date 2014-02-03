@@ -188,7 +188,7 @@ public final class Timber {
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private String nextTag;
 
-    private String createTag() {
+    protected String createTag() {
       String tag = nextTag;
       if (tag != null) {
         nextTag = null;
