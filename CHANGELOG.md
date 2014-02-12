@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 2.2.2 *(2014-02-12)*
+----------------------------
+
+ * Fix: Include debug level in previous fix which avoids formatting messages with no arguments.
+
+
 Version 2.2.1 *(2014-02-11)*
 ----------------------------
 
