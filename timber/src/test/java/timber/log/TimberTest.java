@@ -12,6 +12,7 @@ import org.robolectric.shadows.ShadowLog;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.robolectric.shadows.ShadowLog.LogItem;
+import static timber.log.Timber.DebugTree.formatString;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(manifest = Config.NONE)
@@ -19,6 +20,10 @@ public class TimberTest {
   @Before @After public void setUpAndTearDown() {
     Timber.FOREST.clear();
     Timber.TAGGED_TREES.clear();
+  }
+
+  @Test public void noArgsDoesNotFormat() {
+    assertThat(formatString("te%st")).isSameAs("te%st");
   }
 
   @Test public void debugTagWorks() {
