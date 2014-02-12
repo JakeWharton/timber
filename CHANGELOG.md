@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 2.2.1 *(2014-02-11)*
+----------------------------
+
+ * Fix: Do not attempt to format log messages which do not have arguments.
+
+
 Version 2.2.0 *(2014-02-02)*
 ----------------------------
 
