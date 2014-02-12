@@ -217,7 +217,7 @@ public final class Timber {
     }
 
     @Override public void d(String message, Object... args) {
-      Log.d(createTag(), String.format(message, args));
+      Log.d(createTag(), formatString(message, args));
     }
 
     @Override public void d(Throwable t, String message, Object... args) {
