@@ -253,7 +253,8 @@ public final class Timber {
     }
   }
   
-  /** A {@link Tree} for debug builds. Automatically infers the tag from the calling class. */
+  /** A {@link Tree} for production builds. Will print info, warning and error logs.
+   *  Automatically infers the tag from the calling class.*/
   public static class ErrorWarningTree implements TaggedTree {
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
