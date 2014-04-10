@@ -252,7 +252,7 @@ public final class Timber {
       NEXT_TAG.set(tag);
     }
   }
-  
+
   /** A {@link Tree} for production builds. Will print info, warning and error logs.
    *  Automatically infers the tag from the calling class.*/
   public static class ErrorWarningTree implements TaggedTree {
@@ -280,19 +280,19 @@ public final class Timber {
     }
 
     @Override public void v(String message, Object... args) {
-      
+
     }
 
     @Override public void v(Throwable t, String message, Object... args) {
-      
+
     }
 
     @Override public void d(String message, Object... args) {
-      
+
     }
 
     @Override public void d(Throwable t, String message, Object... args) {
-      
+
     }
 
     @Override public void i(String message, Object... args) {
