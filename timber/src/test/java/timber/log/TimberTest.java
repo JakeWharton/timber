@@ -14,7 +14,7 @@ import static org.fest.assertions.api.Assertions.assertThat;
 import static org.robolectric.shadows.ShadowLog.LogItem;
 import static timber.log.Timber.DebugTree.formatString;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(RobolectricTestRunner.class) //
 @Config(manifest = Config.NONE)
 public class TimberTest {
   @Before @After public void setUpAndTearDown() {
@@ -49,6 +49,22 @@ public class TimberTest {
     assertThat(log.type).isEqualTo(Log.DEBUG);
     assertThat(log.tag).isEqualTo("Custom");
     assertThat(log.msg).isEqualTo("Hello, world!");
+    assertThat(log.throwable).isNull();
+  }
+
+  @Test public void logWithExceptionHasCorrectTag() {
+    Timber.plant(new Timber.DebugTree());
+    NullPointerException datThrowable = new NullPointerException();
+    Timber.e(datThrowable, "OMFG!");
+
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(1);
+    LogItem log = logs.get(0);
+    assertThat(log.type).isEqualTo(Log.ERROR);
+    assertThat(log.tag).isEqualTo("TimberTest");
+    assertThat(log.msg).startsWith("OMFG!");
+    assertThat(log.msg).contains("java.lang.NullPointerException");
+    // We use a low-level primitive that Robolectric doesn't populate.
     assertThat(log.throwable).isNull();
   }
 }
