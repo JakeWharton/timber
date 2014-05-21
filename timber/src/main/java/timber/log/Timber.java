@@ -195,7 +195,7 @@ public final class Timber {
         return tag;
       }
 
-      tag = new Throwable().getStackTrace()[4].getClassName();
+      tag = new Throwable().getStackTrace()[5].getClassName();
       Matcher m = ANONYMOUS_CLASS.matcher(tag);
       if (m.find()) {
         tag = m.replaceAll("");
@@ -209,43 +209,64 @@ public final class Timber {
     }
 
     @Override public void v(String message, Object... args) {
-      Log.v(createTag(), formatString(message, args));
+      throwShade(Log.VERBOSE, formatString(message, args), null);
     }
 
     @Override public void v(Throwable t, String message, Object... args) {
-      Log.v(createTag(), formatString(message, args), t);
+      throwShade(Log.VERBOSE, formatString(message, args), t);
     }
 
     @Override public void d(String message, Object... args) {
-      Log.d(createTag(), formatString(message, args));
+      throwShade(Log.DEBUG, formatString(message, args), null);
     }
 
     @Override public void d(Throwable t, String message, Object... args) {
-      Log.d(createTag(), formatString(message, args), t);
+      throwShade(Log.DEBUG, formatString(message, args), t);
     }
 
     @Override public void i(String message, Object... args) {
-      Log.i(createTag(), formatString(message, args));
+      throwShade(Log.INFO, formatString(message, args), null);
     }
 
     @Override public void i(Throwable t, String message, Object... args) {
-      Log.i(createTag(), formatString(message, args), t);
+      throwShade(Log.INFO, formatString(message, args), t);
     }
 
     @Override public void w(String message, Object... args) {
-      Log.w(createTag(), formatString(message, args));
+      throwShade(Log.WARN, formatString(message, args), null);
     }
 
     @Override public void w(Throwable t, String message, Object... args) {
-      Log.w(createTag(), formatString(message, args), t);
+      throwShade(Log.WARN, formatString(message, args), t);
     }
 
     @Override public void e(String message, Object... args) {
-      Log.e(createTag(), formatString(message, args));
+      throwShade(Log.ERROR, formatString(message, args), null);
     }
 
     @Override public void e(Throwable t, String message, Object... args) {
-      Log.e(createTag(), formatString(message, args), t);
+      throwShade(Log.ERROR, formatString(message, args), t);
+    }
+
+    private void throwShade(int priority, String message, Throwable t) {
+      if (message == null || message.length() == 0) {
+        return;
+      }
+      String tag = createTag();
+      if (t != null) {
+        message += "\n" + Log.getStackTraceString(t);
+      }
+      if (message.length() < 4000) {
+        Log.println(priority, tag, message);
+      } else {
+        // It's rare that the message will be this large, so we're ok with the perf hit of splitting
+        // and calling Log.println N times.  It's possible but unlikely that a single line will be
+        // longer than 4000 characters: we're explicitly ignoring this case here.
+        String[] lines = message.split("\n");
+        for (String line : lines) {
+          Log.println(priority, tag, line);
+        }
+      }
     }
 
     @Override public void tag(String tag) {
