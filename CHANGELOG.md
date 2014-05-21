@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 2.3.0 *(2014-05-21)*
+----------------------------
+
+ * New: Messages longer than 4000 characters will be split into multiple lines.
+
+
 Version 2.2.2 *(2014-02-12)*
 ----------------------------
 
