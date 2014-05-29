@@ -195,7 +195,12 @@ public final class Timber {
         return tag;
       }
 
-      tag = new Throwable().getStackTrace()[5].getClassName();
+      StackTraceElement[] stackTrace = new Throwable().getStackTrace();
+      if (stackTrace.length < 6) {
+        throw new IllegalStateException(
+            "Synthetic stacktrace didn't have enough elements: are you using proguard?");
+      }
+      tag = stackTrace[5].getClassName();
       Matcher m = ANONYMOUS_CLASS.matcher(tag);
       if (m.find()) {
         tag = m.replaceAll("");

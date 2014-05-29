@@ -2,6 +2,7 @@ package timber.log;
 
 import android.util.Log;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,13 +58,32 @@ public class TimberTest {
     NullPointerException datThrowable = new NullPointerException();
     Timber.e(datThrowable, "OMFG!");
 
+    assertExceptionLogged("OMFG!", "java.lang.NullPointerException");
+  }
+
+  @Test
+  public void testLogExceptionFromSpawnedThread() throws Exception {
+    Timber.plant(new Timber.DebugTree());
+    final NullPointerException datThrowable = new NullPointerException();
+    final CountDownLatch latch = new CountDownLatch(1);
+    new Thread() {
+      @Override public void run() {
+        Timber.e(datThrowable, "OMFG!");
+        latch.countDown();
+      }
+    }.run();
+    latch.await();
+    assertExceptionLogged("OMFG!", "java.lang.NullPointerException");
+  }
+
+  private static void assertExceptionLogged(String message, String exceptionClassname) {
     List<LogItem> logs = ShadowLog.getLogs();
     assertThat(logs).hasSize(1);
     LogItem log = logs.get(0);
     assertThat(log.type).isEqualTo(Log.ERROR);
     assertThat(log.tag).isEqualTo("TimberTest");
-    assertThat(log.msg).startsWith("OMFG!");
-    assertThat(log.msg).contains("java.lang.NullPointerException");
+    assertThat(log.msg).startsWith(message);
+    assertThat(log.msg).contains(exceptionClassname);
     // We use a low-level primitive that Robolectric doesn't populate.
     assertThat(log.throwable).isNull();
   }
