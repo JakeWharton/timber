@@ -11,6 +11,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLog;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.robolectric.shadows.ShadowLog.LogItem;
 import static timber.log.Timber.DebugTree.formatString;
 
@@ -20,6 +21,46 @@ public class TimberTest {
   @Before @After public void setUpAndTearDown() {
     Timber.FOREST.clear();
     Timber.TAGGED_TREES.clear();
+  }
+
+  @Test public void uprootThrowsIfMissing() {
+    try {
+      Timber.uproot(new Timber.DebugTree());
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertThat(e).hasMessageStartingWith("Cannot uproot tree which is not planted: ");
+    }
+  }
+
+  @Test public void uprootRemovesTree() {
+    Timber.DebugTree tree1 = new Timber.DebugTree();
+    Timber.DebugTree tree2 = new Timber.DebugTree();
+    Timber.plant(tree1);
+    Timber.plant(tree2);
+    Timber.d("First");
+    Timber.uproot(tree1);
+    Timber.d("Second");
+
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(3);
+    assertThat(logs.get(0).msg).isEqualTo("First");
+    assertThat(logs.get(1).msg).isEqualTo("First");
+    assertThat(logs.get(2).msg).isEqualTo("Second");
+  }
+
+  @Test public void uprootAllRemovesAll() {
+    Timber.DebugTree tree1 = new Timber.DebugTree();
+    Timber.DebugTree tree2 = new Timber.DebugTree();
+    Timber.plant(tree1);
+    Timber.plant(tree2);
+    Timber.d("First");
+    Timber.uprootAll();
+    Timber.d("Second");
+
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(2);
+    assertThat(logs.get(0).msg).isEqualTo("First");
+    assertThat(logs.get(1).msg).isEqualTo("First");
   }
 
   @Test public void noArgsDoesNotFormat() {

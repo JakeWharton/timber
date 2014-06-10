@@ -75,6 +75,24 @@ public final class Timber {
     FOREST.add(tree);
   }
 
+  /** Remove a planted tree. */
+  public static void uproot(Tree tree) {
+    for (int i = 0, size = FOREST.size(); i < size; i++) {
+      if (FOREST.get(i) == tree) {
+        TAGGED_TREES.delete(i);
+        FOREST.remove(i);
+        return;
+      }
+    }
+    throw new IllegalArgumentException("Cannot uproot tree which is not planted: " + tree);
+  }
+
+  /** Remove all planted trees. */
+  public static void uprootAll() {
+    TAGGED_TREES.clear();
+    FOREST.clear();
+  }
+
   static final List<Tree> FOREST = new CopyOnWriteArrayList<Tree>();
   static final SparseBooleanArray TAGGED_TREES = new SparseBooleanArray();
 
