@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 2.4.0 *(2014-06-10)*
+----------------------------
+
+ * New: `uproot` and `uprootAll` methods allow removing trees.
+
+
 Version 2.3.0 *(2014-05-21)*
 ----------------------------
 
