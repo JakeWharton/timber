@@ -1,0 +1,33 @@
+buildscript {
+  repositories {
+      mavenCentral()
+  }
+  dependencies {
+      classpath 'com.android.tools.build:gradle:0.11.+'
+  }
+}
+
+apply plugin: 'android'
+
+android {
+  compileSdkVersion 19
+  buildToolsVersion "19.1.0"
+  defaultConfig {
+      minSdkVersion 4
+      targetSdkVersion 19
+
+      versionCode 1
+      versionName '1.0'
+  }
+
+  compileOptions {
+      sourceCompatibility JavaVersion.VERSION_1_6
+      targetCompatibility JavaVersion.VERSION_1_6
+  }
+}
+
+dependencies {
+  compile project(':timber')
+  compile 'com.jakewharton:butterknife:+'
+
+}

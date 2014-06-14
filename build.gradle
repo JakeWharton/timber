@@ -1,0 +1,19 @@
+allprojects {
+  buildscript {
+    repositories {
+      mavenCentral()
+      jcenter()
+    }
+  }
+
+  dependencies {
+    repositories {
+      mavenCentral()
+    }
+  }
+
+  group = GROUP
+  version = VERSION_NAME
+
+  apply plugin: 'maven'
+}
