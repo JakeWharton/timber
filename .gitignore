@@ -13,6 +13,9 @@ target
 pom.xml.*
 release.properties
 
+.gradle
+build/
+
 .idea
 *.iml
 classes
