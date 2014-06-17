@@ -1,0 +1,2 @@
+include ':timber', ':timber-lint', ':timber-sample'
+rootProject.name = 'timber-parent'
