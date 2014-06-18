@@ -280,7 +280,7 @@ public final class Timber {
           return;
         }
       } else if (t != null) {
-          message += "\n" + Log.getStackTraceString(t);
+        message += "\n" + Log.getStackTraceString(t);
       }
 
       String tag = createTag();

@@ -119,34 +119,20 @@ public class TimberTest {
 
   @Test
   public void testLogNullMessageWithThrowable() throws Exception {
-      Timber.plant(new Timber.DebugTree());
-      final NullPointerException datThrowable = new NullPointerException();
-      final CountDownLatch latch = new CountDownLatch(1);
-      new Thread() {
-          @Override public void run() {
-              Timber.e(datThrowable, null);
-              latch.countDown();
-          }
-      }.run();
-      latch.await();
+    Timber.plant(new Timber.DebugTree());
+    final NullPointerException datThrowable = new NullPointerException();
+    Timber.e(datThrowable, null);
 
-      assertExceptionLogged("", "java.lang.NullPointerException");
+    assertExceptionLogged("", "java.lang.NullPointerException");
   }
 
   @Test
   public void testLogNullMessageWithoutThrowable() throws Exception {
-      Timber.plant(new Timber.DebugTree());
-      final CountDownLatch latch = new CountDownLatch(1);
-      new Thread() {
-          @Override public void run() {
-              Timber.d(null);
-              latch.countDown();
-          }
-      }.run();
-      latch.await();
+    Timber.plant(new Timber.DebugTree());
+    Timber.d(null);
 
-      List<LogItem> logs = ShadowLog.getLogs();
-      assertThat(logs).hasSize(0);
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(0);
   }
 
     private static void assertExceptionLogged(String message, String exceptionClassname) {
