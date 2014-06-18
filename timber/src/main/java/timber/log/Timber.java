@@ -273,12 +273,17 @@ public final class Timber {
 
     private void throwShade(int priority, String message, Throwable t) {
       if (message == null || message.length() == 0) {
-        return;
-      }
-      String tag = createTag();
-      if (t != null) {
+        if (t != null) {
+          message = Log.getStackTraceString(t);
+        } else {
+          // Swallow message if it's null and there's no throwable
+          return;
+        }
+      } else if (t != null) {
         message += "\n" + Log.getStackTraceString(t);
       }
+
+      String tag = createTag();
       if (message.length() < 4000) {
         Log.println(priority, tag, message);
       } else {

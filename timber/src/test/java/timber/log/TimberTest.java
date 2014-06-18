@@ -117,7 +117,25 @@ public class TimberTest {
     assertExceptionLogged("OMFG!", "java.lang.NullPointerException");
   }
 
-  private static void assertExceptionLogged(String message, String exceptionClassname) {
+  @Test
+  public void testLogNullMessageWithThrowable() throws Exception {
+    Timber.plant(new Timber.DebugTree());
+    final NullPointerException datThrowable = new NullPointerException();
+    Timber.e(datThrowable, null);
+
+    assertExceptionLogged("", "java.lang.NullPointerException");
+  }
+
+  @Test
+  public void testLogNullMessageWithoutThrowable() throws Exception {
+    Timber.plant(new Timber.DebugTree());
+    Timber.d(null);
+
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(0);
+  }
+
+    private static void assertExceptionLogged(String message, String exceptionClassname) {
     List<LogItem> logs = ShadowLog.getLogs();
     assertThat(logs).hasSize(1);
     LogItem log = logs.get(0);
