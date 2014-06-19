@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 2.4.1 *(2014-06-19)*
+----------------------------
+
+ * Fix: Calls with no message but a `Throwable` are now correctly logged.
+
+
 Version 2.4.0 *(2014-06-10)*
 ----------------------------
 
