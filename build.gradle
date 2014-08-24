@@ -1,0 +1,16 @@
+allprojects {
+  buildscript {
+    repositories {
+      jcenter()
+    }
+  }
+
+  dependencies {
+    repositories {
+      jcenter()
+    }
+  }
+
+  group = GROUP
+  version = VERSION_NAME
+}
