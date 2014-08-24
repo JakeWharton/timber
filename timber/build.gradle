@@ -2,12 +2,10 @@ buildscript {
   dependencies {
     classpath 'com.android.tools.build:gradle:0.12.+'
     classpath 'org.robolectric:robolectric-gradle-plugin:0.12.+'
-    classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.7.1'
   }
 }
 
 apply plugin: 'com.android.library'
-//apply plugin: 'nexus'
 
 dependencies {
   androidTestCompile 'junit:junit:4.11'
@@ -38,31 +36,93 @@ android {
   }
 }
 
-//modifyPom {
-//  project {
-//    name "Timber"
-//    description POM_DESCRIPTION
-//    url POM_URL
-//
-//    scm {
-//      url POM_SCM_URL
-//      connection POM_SCM_CONNECTION
-//      developerConnection POM_SCM_DEV_CONNECTION
-//    }
-//
-//    licenses {
-//      license {
-//        name POM_LICENCE_NAME
-//        url POM_LICENCE_URL
-//        distribution POM_LICENCE_DIST
-//      }
-//    }
-//
-//    developers {
-//      developer {
-//        id POM_DEVELOPER_ID
-//        name POM_DEVELOPER_NAME
-//      }
-//    }
-//  }
-//}
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+def sonaTypeUrl = ""
+def devBuild = false
+def releaseBuild = false
+
+if (hasProperty("release")) {
+  releaseBuild = true
+  sonaTypeUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+} else if (hasProperty("snapshot")) {
+  VERSION += "-SNAPSHOT"
+  sonaTypeUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+} else {
+  devBuild = true
+}
+
+afterEvaluate { project ->
+  uploadArchives {
+    repositories {
+      if (devBuild) {
+        mavenLocal()
+      } else {
+        mavenDeployer {
+          beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+          repository(url: SONATYPE_URL) {
+            authentication(userName: sonatypeUsername, password: sonatypePassword)
+          }
+
+          artifactId = ARTIFACT_ID
+
+          pom.project {
+            name "Timber"
+            description POM_DESCRIPTION
+            url POM_URL
+            packaging 'aar'
+
+            scm {
+              url POM_SCM_URL
+              connection POM_SCM_CONNECTION
+              developerConnection POM_SCM_DEV_CONNECTION
+            }
+
+            licenses {
+              license {
+                name POM_LICENCE_NAME
+                url POM_LICENCE_URL
+                distribution POM_LICENCE_DIST
+              }
+            }
+
+            developers {
+              developer {
+                id POM_DEVELOPER_ID
+                name POM_DEVELOPER_NAME
+              }
+            }
+          }
+        }
+      }
+    }
+
+    signing {
+      required { releaseBuild && gradle.taskGraph.hasTask("uploadArchives") }
+      sign configurations.archives
+    }
+
+    task androidJavadocs(type: Javadoc) {
+      source = android.sourceSets.main.java.srcDirs
+      classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    }
+
+    task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+      classifier = 'javadoc'
+      from androidJavadocs.destinationDir
+    }
+
+    task androidSourcesJar(type: Jar) {
+      classifier = 'sources'
+      from android.sourceSets.main.java.srcDirs
+    }
+
+
+    artifacts {
+      archives androidSourcesJar
+      archives androidJavadocsJar
+    }
+  }
+}
