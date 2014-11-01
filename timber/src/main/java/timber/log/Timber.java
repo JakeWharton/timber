@@ -77,6 +77,9 @@ public final class Timber {
 
   /** Add a new logging tree. */
   public static void plant(Tree tree) {
+    if (tree == null) {
+      throw new NullPointerException("tree == null");
+    }
     if (tree == TREE_OF_SOULS) {
       throw new IllegalArgumentException("Cannot plant Timber into itself.");
     }

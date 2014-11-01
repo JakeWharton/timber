@@ -35,6 +35,15 @@ public class TimberTest {
     }
   }
 
+  @Test public void nullTree() {
+    try {
+      Timber.plant(null);
+      fail();
+    } catch (NullPointerException e) {
+      assertThat(e).hasMessage("tree == null");
+    }
+  }
+
   @Test public void uprootThrowsIfMissing() {
     try {
       Timber.uproot(new Timber.DebugTree());
