@@ -69,6 +69,9 @@ public final class Timber {
 
   /** Add a new logging tree. */
   public static void plant(Tree tree) {
+    if (tree == null) {
+      throw new IllegalArgumentException("Cannot add a null tree to the forest");
+    }
     if (tree instanceof TaggedTree) {
       TAGGED_TREES.append(FOREST.size(), true);
     }
