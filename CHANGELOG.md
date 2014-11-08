@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 2.5.0 *(2014-11-08)*
+----------------------------
+
+ * New: `Timber.asTree()` exposes functionality as a `Tree` instance rather than static methods.
+
+
 Version 2.4.2 *(2014-11-07)*
 ----------------------------
 

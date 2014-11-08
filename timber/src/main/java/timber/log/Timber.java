@@ -59,6 +59,14 @@ public final class Timber {
     TREE_OF_SOULS.e(t, message, args);
   }
 
+  /**
+   * A view into Timber's planted trees as a tree itself. This can be used for injecting a logger
+   * instance rather than using static methods or to facilitate testing.
+   */
+  public static Tree asTree() {
+    return TREE_OF_SOULS;
+  }
+
   /** Set a one-time tag for use on the next logging call. */
   public static Tree tag(String tag) {
     for (int index = 0, size = TAGGED_TREES.size(); index < size; index++) {
@@ -69,6 +77,9 @@ public final class Timber {
 
   /** Add a new logging tree. */
   public static void plant(Tree tree) {
+    if (tree == TREE_OF_SOULS) {
+      throw new IllegalArgumentException("Cannot plant Timber into itself.");
+    }
     if (tree instanceof TaggedTree) {
       TAGGED_TREES.append(FOREST.size(), true);
     }

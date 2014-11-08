@@ -24,6 +24,16 @@ public class TimberTest {
     Timber.TAGGED_TREES.clear();
   }
 
+  @Test public void recursion() {
+    Timber.Tree timber = Timber.asTree();
+    try {
+      Timber.plant(timber);
+      fail();
+    } catch (IllegalArgumentException e) {
+      assertThat(e).hasMessage("Cannot plant Timber into itself.");
+    }
+  }
+
   @Test public void uprootThrowsIfMissing() {
     try {
       Timber.uproot(new Timber.DebugTree());
