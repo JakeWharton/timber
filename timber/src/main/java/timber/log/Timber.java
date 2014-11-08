@@ -101,7 +101,7 @@ public final class Timber {
     @Override public void v(String message, Object... args) {
       List<Tree> forest = FOREST;
       //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = FOREST.size(); i < count; i++) {
+      for (int i = 0, count = forest.size(); i < count; i++) {
         forest.get(i).v(message, args);
       }
     }
