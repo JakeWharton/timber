@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 2.4.2 *(2014-11-07)*
+----------------------------
+
+ * Eliminate heap allocation when dispatching log calls.
+
+
 Version 2.4.1 *(2014-06-19)*
 ----------------------------
 

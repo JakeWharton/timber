@@ -37,12 +37,12 @@ Download [the latest JAR][2] or grab via Maven:
 <dependency>
   <groupId>com.jakewharton.timber</groupId>
   <artifactId>timber</artifactId>
-  <version>2.4.1</version>
+  <version>2.4.2</version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-compile 'com.jakewharton.timber:timber:2.4.+'
+compile 'com.jakewharton.timber:timber:2.4.2'
 ```
 
 
