@@ -99,62 +99,82 @@ public final class Timber {
   /** A {@link Tree} that delegates to all planted trees in the {@link #FOREST forest}. */
   private static final Tree TREE_OF_SOULS = new Tree() {
     @Override public void v(String message, Object... args) {
-      for (Tree tree : FOREST) {
-        tree.v(message, args);
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = FOREST.size(); i < count; i++) {
+        forest.get(i).v(message, args);
       }
     }
 
     @Override public void v(Throwable t, String message, Object... args) {
-      for (Tree tree : FOREST) {
-        tree.v(t, message, args);
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).v(t, message, args);
       }
     }
 
     @Override public void d(String message, Object... args) {
-      for (Tree tree : FOREST) {
-        tree.d(message, args);
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).d(message, args);
       }
     }
 
     @Override public void d(Throwable t, String message, Object... args) {
-      for (Tree tree : FOREST) {
-        tree.d(t, message, args);
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).d(t, message, args);
       }
     }
 
     @Override public void i(String message, Object... args) {
-      for (Tree tree : FOREST) {
-        tree.i(message, args);
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).i(message, args);
       }
     }
 
     @Override public void i(Throwable t, String message, Object... args) {
-      for (Tree tree : FOREST) {
-        tree.i(t, message, args);
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).i(t, message, args);
       }
     }
 
     @Override public void w(String message, Object... args) {
-      for (Tree tree : FOREST) {
-        tree.w(message, args);
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).w(message, args);
       }
     }
 
     @Override public void w(Throwable t, String message, Object... args) {
-      for (Tree tree : FOREST) {
-        tree.w(t, message, args);
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).w(t, message, args);
       }
     }
 
     @Override public void e(String message, Object... args) {
-      for (Tree tree : FOREST) {
-        tree.e(message, args);
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).e(message, args);
       }
     }
 
     @Override public void e(Throwable t, String message, Object... args) {
-      for (Tree tree : FOREST) {
-        tree.e(t, message, args);
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).e(t, message, args);
       }
     }
   };
