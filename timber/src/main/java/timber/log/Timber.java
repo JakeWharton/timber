@@ -339,7 +339,8 @@ public final class Timber {
     }
 
     /**
-     * Inspired by: http://stackoverflow.com/questions/8888654/android-set-max-length-of-logcat-messages
+     * Inspired by:
+     * http://stackoverflow.com/questions/8888654/android-set-max-length-of-logcat-messages
      */
     private void logMessageIgnoringLimit(int priority, String tag, String message) {
       while (message.length() != 0) {
