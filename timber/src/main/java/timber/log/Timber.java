@@ -234,8 +234,12 @@ public final class Timber {
 
   /** A {@link Tree} for debug builds. Automatically infers the tag from the calling class. */
   public static class DebugTree implements TaggedTree {
+    /** @see <a href="http://stackoverflow.com/a/8899735" /> */
+    private static final int ANDROID_LOG_ENTRY_MAX_LENGTH = 4000;
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
+
+    private int logEntryMaxLength;
 
     private static String createTag() {
       String tag = NEXT_TAG.get();
@@ -260,6 +264,17 @@ public final class Timber {
     static String formatString(String message, Object... args) {
       // If no varargs are supplied, treat it as a request to log the string without formatting.
       return args.length == 0 ? message : String.format(message, args);
+    }
+
+    public DebugTree() {
+      this(ANDROID_LOG_ENTRY_MAX_LENGTH);
+    }
+
+    /**
+     * It's for tests only. Don't use it in production code.
+     */
+    DebugTree(int logEntryMaxLength) {
+      this.logEntryMaxLength = logEntryMaxLength;
     }
 
     @Override public void v(String message, Object... args) {
@@ -315,15 +330,30 @@ public final class Timber {
       }
 
       String tag = createTag();
-      if (message.length() < 4000) {
+
+      if (message.length() < logEntryMaxLength) {
         Log.println(priority, tag, message);
       } else {
-        // It's rare that the message will be this large, so we're ok with the perf hit of splitting
-        // and calling Log.println N times.  It's possible but unlikely that a single line will be
-        // longer than 4000 characters: we're explicitly ignoring this case here.
-        String[] lines = message.split("\n");
-        for (String line : lines) {
-          Log.println(priority, tag, line);
+        logMessageIgnoringLimit(priority, tag, message);
+      }
+    }
+
+    /**
+     * Inspired by: http://stackoverflow.com/questions/8888654/android-set-max-length-of-logcat-messages
+     */
+    private void logMessageIgnoringLimit(int priority, String tag, String message) {
+      while (message.length() != 0) {
+        int nextNewLineIndex = message.indexOf('\n');
+        int chunkLength = nextNewLineIndex != -1 ? nextNewLineIndex : message.length();
+        chunkLength = Math.min(chunkLength, logEntryMaxLength);
+        String messageChunk = message.substring(0, chunkLength);
+        Log.println(priority, tag, messageChunk);
+
+        if (nextNewLineIndex != -1 && nextNewLineIndex == chunkLength) {
+          // Don't print out the \n twice.
+          message = message.substring(chunkLength + 1);
+        } else {
+          message = message.substring(chunkLength);
         }
       }
     }

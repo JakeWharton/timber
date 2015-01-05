@@ -1,8 +1,6 @@
 package timber.log;
 
 import android.util.Log;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +8,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLog;
+
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -132,6 +133,37 @@ public class TimberTest {
     Timber.e(datThrowable, null);
 
     assertExceptionLogged("", "java.lang.NullPointerException");
+  }
+
+  @Test public void shouldDivideLongMessageWithNewLinesToChunksOnNewLines() {
+    // given
+    Timber.plant(new Timber.DebugTree(5));
+
+    // when
+    Timber.d("123\n4567\n890");
+
+    // then
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(3);
+
+    assertThat(logs.get(0).msg).isEqualTo("123");
+    assertThat(logs.get(1).msg).isEqualTo("4567");
+    assertThat(logs.get(2).msg).isEqualTo("890");
+  }
+
+  @Test public void shouldDivideLongMessageWithoutNewLinesToChunks() {
+    // given
+    Timber.plant(new Timber.DebugTree(5));
+
+    // when
+    Timber.d("1234567890");
+
+    // then
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(2);
+
+    assertThat(logs.get(0).msg).isEqualTo("12345");
+    assertThat(logs.get(1).msg).isEqualTo("67890");
   }
 
   @Test public void testLogNullMessageWithoutThrowable() throws Exception {
