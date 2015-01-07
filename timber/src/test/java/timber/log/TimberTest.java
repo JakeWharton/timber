@@ -136,13 +136,10 @@ public class TimberTest {
   }
 
   @Test public void shouldDivideLongMessageWithNewLinesToChunksOnNewLines() {
-    // given
     Timber.plant(new Timber.DebugTree(5));
 
-    // when
     Timber.d("123\n4567\n890");
 
-    // then
     List<LogItem> logs = ShadowLog.getLogs();
     assertThat(logs).hasSize(3);
 
@@ -152,13 +149,10 @@ public class TimberTest {
   }
 
   @Test public void shouldDivideLongMessageWithoutNewLinesToChunks() {
-    // given
     Timber.plant(new Timber.DebugTree(5));
 
-    // when
     Timber.d("1234567890");
 
-    // then
     List<LogItem> logs = ShadowLog.getLogs();
     assertThat(logs).hasSize(2);
 
