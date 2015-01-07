@@ -1,6 +1,7 @@
 package timber.log;
 
 import android.util.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -136,28 +137,31 @@ public class TimberTest {
   }
 
   @Test public void shouldDivideLongMessageWithNewLinesToChunksOnNewLines() {
-    Timber.plant(new Timber.DebugTree(5));
+    Timber.plant(new Timber.DebugTree());
+    String[] logChunks = new String[] {StringUtils.repeat('a', 3000),
+            StringUtils.repeat('b', 3000), StringUtils.repeat('c', 3000)};
 
-    Timber.d("123\n4567\n890");
+    Timber.d(logChunks[0] + "\n" + logChunks[1] + "\n" + logChunks[2]);
 
     List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(3);
-
-    assertThat(logs.get(0).msg).isEqualTo("123");
-    assertThat(logs.get(1).msg).isEqualTo("4567");
-    assertThat(logs.get(2).msg).isEqualTo("890");
+    assertThat(logs).hasSize(logChunks.length);
+    for (int i = 0; i < logs.size(); ++i) {
+      assertThat(logs.get(i).msg).isEqualTo(logChunks[i]);
+    }
   }
 
   @Test public void shouldDivideLongMessageWithoutNewLinesToChunks() {
-    Timber.plant(new Timber.DebugTree(5));
+    Timber.plant(new Timber.DebugTree());
+    String[] logChunks = new String[] {StringUtils.repeat('a', 4000),
+            StringUtils.repeat('b', 4000)};
 
-    Timber.d("1234567890");
+    Timber.d(logChunks[0] + logChunks[1]);
 
     List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(2);
-
-    assertThat(logs.get(0).msg).isEqualTo("12345");
-    assertThat(logs.get(1).msg).isEqualTo("67890");
+    assertThat(logs).hasSize(logChunks.length);
+    for (int i = 0; i < logs.size(); ++i) {
+      assertThat(logs.get(i).msg).isEqualTo(logChunks[i]);
+    }
   }
 
   @Test public void testLogNullMessageWithoutThrowable() throws Exception {

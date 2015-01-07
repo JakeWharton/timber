@@ -235,11 +235,9 @@ public final class Timber {
   /** A {@link Tree} for debug builds. Automatically infers the tag from the calling class. */
   public static class DebugTree implements TaggedTree {
     /** @see <a href="http://stackoverflow.com/a/8899735" /> */
-    private static final int ANDROID_LOG_ENTRY_MAX_LENGTH = 4000;
+    private static final int LOG_ENTRY_MAX_LENGTH = 4000;
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
-
-    private int logEntryMaxLength;
 
     private static String createTag() {
       String tag = NEXT_TAG.get();
@@ -264,17 +262,6 @@ public final class Timber {
     static String formatString(String message, Object... args) {
       // If no varargs are supplied, treat it as a request to log the string without formatting.
       return args.length == 0 ? message : String.format(message, args);
-    }
-
-    public DebugTree() {
-      this(ANDROID_LOG_ENTRY_MAX_LENGTH);
-    }
-
-    /**
-     * It's for tests only. Don't use it in production code.
-     */
-    DebugTree(int logEntryMaxLength) {
-      this.logEntryMaxLength = logEntryMaxLength;
     }
 
     @Override public void v(String message, Object... args) {
@@ -331,7 +318,7 @@ public final class Timber {
 
       String tag = createTag();
 
-      if (message.length() < logEntryMaxLength) {
+      if (message.length() < LOG_ENTRY_MAX_LENGTH) {
         Log.println(priority, tag, message);
       } else {
         logMessageIgnoringLimit(priority, tag, message);
@@ -346,7 +333,7 @@ public final class Timber {
       while (message.length() != 0) {
         int nextNewLineIndex = message.indexOf('\n');
         int chunkLength = nextNewLineIndex != -1 ? nextNewLineIndex : message.length();
-        chunkLength = Math.min(chunkLength, logEntryMaxLength);
+        chunkLength = Math.min(chunkLength, LOG_ENTRY_MAX_LENGTH);
         String messageChunk = message.substring(0, chunkLength);
         Log.println(priority, tag, messageChunk);
 

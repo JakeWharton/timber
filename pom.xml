@@ -36,6 +36,7 @@
     <robolectric.version>2.2</robolectric.version>
     <fest.version>2.0M10</fest.version>
     <lint.version>22.4.0</lint.version>
+    <commonslang.version>3.3.2</commonslang.version>
   </properties>
 
   <scm>
@@ -88,6 +89,11 @@
         <groupId>com.android.tools.lint</groupId>
         <artifactId>lint</artifactId>
         <version>${lint.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${commonslang.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
