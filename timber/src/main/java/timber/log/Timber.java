@@ -234,6 +234,8 @@ public final class Timber {
 
   /** A {@link Tree} for debug builds. Automatically infers the tag from the calling class. */
   public static class DebugTree implements TaggedTree {
+    /** @see <a href="http://stackoverflow.com/a/8899735" /> */
+    private static final int LOG_ENTRY_MAX_LENGTH = 4000;
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
 
@@ -315,15 +317,31 @@ public final class Timber {
       }
 
       String tag = createTag();
-      if (message.length() < 4000) {
+
+      if (message.length() < LOG_ENTRY_MAX_LENGTH) {
         Log.println(priority, tag, message);
       } else {
-        // It's rare that the message will be this large, so we're ok with the perf hit of splitting
-        // and calling Log.println N times.  It's possible but unlikely that a single line will be
-        // longer than 4000 characters: we're explicitly ignoring this case here.
-        String[] lines = message.split("\n");
-        for (String line : lines) {
-          Log.println(priority, tag, line);
+        logMessageIgnoringLimit(priority, tag, message);
+      }
+    }
+
+    /**
+     * Inspired by:
+     * http://stackoverflow.com/questions/8888654/android-set-max-length-of-logcat-messages
+     */
+    private void logMessageIgnoringLimit(int priority, String tag, String message) {
+      while (message.length() != 0) {
+        int nextNewLineIndex = message.indexOf('\n');
+        int chunkLength = nextNewLineIndex != -1 ? nextNewLineIndex : message.length();
+        chunkLength = Math.min(chunkLength, LOG_ENTRY_MAX_LENGTH);
+        String messageChunk = message.substring(0, chunkLength);
+        Log.println(priority, tag, messageChunk);
+
+        if (nextNewLineIndex != -1 && nextNewLineIndex == chunkLength) {
+          // Don't print out the \n twice.
+          message = message.substring(chunkLength + 1);
+        } else {
+          message = message.substring(chunkLength);
         }
       }
     }

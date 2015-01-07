@@ -1,8 +1,7 @@
 package timber.log;
 
 import android.util.Log;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +9,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLog;
+
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -132,6 +134,34 @@ public class TimberTest {
     Timber.e(datThrowable, null);
 
     assertExceptionLogged("", "java.lang.NullPointerException");
+  }
+
+  @Test public void shouldDivideLongMessageWithNewLinesToChunksOnNewLines() {
+    Timber.plant(new Timber.DebugTree());
+    String[] logChunks = new String[] {StringUtils.repeat('a', 3000),
+            StringUtils.repeat('b', 3000), StringUtils.repeat('c', 3000)};
+
+    Timber.d(logChunks[0] + "\n" + logChunks[1] + "\n" + logChunks[2]);
+
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(logChunks.length);
+    for (int i = 0; i < logs.size(); ++i) {
+      assertThat(logs.get(i).msg).isEqualTo(logChunks[i]);
+    }
+  }
+
+  @Test public void shouldDivideLongMessageWithoutNewLinesToChunks() {
+    Timber.plant(new Timber.DebugTree());
+    String[] logChunks = new String[] {StringUtils.repeat('a', 4000),
+            StringUtils.repeat('b', 4000)};
+
+    Timber.d(logChunks[0] + logChunks[1]);
+
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(logChunks.length);
+    for (int i = 0; i < logs.size(); ++i) {
+      assertThat(logs.get(i).msg).isEqualTo(logChunks[i]);
+    }
   }
 
   @Test public void testLogNullMessageWithoutThrowable() throws Exception {
