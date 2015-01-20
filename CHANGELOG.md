@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 2.5.1 *(2015-01-19)*
+----------------------------
+
+ * Fix: Properly split lines which contain both newlines and are over 4000 characters.
+ * Explicitly forbid `null` tree instances.
+
+
 Version 2.5.0 *(2014-11-08)*
 ----------------------------
 
