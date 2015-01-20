@@ -241,7 +241,12 @@ public final class Timber {
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
 
-    private static String createTag() {
+    static String formatString(String message, Object... args) {
+      // If no varargs are supplied, treat it as a request to log the string without formatting.
+      return args.length == 0 ? message : String.format(message, args);
+    }
+
+    private String createTag() {
       String tag = NEXT_TAG.get();
       if (tag != null) {
         NEXT_TAG.remove();
@@ -249,11 +254,11 @@ public final class Timber {
       }
 
       StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-      if (stackTrace.length < 6) {
+      if (getCallingLineStackTraceIndex() >= stackTrace.length) {
         throw new IllegalStateException(
             "Synthetic stacktrace didn't have enough elements: are you using proguard?");
       }
-      tag = stackTrace[5].getClassName();
+      tag = stackTrace[getCallingLineStackTraceIndex()].getClassName();
       Matcher m = ANONYMOUS_CLASS.matcher(tag);
       if (m.find()) {
         tag = m.replaceAll("");
@@ -261,9 +266,13 @@ public final class Timber {
       return tag.substring(tag.lastIndexOf('.') + 1);
     }
 
-    static String formatString(String message, Object... args) {
-      // If no varargs are supplied, treat it as a request to log the string without formatting.
-      return args.length == 0 ? message : String.format(message, args);
+    /**
+     * @return the index that should be used to have the line of the class that uses the logger
+     * when creating tag for logging; override it if you want to wrap Timber with your own
+     * framework to have the correct tag
+     */
+    protected int getCallingLineStackTraceIndex() {
+      return 5;
     }
 
     @Override public void v(String message, Object... args) {
