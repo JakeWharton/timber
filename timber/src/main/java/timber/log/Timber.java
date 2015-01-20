@@ -234,6 +234,7 @@ public final class Timber {
 
   /** A {@link Tree} for debug builds. Automatically infers the tag from the calling class. */
   public static class DebugTree implements TaggedTree {
+    private static final int MAX_LOG_LENGTH = 4000;
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
 
@@ -315,16 +316,21 @@ public final class Timber {
       }
 
       String tag = createTag();
-      if (message.length() < 4000) {
+
+      if (message.length() < MAX_LOG_LENGTH) {
         Log.println(priority, tag, message);
-      } else {
-        // It's rare that the message will be this large, so we're ok with the perf hit of splitting
-        // and calling Log.println N times.  It's possible but unlikely that a single line will be
-        // longer than 4000 characters: we're explicitly ignoring this case here.
-        String[] lines = message.split("\n");
-        for (String line : lines) {
-          Log.println(priority, tag, line);
-        }
+        return;
+      }
+
+      // Split by line, then ensure each line can fit into Log's maximum length.
+      for (int i = 0, length = message.length(); i < length; i++) {
+        int newline = message.indexOf('\n', i);
+        newline = newline != -1 ? newline : length;
+        do {
+          int end = Math.min(newline, i + MAX_LOG_LENGTH);
+          Log.println(priority, tag, message.substring(i, end));
+          i = end;
+        } while (i < newline);
       }
     }
 

@@ -1,6 +1,7 @@
 package timber.log;
 
 import android.util.Log;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import org.junit.After;
@@ -134,6 +135,18 @@ public class TimberTest {
     assertExceptionLogged("", "java.lang.NullPointerException");
   }
 
+  @Test public void chunkAcrossNewlinesAndLimit() {
+    Timber.plant(new Timber.DebugTree());
+    Timber.d(repeat('a', 3000) + '\n' + repeat('b', 6000) + '\n' + repeat('c', 3000));
+
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(4);
+    assertThat(logs.get(0).msg).isEqualTo(repeat('a', 3000));
+    assertThat(logs.get(1).msg).isEqualTo(repeat('b', 4000));
+    assertThat(logs.get(2).msg).isEqualTo(repeat('b', 2000));
+    assertThat(logs.get(3).msg).isEqualTo(repeat('c', 3000));
+  }
+
   @Test public void testLogNullMessageWithoutThrowable() throws Exception {
     Timber.plant(new Timber.DebugTree());
     Timber.d(null);
@@ -152,5 +165,11 @@ public class TimberTest {
     assertThat(log.msg).contains(exceptionClassname);
     // We use a low-level primitive that Robolectric doesn't populate.
     assertThat(log.throwable).isNull();
+  }
+
+  private static String repeat(char c, int number) {
+    char[] data = new char[number];
+    Arrays.fill(data, c);
+    return new String(data);
   }
 }
