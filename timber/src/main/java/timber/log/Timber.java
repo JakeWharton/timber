@@ -245,7 +245,7 @@ public final class Timber {
      * Returns an explicitly set tag for the next log message or {@code null}. Calling this method
      * clears any set tag so it may only be called once.
      */
-    protected String nextTag() {
+    protected final String nextTag() {
       String tag = NEXT_TAG.get();
       if (tag != null) {
         NEXT_TAG.remove();
