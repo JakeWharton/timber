@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 2.6.0 *(2015-02-17)*
+----------------------------
+
+ * New: `DebugTree` subclasses can now override `createTag()` to specify log tags. `nextTag()` is
+   also accessible for querying if an explicit tag was set.
+
+
 Version 2.5.1 *(2015-01-19)*
 ----------------------------
 
