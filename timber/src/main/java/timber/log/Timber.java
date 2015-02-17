@@ -241,19 +241,37 @@ public final class Timber {
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
 
-    private static String createTag() {
+    /**
+     * Returns an explicitly set tag for the next log message or {@code null}. Calling this method
+     * clears any set tag so it may only be called once.
+     */
+    protected String nextTag() {
       String tag = NEXT_TAG.get();
       if (tag != null) {
         NEXT_TAG.remove();
+      }
+      return tag;
+    }
+
+    /**
+     * Creates a tag for a log message.
+     * <p>
+     * By default this method will check {@link #nextTag()} for an explicit tag. If there is no
+     * explicit tag, the class name of the caller will be used by inspecting the stack trace of the
+     * current thread.
+     */
+    protected String createTag() {
+      String tag = nextTag();
+      if (tag != null) {
         return tag;
       }
 
-      StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-      if (stackTrace.length < 6) {
+      StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+      if (stackTrace.length < 7) {
         throw new IllegalStateException(
             "Synthetic stacktrace didn't have enough elements: are you using proguard?");
       }
-      tag = stackTrace[5].getClassName();
+      tag = stackTrace[6].getClassName();
       Matcher m = ANONYMOUS_CLASS.matcher(tag);
       if (m.find()) {
         tag = m.replaceAll("");

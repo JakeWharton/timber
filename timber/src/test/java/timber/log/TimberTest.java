@@ -4,6 +4,7 @@ import android.util.Log;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,7 +89,7 @@ public class TimberTest {
     assertThat(formatString("te%st")).isSameAs("te%st");
   }
 
-  @Test public void debugTagWorks() {
+  @Test public void debugTreeTagGeneration() {
     Timber.plant(new Timber.DebugTree());
     Timber.d("Hello, world!");
 
@@ -101,7 +102,7 @@ public class TimberTest {
     assertThat(log.throwable).isNull();
   }
 
-  @Test public void customTagWorks() {
+  @Test public void debugTreeCustomTag() {
     Timber.plant(new Timber.DebugTree());
     Timber.tag("Custom").d("Hello, world!");
 
@@ -112,6 +113,36 @@ public class TimberTest {
     assertThat(log.tag).isEqualTo("Custom");
     assertThat(log.msg).isEqualTo("Hello, world!");
     assertThat(log.throwable).isNull();
+  }
+
+  @Test public void debugTreeCustomTagCreation() {
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected String createTag() {
+        return "Override";
+      }
+    });
+    Timber.d("Hello, world!");
+
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(1);
+    LogItem log = logs.get(0);
+    assertThat(log.type).isEqualTo(Log.DEBUG);
+    assertThat(log.tag).isEqualTo("Override");
+    assertThat(log.msg).isEqualTo("Hello, world!");
+    assertThat(log.throwable).isNull();
+  }
+
+  @Test public void debugTreeCustomTagCreationCanUseNextTag() {
+    final AtomicReference<String> nextTagRef = new AtomicReference<String>();
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected String createTag() {
+        nextTagRef.set(nextTag());
+        return "Override";
+      }
+    });
+    Timber.tag("Custom").d("Hello, world!");
+
+    assertThat(nextTagRef.get()).isEqualTo("Custom");
   }
 
   @Test public void logWithExceptionHasCorrectTag() {
