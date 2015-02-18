@@ -279,49 +279,49 @@ public final class Timber {
       return tag.substring(tag.lastIndexOf('.') + 1);
     }
 
-    static String formatString(String message, Object... args) {
+    private static String maybeFormat(String message, Object... args) {
       // If no varargs are supplied, treat it as a request to log the string without formatting.
       return args.length == 0 ? message : String.format(message, args);
     }
 
     @Override public void v(String message, Object... args) {
-      throwShade(Log.VERBOSE, formatString(message, args), null);
+      throwShade(Log.VERBOSE, maybeFormat(message, args), null);
     }
 
     @Override public void v(Throwable t, String message, Object... args) {
-      throwShade(Log.VERBOSE, formatString(message, args), t);
+      throwShade(Log.VERBOSE, maybeFormat(message, args), t);
     }
 
     @Override public void d(String message, Object... args) {
-      throwShade(Log.DEBUG, formatString(message, args), null);
+      throwShade(Log.DEBUG, maybeFormat(message, args), null);
     }
 
     @Override public void d(Throwable t, String message, Object... args) {
-      throwShade(Log.DEBUG, formatString(message, args), t);
+      throwShade(Log.DEBUG, maybeFormat(message, args), t);
     }
 
     @Override public void i(String message, Object... args) {
-      throwShade(Log.INFO, formatString(message, args), null);
+      throwShade(Log.INFO, maybeFormat(message, args), null);
     }
 
     @Override public void i(Throwable t, String message, Object... args) {
-      throwShade(Log.INFO, formatString(message, args), t);
+      throwShade(Log.INFO, maybeFormat(message, args), t);
     }
 
     @Override public void w(String message, Object... args) {
-      throwShade(Log.WARN, formatString(message, args), null);
+      throwShade(Log.WARN, maybeFormat(message, args), null);
     }
 
     @Override public void w(Throwable t, String message, Object... args) {
-      throwShade(Log.WARN, formatString(message, args), t);
+      throwShade(Log.WARN, maybeFormat(message, args), t);
     }
 
     @Override public void e(String message, Object... args) {
-      throwShade(Log.ERROR, formatString(message, args), null);
+      throwShade(Log.ERROR, maybeFormat(message, args), null);
     }
 
     @Override public void e(Throwable t, String message, Object... args) {
-      throwShade(Log.ERROR, formatString(message, args), t);
+      throwShade(Log.ERROR, maybeFormat(message, args), t);
     }
 
     private void throwShade(int priority, String message, Throwable t) {
