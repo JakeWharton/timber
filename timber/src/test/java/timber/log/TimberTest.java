@@ -153,7 +153,7 @@ public class TimberTest {
     assertThat(nextTagRef.get()).isEqualTo("Custom");
   }
 
-  @Test public void logWithExceptionHasCorrectTag() {
+  @Test public void messageWithException() {
     Timber.plant(new Timber.DebugTree());
     NullPointerException datThrowable = new NullPointerException();
     Timber.e(datThrowable, "OMFG!");
@@ -161,7 +161,7 @@ public class TimberTest {
     assertExceptionLogged("OMFG!", "java.lang.NullPointerException");
   }
 
-  @Test public void testLogExceptionFromSpawnedThread() throws Exception {
+  @Test public void exceptionFromSpawnedThread() throws InterruptedException {
     Timber.plant(new Timber.DebugTree());
     final NullPointerException datThrowable = new NullPointerException();
     final CountDownLatch latch = new CountDownLatch(1);
@@ -175,7 +175,7 @@ public class TimberTest {
     assertExceptionLogged("OMFG!", "java.lang.NullPointerException");
   }
 
-  @Test public void testLogNullMessageWithThrowable() throws Exception {
+  @Test public void nullMessageWithThrowable() {
     Timber.plant(new Timber.DebugTree());
     final NullPointerException datThrowable = new NullPointerException();
     Timber.e(datThrowable, null);
@@ -195,7 +195,7 @@ public class TimberTest {
     assertThat(logs.get(3).msg).isEqualTo(repeat('c', 3000));
   }
 
-  @Test public void testLogNullMessageWithoutThrowable() throws Exception {
+  @Test public void nullMessageWithoutThrowable() {
     Timber.plant(new Timber.DebugTree());
     Timber.d(null);
 
