@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 2.7.1 *(2015-02-17)*
+----------------------------
+
+ * Fix: Switch method of getting calling class to be consistent across API levels.
+
+
 Version 2.7.0 *(2015-02-17)*
 ----------------------------
 
