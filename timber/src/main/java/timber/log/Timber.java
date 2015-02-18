@@ -329,12 +329,10 @@ public final class Timber {
 
     private void throwShade(int priority, String message, Throwable t) {
       if (message == null || message.length() == 0) {
-        if (t != null) {
-          message = Log.getStackTraceString(t);
-        } else {
-          // Swallow message if it's null and there's no throwable.
-          return;
+        if (t == null) {
+          return; // Swallow message if it's null and there's no throwable.
         }
+        message = Log.getStackTraceString(t);
       } else if (t != null) {
         message += "\n" + Log.getStackTraceString(t);
       }
