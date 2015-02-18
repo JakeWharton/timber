@@ -259,6 +259,9 @@ public final class Timber {
      * By default this method will check {@link #nextTag()} for an explicit tag. If there is no
      * explicit tag, the class name of the caller will be used by inspecting the stack trace of the
      * current thread.
+     * <p>
+     * Note: Do not call {@code super.createTag()} if you override this method. It will produce
+     * incorrect results.
      */
     protected String createTag() {
       String tag = nextTag();
