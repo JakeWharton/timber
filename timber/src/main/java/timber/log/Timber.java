@@ -291,43 +291,43 @@ public final class Timber {
       return args.length == 0 ? message : String.format(message, args);
     }
 
-    @Override public void v(String message, Object... args) {
+    @Override public final void v(String message, Object... args) {
       throwShade(Log.VERBOSE, maybeFormat(message, args), null);
     }
 
-    @Override public void v(Throwable t, String message, Object... args) {
+    @Override public final void v(Throwable t, String message, Object... args) {
       throwShade(Log.VERBOSE, maybeFormat(message, args), t);
     }
 
-    @Override public void d(String message, Object... args) {
+    @Override public final void d(String message, Object... args) {
       throwShade(Log.DEBUG, maybeFormat(message, args), null);
     }
 
-    @Override public void d(Throwable t, String message, Object... args) {
+    @Override public final void d(Throwable t, String message, Object... args) {
       throwShade(Log.DEBUG, maybeFormat(message, args), t);
     }
 
-    @Override public void i(String message, Object... args) {
+    @Override public final void i(String message, Object... args) {
       throwShade(Log.INFO, maybeFormat(message, args), null);
     }
 
-    @Override public void i(Throwable t, String message, Object... args) {
+    @Override public final void i(Throwable t, String message, Object... args) {
       throwShade(Log.INFO, maybeFormat(message, args), t);
     }
 
-    @Override public void w(String message, Object... args) {
+    @Override public final void w(String message, Object... args) {
       throwShade(Log.WARN, maybeFormat(message, args), null);
     }
 
-    @Override public void w(Throwable t, String message, Object... args) {
+    @Override public final void w(Throwable t, String message, Object... args) {
       throwShade(Log.WARN, maybeFormat(message, args), t);
     }
 
-    @Override public void e(String message, Object... args) {
+    @Override public final void e(String message, Object... args) {
       throwShade(Log.ERROR, maybeFormat(message, args), null);
     }
 
-    @Override public void e(Throwable t, String message, Object... args) {
+    @Override public final void e(Throwable t, String message, Object... args) {
       throwShade(Log.ERROR, maybeFormat(message, args), t);
     }
 
@@ -342,7 +342,11 @@ public final class Timber {
       }
 
       String tag = createTag();
+      logMessage(priority, tag, message);
+    }
 
+    /** Log a message! */
+    protected void logMessage(int priority, String tag, String message) {
       if (message.length() < MAX_LOG_LENGTH) {
         Log.println(priority, tag, message);
         return;

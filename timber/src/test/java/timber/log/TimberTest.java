@@ -1,6 +1,7 @@
 package timber.log;
 
 import android.util.Log;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -201,6 +202,38 @@ public class TimberTest {
 
     List<LogItem> logs = ShadowLog.getLogs();
     assertThat(logs).hasSize(0);
+  }
+
+  @Test public void logMessageCallback() {
+    final List<String> logs = new ArrayList<String>();
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected void logMessage(int priority, String tag, String message) {
+        logs.add(priority + " " + tag + " " + message);
+      }
+    });
+
+    Timber.v("Verbose");
+    Timber.tag("Custom").v("Verbose");
+    Timber.d("Debug");
+    Timber.tag("Custom").d("Debug");
+    Timber.i("Info");
+    Timber.tag("Custom").i("Info");
+    Timber.w("Warn");
+    Timber.tag("Custom").w("Warn");
+    Timber.e("Error");
+    Timber.tag("Custom").e("Error");
+
+    assertThat(logs).containsExactly( //
+        "2 TimberTest Verbose", //
+        "2 Custom Verbose", //
+        "3 TimberTest Debug", //
+        "3 Custom Debug", //
+        "4 TimberTest Info", //
+        "4 Custom Info", //
+        "5 TimberTest Warn", //
+        "5 Custom Warn", //
+        "6 TimberTest Error", //
+        "6 Custom Error");
   }
 
   private static void assertExceptionLogged(String message, String exceptionClassname) {
