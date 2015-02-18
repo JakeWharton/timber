@@ -241,6 +241,10 @@ public final class Timber {
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
 
+    @Override public final void tag(String tag) {
+      NEXT_TAG.set(tag);
+    }
+
     /**
      * Returns an explicitly set tag for the next log message or {@code null}. Calling this method
      * clears any set tag so it may only be called once.
@@ -354,10 +358,6 @@ public final class Timber {
           i = end;
         } while (i < newline);
       }
-    }
-
-    @Override public void tag(String tag) {
-      NEXT_TAG.set(tag);
     }
   }
 
