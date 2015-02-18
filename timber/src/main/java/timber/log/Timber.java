@@ -194,6 +194,7 @@ public final class Timber {
   };
 
   private Timber() {
+    throw new AssertionError("No instances.");
   }
 
   /** A facade for handling logging calls. Install instances via {@link #plant}. */
