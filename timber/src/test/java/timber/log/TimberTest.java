@@ -16,7 +16,6 @@ import org.robolectric.shadows.ShadowLog;
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.robolectric.shadows.ShadowLog.LogItem;
-import static timber.log.Timber.DebugTree.formatString;
 
 @RunWith(RobolectricTestRunner.class) //
 @Config(manifest = Config.NONE)
@@ -86,7 +85,16 @@ public class TimberTest {
   }
 
   @Test public void noArgsDoesNotFormat() {
-    assertThat(formatString("te%st")).isSameAs("te%st");
+    Timber.plant(new Timber.DebugTree());
+    Timber.d("te%st");
+
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(1);
+    LogItem log = logs.get(0);
+    assertThat(log.type).isEqualTo(Log.DEBUG);
+    assertThat(log.tag).isEqualTo("TimberTest");
+    assertThat(log.msg).isEqualTo("te%st");
+    assertThat(log.throwable).isNull();
   }
 
   @Test public void debugTreeTagGeneration() {
