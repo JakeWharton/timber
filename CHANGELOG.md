@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+Version 2.7.0 *(2015-02-17)*
+----------------------------
+
+ * New: `DebugTree` subclasses can now override `logMessage` for access to the priority, tag, and
+   entire message for every log.
+ * Fix: Prevent overriding `Tree` and `TaggedTree` methods on `DebugTree`.
+
+
 Version 2.6.0 *(2015-02-17)*
 ----------------------------
 
