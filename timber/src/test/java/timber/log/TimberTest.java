@@ -207,7 +207,7 @@ public class TimberTest {
   @Test public void logMessageCallback() {
     final List<String> logs = new ArrayList<String>();
     Timber.plant(new Timber.DebugTree() {
-      @Override protected void logMessage(int priority, String tag, String message) {
+      @Override protected void logMessage(int priority, String tag, String message, Throwable t) {
         logs.add(priority + " " + tag + " " + message);
       }
     });
@@ -222,6 +222,8 @@ public class TimberTest {
     Timber.tag("Custom").w("Warn");
     Timber.e("Error");
     Timber.tag("Custom").e("Error");
+    Timber.wtf("Wtf");
+    Timber.tag("Custom").wtf("Wtf");
 
     assertThat(logs).containsExactly( //
         "2 TimberTest Verbose", //
@@ -233,7 +235,9 @@ public class TimberTest {
         "5 TimberTest Warn", //
         "5 Custom Warn", //
         "6 TimberTest Error", //
-        "6 Custom Error");
+        "6 Custom Error", //
+        "7 TimberTest Wtf", //
+        "7 Custom Wtf");
   }
 
   private static void assertExceptionLogged(String message, String exceptionClassname) {
