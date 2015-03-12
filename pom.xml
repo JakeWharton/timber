@@ -35,7 +35,7 @@
     <junit.version>4.10</junit.version>
     <robolectric.version>2.2</robolectric.version>
     <fest.version>2.0M10</fest.version>
-    <lint.version>22.4.0</lint.version>
+    <lint.version>24.1.2</lint.version>
   </properties>
 
   <scm>
