@@ -10,7 +10,7 @@ public class ExampleApp extends Application {
     super.onCreate();
 
     if (BuildConfig.DEBUG) {
-      Timber.plant(new DebugTree());
+      Timber.setLogLevel(Timber.LogLevel.METHOD).plant(new Timber.DebugTree());
     } else {
       Timber.plant(new CrashReportingTree());
     }

@@ -9,6 +9,35 @@ import java.util.regex.Pattern;
 
 /** Logging for lazy people. */
 public final class Timber {
+  //just to pass null value
+  public Timber(Tree nullValue) {}
+
+  /**
+  * Sets Logging level Hierarchy
+  */
+  public enum LogLevel{
+    CLASS,METHOD,LINE_NUMBER
+  }
+  //Default LogLevel
+  private static LogLevel level = LogLevel.CLASS;
+  private static Timber TIMBER ;
+  /**
+   * Set Logging Level with Timber.LogLevel (enum)<br>
+   * CLASS will log CLASS name only.<br>
+   * METHOD will log CLASS > METHOD.<br>
+   * LINE_NUMBER will log CLASS > METHOD > LINE_NUMBER.
+   * @param logLevel Default is LogLevel.CLASS
+   */
+  public static Timber setLogLevel(LogLevel logLevel) {
+    if(TIMBER==null){
+      level=logLevel;
+      return new Timber(null);
+    }else{
+      Log.d("LogLevelException", "Single Log Level can be set");
+      return TIMBER;
+    }
+  }
+
   /** Log a verbose message with optional format args. */
   public static void v(String message, Object... args) {
     TREE_OF_SOULS.v(message, args);
@@ -269,7 +298,7 @@ public final class Timber {
      * incorrect results.
      */
     protected String createTag() {
-      String tag = nextTag();
+      String tag = nextTag(),className="",methodName="",lineNumber="";
       if (tag != null) {
         return tag;
       }
@@ -281,12 +310,21 @@ public final class Timber {
         throw new IllegalStateException(
             "Synthetic stacktrace didn't have enough elements: are you using proguard?");
       }
-      tag = stackTrace[5].getClassName();
-      Matcher m = ANONYMOUS_CLASS.matcher(tag);
-      if (m.find()) {
-        tag = m.replaceAll("");
+      switch (level) {
+        case LINE_NUMBER:
+          lineNumber = " > " + stackTrace[5].getLineNumber();
+        case METHOD:
+          methodName = " > " + stackTrace[5].getMethodName();
+        case CLASS:
+        default:
+          tag = stackTrace[5].getClassName();
+          Matcher m = ANONYMOUS_CLASS.matcher(tag);
+          if (m.find()) {
+            tag = m.replaceAll("");
+          }
+          className = tag.substring(tag.lastIndexOf('.') + 1);
       }
-      return tag.substring(tag.lastIndexOf('.') + 1);
+      return className+methodName+lineNumber;
     }
 
     private static String maybeFormat(String message, Object... args) {
