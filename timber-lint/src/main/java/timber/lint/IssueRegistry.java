@@ -12,6 +12,7 @@ public final class IssueRegistry extends com.android.tools.lint.client.api.Issue
         WrongTimberUsageDetector.ISSUE_ARG_TYPES,
         WrongTimberUsageDetector.ISSUE_BINARY,
         WrongTimberUsageDetector.ISSUE_FORMAT,
-        WrongTimberUsageDetector.ISSUE_THROWABLE);
+        WrongTimberUsageDetector.ISSUE_THROWABLE,
+        WrongTimberUsageDetector.ISSUE_TAG_LENGTH);
   }
 }
