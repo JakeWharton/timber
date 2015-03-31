@@ -53,7 +53,8 @@ import static com.android.tools.lint.client.api.JavaParser.TYPE_OBJECT;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_SHORT;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_STRING;
 
-final class WrongTimberUsageDetector extends Detector implements Detector.JavaScanner {
+public final class WrongTimberUsageDetector extends Detector implements Detector.JavaScanner,
+    Detector.ClassScanner {
   @NonNull @Override public Speed getSpeed() {
     return Speed.NORMAL;
   }
@@ -63,7 +64,7 @@ final class WrongTimberUsageDetector extends Detector implements Detector.JavaSc
   }
 
   @Override public List<String> getApplicableMethodNames() {
-    return Arrays.asList("format", "v", "d", "i", "w", "e");
+    return Arrays.asList("tag", "format", "v", "d", "i", "w", "e");
   }
 
   @Override public void checkCall(@NonNull ClassContext context, @NonNull ClassNode classNode,
@@ -101,6 +102,15 @@ final class WrongTimberUsageDetector extends Detector implements Detector.JavaSc
       }
       context.report(ISSUE_FORMAT, node, context.getLocation(node),
           "Using 'String#format' inside of 'Timber'");
+    } else if ("tag".equals(methodName)) {
+      Node argument = node.astArguments().iterator().next();
+      String tag = findLiteralValue(context, argument);
+      if (tag.length() > 23) {
+        String message = String.format(
+            "The logging tag can be at most 23 characters, was %1$d (%2$s)",
+            tag.length(), tag);
+        context.report(ISSUE_TAG_LENGTH, node, context.getLocation(node), message);
+      }
     } else {
       if (node.astOperand() instanceof VariableReference) {
         VariableReference ref = (VariableReference) node.astOperand();
@@ -506,5 +516,9 @@ final class WrongTimberUsageDetector extends Detector implements Detector.JavaSc
           "The argument types that you specified in your formatting string does not match the types"
               + " of the arguments that you passed to your formatting call.", Category.MESSAGES, 9,
           Severity.ERROR,
+          new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
+  public static final Issue ISSUE_TAG_LENGTH =
+      Issue.create("TimberTagLength", "Too Long Log Tags", "Log tags are only allowed to be at most"
+              + " 23 tag characters long.", Category.CORRECTNESS, 5, Severity.ERROR,
           new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
 }
