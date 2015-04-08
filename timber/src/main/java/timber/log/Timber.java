@@ -59,15 +59,15 @@ public final class Timber {
     TREE_OF_SOULS.e(t, message, args);
   }
 
-    /** Log an assert message with optional format args. */
-    public static void wtf(String message, Object... args) {
-        TREE_OF_SOULS.wtf(message, args);
-    }
+  /** Log an assert message with optional format args. */
+  public static void wtf(String message, Object... args) {
+    TREE_OF_SOULS.wtf(message, args);
+  }
 
-    /** Log an assert exception and a message with optional format args. */
-    public static void wtf(Throwable t, String message, Object... args) {
-        TREE_OF_SOULS.wtf(t, message, args);
-    }
+  /** Log an assert exception and a message with optional format args. */
+  public static void wtf(Throwable t, String message, Object... args) {
+    TREE_OF_SOULS.wtf(t, message, args);
+  }
 
   /**
    * A view into Timber's planted trees as a tree itself. This can be used for injecting a logger
@@ -202,21 +202,21 @@ public final class Timber {
       }
     }
 
-      @Override public void wtf(String message, Object... args) {
-          List<Tree> forest = FOREST;
-          //noinspection ForLoopReplaceableByForEach
-          for (int i = 0, count = forest.size(); i < count; i++) {
-              forest.get(i).wtf(message, args);
-          }
+    @Override public void wtf(String message, Object... args) {
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).wtf(message, args);
       }
+    }
 
-      @Override public void wtf(Throwable t, String message, Object... args) {
-          List<Tree> forest = FOREST;
-          //noinspection ForLoopReplaceableByForEach
-          for (int i = 0, count = forest.size(); i < count; i++) {
-              forest.get(i).wtf(t, message, args);
-          }
+    @Override public void wtf(Throwable t, String message, Object... args) {
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).wtf(t, message, args);
       }
+    }
   };
 
   private Timber() {
@@ -255,11 +255,11 @@ public final class Timber {
     /** Log an error exception and a message with optional format args. */
     void e(Throwable t, String message, Object... args);
 
-      /** Log an assert message with optional format args. */
-      void wtf(String message, Object... args);
+    /** Log an assert message with optional format args. */
+    void wtf(String message, Object... args);
 
-      /** Log an assert exception and a message with optional format args. */
-      void wtf(Throwable t, String message, Object... args);
+    /** Log an assert exception and a message with optional format args. */
+    void wtf(Throwable t, String message, Object... args);
   }
 
   /** A facade for attaching tags to logging calls. Install instances via {@link #plant} */
@@ -366,15 +366,15 @@ public final class Timber {
       throwShade(Log.ERROR, maybeFormat(message, args), t);
     }
 
-      @Override
-      public final void wtf(String message, Object... args) {
-          throwShade(Log.ASSERT, maybeFormat(message, args), null);
-      }
+    @Override
+    public final void wtf(String message, Object... args) {
+      throwShade(Log.ASSERT, maybeFormat(message, args), null);
+    }
 
-      @Override
-      public final void wtf(Throwable t, String message, Object... args) {
-          throwShade(Log.ASSERT, maybeFormat(message, args), t);
-      }
+    @Override
+    public final void wtf(Throwable t, String message, Object... args) {
+      throwShade(Log.ASSERT, maybeFormat(message, args), t);
+    }
 
     private void throwShade(int priority, String message, Throwable t) {
       if (message == null || message.length() == 0) {
@@ -387,13 +387,16 @@ public final class Timber {
       }
 
       String tag = createTag();
-      logMessage(priority, tag, message);
+      logMessage(priority, tag, message, t);
     }
 
     /** Log a message! */
-    protected void logMessage(int priority, String tag, String message) {
+    protected void logMessage(int priority, String tag, String message, Throwable throwable) {
       if (message.length() < MAX_LOG_LENGTH) {
-        Log.println(priority, tag, message);
+        if (priority != Log.ASSERT)
+          Log.println(priority, tag, message);
+        else
+          logWtf(tag, message, throwable);
         return;
       }
 
@@ -403,10 +406,21 @@ public final class Timber {
         newline = newline != -1 ? newline : length;
         do {
           int end = Math.min(newline, i + MAX_LOG_LENGTH);
+          if (priority != Log.ASSERT)
           Log.println(priority, tag, message.substring(i, end));
+            else
+          logWtf(tag, message.substring(i, end), throwable);
           i = end;
         } while (i < newline);
       }
+    }
+
+    /** Use Log.wtf method **/
+    private void logWtf(String tag, String message, Throwable throwable) {
+      if (throwable == null)
+        Log.wtf(tag, message);
+      else
+        Log.wtf(tag, message, throwable);
     }
   }
 
@@ -442,10 +456,10 @@ public final class Timber {
     @Override public void e(Throwable t, String message, Object... args) {
     }
 
-      @Override public void wtf(String message, Object... args) {
-      }
+    @Override public void wtf(String message, Object... args) {
+    }
 
-      @Override public void wtf(Throwable t, String message, Object... args) {
-      }
+    @Override public void wtf(Throwable t, String message, Object... args) {
+    }
   }
 }
