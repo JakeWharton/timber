@@ -395,8 +395,7 @@ public final class Timber {
       if (message.length() < MAX_LOG_LENGTH) {
         if (priority != Log.ASSERT) {
           Log.println(priority, tag, message);
-        }
-        else {
+        } else {
           logWtf(tag, message, throwable);
         }
         return;
@@ -410,8 +409,7 @@ public final class Timber {
           int end = Math.min(newline, i + MAX_LOG_LENGTH);
           if (priority != Log.ASSERT) {
             Log.println(priority, tag, message.substring(i, end));
-          }
-          else{
+          } else {
             logWtf(tag, message.substring(i, end), throwable);
           }
           i = end;
@@ -423,8 +421,7 @@ public final class Timber {
     private void logWtf(String tag, String message, Throwable throwable) {
       if (throwable == null) {
         Log.wtf(tag, message);
-      }
-      else {
+      } else {
         Log.wtf(tag, message, throwable);
       }
     }
