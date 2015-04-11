@@ -64,7 +64,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   }
 
   @Override public List<String> getApplicableMethodNames() {
-    return Arrays.asList("tag", "format", "v", "d", "i", "w", "e");
+    return Arrays.asList("tag", "format", "v", "d", "i", "w", "e", "wtf");
   }
 
   @Override public void checkCall(@NonNull ClassContext context, @NonNull ClassNode classNode,
