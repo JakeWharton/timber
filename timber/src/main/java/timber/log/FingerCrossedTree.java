@@ -87,6 +87,9 @@ public class FingerCrossedTree implements Tree {
                     tree.e(t, message, args);
                 }
                 break;
+            default:
+                assert false : "Log level not managed";
+                break;
         }
     }
 
