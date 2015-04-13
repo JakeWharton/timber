@@ -36,6 +36,7 @@
     <robolectric.version>2.2</robolectric.version>
     <fest.version>2.0M10</fest.version>
     <lint.version>24.1.2</lint.version>
+    <mockito.version>1.10.19</mockito.version>
   </properties>
 
   <scm>
@@ -88,6 +89,11 @@
         <groupId>com.android.tools.lint</groupId>
         <artifactId>lint</artifactId>
         <version>${lint.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
