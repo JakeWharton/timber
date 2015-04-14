@@ -236,9 +236,9 @@ public final class Timber {
     void tag(String tag);
   }
 
-  /** A {@link Tree} for debug builds. Automatically infers the tag from the calling class. */
-  public static class DebugTree implements TaggedTree {
-    private static final int MAX_LOG_LENGTH = 4000;
+
+  /** A {@link TaggedTree} that automatically infers the tag from the calling class. */
+  public abstract static class AbstractTaggedTree implements TaggedTree {
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
 
@@ -288,6 +288,11 @@ public final class Timber {
       }
       return tag.substring(tag.lastIndexOf('.') + 1);
     }
+  }
+
+  /** A {@link Tree} for debug builds. Automatically infers the tag from the calling class. */
+  public static class DebugTree extends AbstractTaggedTree {
+    private static final int MAX_LOG_LENGTH = 4000;
 
     private static String maybeFormat(String message, Object... args) {
       // If no varargs are supplied, treat it as a request to log the string without formatting.
