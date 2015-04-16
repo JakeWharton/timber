@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +21,7 @@ import static org.robolectric.shadows.ShadowLog.LogItem;
 @Config(manifest = Config.NONE)
 public class TimberTest {
   @Before @After public void setUpAndTearDown() {
-    Timber.FOREST.clear();
-    Timber.TAGGED_TREES.clear();
+    Timber.uprootAll();
   }
 
   @Test public void recursion() {
@@ -124,51 +122,22 @@ public class TimberTest {
     assertThat(log.throwable).isNull();
   }
 
-  @Test public void debugTreeCustomTagCreation() {
-    Timber.plant(new Timber.DebugTree() {
-      @Override protected String getTag() {
-        return "Override";
-      }
-    });
-    Timber.d("Hello, world!");
-
-    List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(1);
-    LogItem log = logs.get(0);
-    assertThat(log.type).isEqualTo(Log.DEBUG);
-    assertThat(log.tag).isEqualTo("Override");
-    assertThat(log.msg).isEqualTo("Hello, world!");
-    assertThat(log.throwable).isNull();
-  }
-
-  @Test public void debugTreeCustomTagCreationCanUseExplicitTag() {
-    final AtomicReference<String> explicitTagRef = new AtomicReference<String>();
-    Timber.plant(new Timber.DebugTree() {
-      @Override protected String getTag() {
-        explicitTagRef.set(readExplicitTag());
-        return "Override";
-      }
-    });
-    Timber.tag("Custom").d("Hello, world!");
-
-    assertThat(explicitTagRef.get()).isEqualTo("Custom");
-  }
-
   @Test public void debugTreeCanAlterCreatedTag() {
-    final AtomicReference<String> tagRef = new AtomicReference<String>();
     Timber.plant(new Timber.DebugTree() {
       @Override protected String createStackElementTag(StackTraceElement element) {
         return super.createStackElementTag(element) + ':' + element.getLineNumber();
-      }
-
-      @Override protected void logMessage(int priority, String tag, String message) {
-        tagRef.set(tag);
       }
     });
 
     Timber.d("Test");
 
-    assertThat(tagRef.get()).isEqualTo("TimberTest:169");
+    List<LogItem> logs = ShadowLog.getLogs();
+    assertThat(logs).hasSize(1);
+    LogItem log = logs.get(0);
+    assertThat(log.type).isEqualTo(Log.DEBUG);
+    assertThat(log.tag).isEqualTo("TimberTest:132");
+    assertThat(log.msg).isEqualTo("Test");
+    assertThat(log.throwable).isNull();
   }
 
   @Test public void messageWithException() {
@@ -224,7 +193,7 @@ public class TimberTest {
   @Test public void logMessageCallback() {
     final List<String> logs = new ArrayList<String>();
     Timber.plant(new Timber.DebugTree() {
-      @Override protected void logMessage(int priority, String tag, String message) {
+      @Override protected void log(int priority, String tag, String message, Throwable t) {
         logs.add(priority + " " + tag + " " + message);
       }
     });
