@@ -271,21 +271,22 @@ public final class Timber {
   /** A {@link Tree} for debug builds. Automatically infers the tag from the calling class. */
   public static class DebugTree implements TaggedTree {
     private static final int MAX_LOG_LENGTH = 4000;
+    private static final int CALL_STACK_INDEX = 5; // Changes require major version bump!!!
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
-    private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
+    private static final ThreadLocal<String> EXPLICIT_TAG = new ThreadLocal<String>();
 
     @Override public final void tag(String tag) {
-      NEXT_TAG.set(tag);
+      EXPLICIT_TAG.set(tag);
     }
 
     /**
      * Returns an explicitly set tag for the next log message or {@code null}. Calling this method
      * clears any set tag so it may only be called once.
      */
-    protected final String nextTag() {
-      String tag = NEXT_TAG.get();
+    protected final String readExplicitTag() {
+      String tag = EXPLICIT_TAG.get();
       if (tag != null) {
-        NEXT_TAG.remove();
+        EXPLICIT_TAG.remove();
       }
       return tag;
     }
@@ -293,15 +294,15 @@ public final class Timber {
     /**
      * Creates a tag for a log message.
      * <p>
-     * By default this method will check {@link #nextTag()} for an explicit tag. If there is no
-     * explicit tag, the class name of the caller will be used by inspecting the stack trace of the
-     * current thread.
+     * By default this method will first check for an {@linkplain #readExplicitTag() explicit tag}.
+     * If none is found, a tag will be {@linkplain #createStackElementTag(StackTraceElement)
+     * created} by looking at the call stack elements.
      * <p>
-     * Note: Do not call {@code super.createTag()} if you override this method. It will produce
+     * Note: Do not call {@code super.getTag()} if you override this method. It will produce
      * incorrect results.
      */
-    protected String createTag() {
-      String tag = nextTag();
+    protected String getTag() {
+      String tag = readExplicitTag();
       if (tag != null) {
         return tag;
       }
@@ -309,11 +310,22 @@ public final class Timber {
       // DO NOT switch this to Thread.getCurrentThread().getStackTrace(). The test will pass
       // because Robolectric runs them on the JVM but on Android the elements are different.
       StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-      if (stackTrace.length < 6) {
+      if (stackTrace.length <= CALL_STACK_INDEX) {
         throw new IllegalStateException(
             "Synthetic stacktrace didn't have enough elements: are you using proguard?");
       }
-      tag = stackTrace[5].getClassName();
+      return createStackElementTag(stackTrace[CALL_STACK_INDEX]);
+    }
+
+    /**
+     * Extract the tag which should be used for the message from the {@code element}. By default
+     * this will use the class name without any anonymous class suffixes (e.g., {@code Foo$1}
+     * becomes {@code Foo}).
+     * <p>
+     * Note: This will not be called if a {@linkplain #tag(String) manual tag} was specified.
+     */
+    protected String createStackElementTag(StackTraceElement element) {
+      String tag = element.getClassName();
       Matcher m = ANONYMOUS_CLASS.matcher(tag);
       if (m.find()) {
         tag = m.replaceAll("");
@@ -384,7 +396,7 @@ public final class Timber {
         message += "\n" + Log.getStackTraceString(t);
       }
 
-      String tag = createTag();
+      String tag = getTag();
       logMessage(priority, tag, message);
     }
 

@@ -126,7 +126,7 @@ public class TimberTest {
 
   @Test public void debugTreeCustomTagCreation() {
     Timber.plant(new Timber.DebugTree() {
-      @Override protected String createTag() {
+      @Override protected String getTag() {
         return "Override";
       }
     });
@@ -141,17 +141,34 @@ public class TimberTest {
     assertThat(log.throwable).isNull();
   }
 
-  @Test public void debugTreeCustomTagCreationCanUseNextTag() {
-    final AtomicReference<String> nextTagRef = new AtomicReference<String>();
+  @Test public void debugTreeCustomTagCreationCanUseExplicitTag() {
+    final AtomicReference<String> explicitTagRef = new AtomicReference<String>();
     Timber.plant(new Timber.DebugTree() {
-      @Override protected String createTag() {
-        nextTagRef.set(nextTag());
+      @Override protected String getTag() {
+        explicitTagRef.set(readExplicitTag());
         return "Override";
       }
     });
     Timber.tag("Custom").d("Hello, world!");
 
-    assertThat(nextTagRef.get()).isEqualTo("Custom");
+    assertThat(explicitTagRef.get()).isEqualTo("Custom");
+  }
+
+  @Test public void debugTreeCanAlterCreatedTag() {
+    final AtomicReference<String> tagRef = new AtomicReference<String>();
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected String createStackElementTag(StackTraceElement element) {
+        return super.createStackElementTag(element) + ':' + element.getLineNumber();
+      }
+
+      @Override protected void logMessage(int priority, String tag, String message) {
+        tagRef.set(tag);
+      }
+    });
+
+    Timber.d("Test");
+
+    assertThat(tagRef.get()).isEqualTo("TimberTest:169");
   }
 
   @Test public void messageWithException() {
