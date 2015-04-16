@@ -1,6 +1,20 @@
 Change Log
 ==========
 
+Version 3.0.0 *(2015-04-16)*
+----------------------------
+
+ * New: `Tree` and `DebugTree` APIs are much more extensible requiring only a single method to
+   override.
+ * New: `DebugTree` exposes `createStackElementTag` method for overriding to customize the
+   reflection-based tag creation (for example, such as to add a line number).
+ * WTF: Support for `wtf` log level.
+ * `HollowTree` has been removed as it is no longer needed. Just extend `Tree`.
+ * `TaggedTree` has been removed and its functionality folded into `Tree`. All `Tree` instances
+   will receive any tags specified by a call to `tag`.
+ * Fix: Multiple planted `DebugTree`s now each correctly received tags set from a call to `tag`.
+
+
 Version 2.7.1 *(2015-02-17)*
 ----------------------------
 
