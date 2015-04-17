@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 3.0.1 *(2015-04-17)*
+----------------------------
+
+ * Fix: String formatting is now always applied when arguments are present. Previously it would
+   only trigger when an exception was included.
+
+
 Version 3.0.0 *(2015-04-16)*
 ----------------------------
 

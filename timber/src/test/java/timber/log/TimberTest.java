@@ -61,11 +61,11 @@ public class TimberTest {
     Timber.uproot(tree1);
     Timber.d("Second");
 
-    List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(3);
-    assertThat(logs.get(0).msg).isEqualTo("First");
-    assertThat(logs.get(1).msg).isEqualTo("First");
-    assertThat(logs.get(2).msg).isEqualTo("Second");
+    assertLog()
+        .hasDebugMessage("TimberTest", "First")
+        .hasDebugMessage("TimberTest", "First")
+        .hasDebugMessage("TimberTest", "Second")
+        .hasNoMoreMessages();
   }
 
   @Test public void uprootAllRemovesAll() {
@@ -77,49 +77,37 @@ public class TimberTest {
     Timber.uprootAll();
     Timber.d("Second");
 
-    List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(2);
-    assertThat(logs.get(0).msg).isEqualTo("First");
-    assertThat(logs.get(1).msg).isEqualTo("First");
+    assertLog()
+        .hasDebugMessage("TimberTest", "First")
+        .hasDebugMessage("TimberTest", "First")
+        .hasNoMoreMessages();
   }
 
   @Test public void noArgsDoesNotFormat() {
     Timber.plant(new Timber.DebugTree());
     Timber.d("te%st");
 
-    List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(1);
-    LogItem log = logs.get(0);
-    assertThat(log.type).isEqualTo(Log.DEBUG);
-    assertThat(log.tag).isEqualTo("TimberTest");
-    assertThat(log.msg).isEqualTo("te%st");
-    assertThat(log.throwable).isNull();
+    assertLog()
+        .hasDebugMessage("TimberTest", "te%st")
+        .hasNoMoreMessages();
   }
 
   @Test public void debugTreeTagGeneration() {
     Timber.plant(new Timber.DebugTree());
     Timber.d("Hello, world!");
 
-    List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(1);
-    LogItem log = logs.get(0);
-    assertThat(log.type).isEqualTo(Log.DEBUG);
-    assertThat(log.tag).isEqualTo("TimberTest");
-    assertThat(log.msg).isEqualTo("Hello, world!");
-    assertThat(log.throwable).isNull();
+    assertLog()
+        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasNoMoreMessages();
   }
 
   @Test public void debugTreeCustomTag() {
     Timber.plant(new Timber.DebugTree());
     Timber.tag("Custom").d("Hello, world!");
 
-    List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(1);
-    LogItem log = logs.get(0);
-    assertThat(log.type).isEqualTo(Log.DEBUG);
-    assertThat(log.tag).isEqualTo("Custom");
-    assertThat(log.msg).isEqualTo("Hello, world!");
-    assertThat(log.throwable).isNull();
+    assertLog()
+        .hasDebugMessage("Custom", "Hello, world!")
+        .hasNoMoreMessages();
   }
 
   @Test public void debugTreeCanAlterCreatedTag() {
@@ -131,13 +119,9 @@ public class TimberTest {
 
     Timber.d("Test");
 
-    List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(1);
-    LogItem log = logs.get(0);
-    assertThat(log.type).isEqualTo(Log.DEBUG);
-    assertThat(log.tag).isEqualTo("TimberTest:132");
-    assertThat(log.msg).isEqualTo("Test");
-    assertThat(log.throwable).isNull();
+    assertLog()
+        .hasDebugMessage("TimberTest:120", "Test")
+        .hasNoMoreMessages();
   }
 
   @Test public void messageWithException() {
@@ -174,20 +158,19 @@ public class TimberTest {
     Timber.plant(new Timber.DebugTree());
     Timber.d(repeat('a', 3000) + '\n' + repeat('b', 6000) + '\n' + repeat('c', 3000));
 
-    List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(4);
-    assertThat(logs.get(0).msg).isEqualTo(repeat('a', 3000));
-    assertThat(logs.get(1).msg).isEqualTo(repeat('b', 4000));
-    assertThat(logs.get(2).msg).isEqualTo(repeat('b', 2000));
-    assertThat(logs.get(3).msg).isEqualTo(repeat('c', 3000));
+    assertLog()
+        .hasDebugMessage("TimberTest", repeat('a', 3000))
+        .hasDebugMessage("TimberTest", repeat('b', 4000))
+        .hasDebugMessage("TimberTest", repeat('b', 2000))
+        .hasDebugMessage("TimberTest", repeat('c', 3000))
+        .hasNoMoreMessages();
   }
 
   @Test public void nullMessageWithoutThrowable() {
     Timber.plant(new Timber.DebugTree());
     Timber.d(null);
 
-    List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(0);
+    assertLog().hasNoMoreMessages();
   }
 
   @Test public void logMessageCallback() {
@@ -221,9 +204,33 @@ public class TimberTest {
         "5 TimberTest Warn", //
         "5 Custom Warn", //
         "6 TimberTest Error", //
-        "6 Custom Error",
-        "7 TimberTest Assert",
-        "7 Custom Assert");
+        "6 Custom Error", //
+        "7 TimberTest Assert", //
+        "7 Custom Assert" //
+    );
+  }
+
+  @Test public void formatting() {
+    Timber.plant(new Timber.DebugTree());
+    Timber.v("Hello, %s!", "World");
+    Timber.d("Hello, %s!", "World");
+    Timber.i("Hello, %s!", "World");
+    Timber.w("Hello, %s!", "World");
+    Timber.e("Hello, %s!", "World");
+
+    assertLog()
+        .hasVerboseMessage("TimberTest", "Hello, World!")
+        .hasDebugMessage("TimberTest", "Hello, World!")
+        .hasInfoMessage("TimberTest", "Hello, World!")
+        .hasWarnMessage("TimberTest", "Hello, World!")
+        .hasErrorMessage("TimberTest", "Hello, World!")
+        .hasNoMoreMessages();
+  }
+
+  private static String repeat(char c, int number) {
+    char[] data = new char[number];
+    Arrays.fill(data, c);
+    return new String(data);
   }
 
   private static void assertExceptionLogged(String message, String exceptionClassname) {
@@ -238,9 +245,48 @@ public class TimberTest {
     assertThat(log.throwable).isNull();
   }
 
-  private static String repeat(char c, int number) {
-    char[] data = new char[number];
-    Arrays.fill(data, c);
-    return new String(data);
+  private static LogAssert assertLog() {
+    return new LogAssert(ShadowLog.getLogs());
+  }
+
+  private static final class LogAssert {
+    private final List<LogItem> items;
+    private int index = 0;
+
+    private LogAssert(List<LogItem> items) {
+      this.items = items;
+    }
+
+    public LogAssert hasVerboseMessage(String tag, String message) {
+      return hasMessage(Log.VERBOSE, tag, message);
+    }
+
+    public LogAssert hasDebugMessage(String tag, String message) {
+      return hasMessage(Log.DEBUG, tag, message);
+    }
+
+    public LogAssert hasInfoMessage(String tag, String message) {
+      return hasMessage(Log.INFO, tag, message);
+    }
+
+    public LogAssert hasWarnMessage(String tag, String message) {
+      return hasMessage(Log.WARN, tag, message);
+    }
+
+    public LogAssert hasErrorMessage(String tag, String message) {
+      return hasMessage(Log.ERROR, tag, message);
+    }
+
+    private LogAssert hasMessage(int priority, String tag, String message) {
+      LogItem item = items.get(index++);
+      assertThat(item.type).isEqualTo(priority);
+      assertThat(item.tag).isEqualTo(tag);
+      assertThat(item.msg).isEqualTo(message);
+      return this;
+    }
+
+    public void hasNoMoreMessages() {
+      assertThat(items).hasSize(index);
+    }
   }
 }

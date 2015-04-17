@@ -299,11 +299,13 @@ public final class Timber {
           return; // Swallow message if it's null and there's no throwable.
         }
         message = Log.getStackTraceString(t);
-      } else if (t != null) {
+      } else {
         if (args.length > 0) {
           message = String.format(message, args);
         }
-        message += "\n" + Log.getStackTraceString(t);
+        if (t != null) {
+          message += "\n" + Log.getStackTraceString(t);
+        }
       }
 
       log(priority, getTag(), message, t);
