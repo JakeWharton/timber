@@ -116,6 +116,26 @@ public class TimberTest {
         .hasNoMoreMessages();
   }
 
+  @Test public void debugTreeTagGenerationStripsAnonymousClassMarker() {
+    Timber.plant(new Timber.DebugTree());
+    new Runnable() {
+      @Override public void run() {
+        Timber.d("Hello, world!");
+
+        new Runnable() {
+          @Override public void run() {
+            Timber.d("Hello, world!");
+          }
+        }.run();
+      }
+    }.run();
+
+    assertLog()
+        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasNoMoreMessages();
+  }
+
   @Test public void debugTreeCustomTag() {
     Timber.plant(new Timber.DebugTree());
     Timber.tag("Custom").d("Hello, world!");
