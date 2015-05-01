@@ -37,12 +37,12 @@ Download [the latest JAR][2] or grab via Maven:
 <dependency>
   <groupId>com.jakewharton.timber</groupId>
   <artifactId>timber</artifactId>
-  <version>3.0.1</version>
+  <version>3.0.2</version>
 </dependency>
 ```
 or Gradle:
 ```groovy
-compile 'com.jakewharton.timber:timber:3.0.1'
+compile 'com.jakewharton.timber:timber:3.0.2'
 ```
 
 Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].

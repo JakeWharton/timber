@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 3.0.2 *(2015-05-01)*
+----------------------------
+
+ * Fix: Strip multiple anonymous class markers (e.g., `$1$2`) from class names when `DebugTree`
+   is creating an inferred tag.
+
+
 Version 3.0.1 *(2015-04-17)*
 ----------------------------
 
