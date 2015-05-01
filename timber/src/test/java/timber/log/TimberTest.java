@@ -24,6 +24,21 @@ public class TimberTest {
     Timber.uprootAll();
   }
 
+  // NOTE: This class references the line number. Keep it at the top so it does not change.
+  @Test public void debugTreeCanAlterCreatedTag() {
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected String createStackElementTag(StackTraceElement element) {
+        return super.createStackElementTag(element) + ':' + element.getLineNumber();
+      }
+    });
+
+    Timber.d("Test");
+
+    assertLog()
+        .hasDebugMessage("TimberTest:35", "Test")
+        .hasNoMoreMessages();
+  }
+
   @Test public void recursion() {
     Timber.Tree timber = Timber.asTree();
     try {
@@ -107,20 +122,6 @@ public class TimberTest {
 
     assertLog()
         .hasDebugMessage("Custom", "Hello, world!")
-        .hasNoMoreMessages();
-  }
-
-  @Test public void debugTreeCanAlterCreatedTag() {
-    Timber.plant(new Timber.DebugTree() {
-      @Override protected String createStackElementTag(StackTraceElement element) {
-        return super.createStackElementTag(element) + ':' + element.getLineNumber();
-      }
-    });
-
-    Timber.d("Test");
-
-    assertLog()
-        .hasDebugMessage("TimberTest:120", "Test")
         .hasNoMoreMessages();
   }
 
