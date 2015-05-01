@@ -326,7 +326,7 @@ public final class Timber {
   public static class DebugTree extends Tree {
     private static final int MAX_LOG_LENGTH = 4000;
     private static final int CALL_STACK_INDEX = 5;
-    private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
+    private static final Pattern ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$");
 
     /**
      * Extract the tag which should be used for the message from the {@code element}. By default
