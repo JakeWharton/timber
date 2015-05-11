@@ -248,6 +248,23 @@ public class TimberTest {
         .hasNoMoreMessages();
   }
 
+  @Test public void isLoggableControlsLogging() {
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected boolean isLoggable(int priority) {
+        return priority == Log.INFO;
+      }
+    });
+    Timber.v("Hello, World!");
+    Timber.d("Hello, World!");
+    Timber.i("Hello, World!");
+    Timber.w("Hello, World!");
+    Timber.e("Hello, World!");
+
+    assertLog()
+        .hasInfoMessage("TimberTest", "Hello, World!")
+        .hasNoMoreMessages();
+  }
+
   private static String repeat(char c, int number) {
     char[] data = new char[number];
     Arrays.fill(data, c);

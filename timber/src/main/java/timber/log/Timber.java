@@ -290,7 +290,15 @@ public final class Timber {
       prepareLog(Log.ASSERT, t, message, args);
     }
 
+    /** Return whether a message at {@code priority} should be logged. */
+    protected boolean isLoggable(int priority) {
+      return true;
+    }
+
     private void prepareLog(int priority, Throwable t, String message, Object... args) {
+      if (!isLoggable(priority)) {
+        return;
+      }
       if (message != null && message.length() == 0) {
         message = null;
       }
