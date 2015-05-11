@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 3.1.0 *(2015-05-11)*
+----------------------------
+
+ * New: `Tree.isLoggable` method allows a tree to determine whether a statement should be logged
+   based on its priority. Defaults to logging all levels.
+
+
 Version 3.0.2 *(2015-05-01)*
 ----------------------------
 
