@@ -21,6 +21,7 @@
 
   <modules>
     <module>timber</module>
+    <module>timber-android</module>
     <module>timber-sample</module>
     <module>timber-lint</module>
   </modules>

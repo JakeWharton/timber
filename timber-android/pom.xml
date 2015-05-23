@@ -9,19 +9,36 @@
     <version>3.1.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>timber-sample</artifactId>
-  <name>Timber Sample</name>
-  <packaging>apk</packaging>
+  <artifactId>timber-android</artifactId>
+  <name>Timber Android</name>
 
   <dependencies>
     <dependency>
       <groupId>com.jakewharton.timber</groupId>
-      <artifactId>timber-android</artifactId>
+      <artifactId>timber</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.jakewharton</groupId>
-      <artifactId>butterknife</artifactId>
+      <groupId>com.jakewharton.timber</groupId>
+      <artifactId>timber</artifactId>
+      <type>test-jar</type>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.robolectric</groupId>
+      <artifactId>robolectric</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easytesting</groupId>
+      <artifactId>fest-assert-core</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -30,14 +47,4 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.simpligility.maven.plugins</groupId>
-        <artifactId>android-maven-plugin</artifactId>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
