@@ -18,6 +18,11 @@ public final class Timber {
     TREE_OF_SOULS.v(t, message, args);
   }
 
+  /** Log a verbose exception. */
+  public static void v(Throwable t) {
+    TREE_OF_SOULS.v(t);
+  }
+
   /** Log a debug message with optional format args. */
   public static void d(String message, Object... args) {
     TREE_OF_SOULS.d(message, args);
@@ -26,6 +31,11 @@ public final class Timber {
   /** Log a debug exception and a message with optional format args. */
   public static void d(Throwable t, String message, Object... args) {
     TREE_OF_SOULS.d(t, message, args);
+  }
+
+  /** Log a debug exception. */
+  public static void d(Throwable t) {
+    TREE_OF_SOULS.d(t);
   }
 
   /** Log an info message with optional format args. */
@@ -38,6 +48,11 @@ public final class Timber {
     TREE_OF_SOULS.i(t, message, args);
   }
 
+  /** Log an info exception. */
+  public static void i(Throwable t) {
+    TREE_OF_SOULS.i(t);
+  }
+
   /** Log a warning message with optional format args. */
   public static void w(String message, Object... args) {
     TREE_OF_SOULS.w(message, args);
@@ -46,6 +61,11 @@ public final class Timber {
   /** Log a warning exception and a message with optional format args. */
   public static void w(Throwable t, String message, Object... args) {
     TREE_OF_SOULS.w(t, message, args);
+  }
+
+  /** Log a warning exception. */
+  public static void w(Throwable t) {
+    TREE_OF_SOULS.w(t);
   }
 
   /** Log an error message with optional format args. */
@@ -58,6 +78,11 @@ public final class Timber {
     TREE_OF_SOULS.e(t, message, args);
   }
 
+  /** Log an error exception. */
+  public static void e(Throwable t) {
+    TREE_OF_SOULS.e(t);
+  }
+
   /** Log an assert message with optional format args. */
   public static void wtf(String message, Object... args) {
     TREE_OF_SOULS.wtf(message, args);
@@ -66,6 +91,11 @@ public final class Timber {
   /** Log an assert exception and a message with optional format args. */
   public static void wtf(Throwable t, String message, Object... args) {
     TREE_OF_SOULS.wtf(t, message, args);
+  }
+
+  /** Log an assert exception. */
+  public static void wtf(Throwable t) {
+    TREE_OF_SOULS.wtf(t);
   }
 
   /**
@@ -129,6 +159,14 @@ public final class Timber {
       }
     }
 
+    @Override public void v(Throwable t) {
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).v(t);
+      }
+    }
+
     @Override public void d(String message, Object... args) {
       List<Tree> forest = FOREST;
       //noinspection ForLoopReplaceableByForEach
@@ -142,6 +180,14 @@ public final class Timber {
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.size(); i < count; i++) {
         forest.get(i).d(t, message, args);
+      }
+    }
+
+    @Override public void d(Throwable t) {
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).d(t);
       }
     }
 
@@ -161,6 +207,14 @@ public final class Timber {
       }
     }
 
+    @Override public void i(Throwable t) {
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).i(t);
+      }
+    }
+
     @Override public void w(String message, Object... args) {
       List<Tree> forest = FOREST;
       //noinspection ForLoopReplaceableByForEach
@@ -174,6 +228,14 @@ public final class Timber {
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.size(); i < count; i++) {
         forest.get(i).w(t, message, args);
+      }
+    }
+
+    @Override public void w(Throwable t) {
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).w(t);
       }
     }
 
@@ -193,6 +255,14 @@ public final class Timber {
       }
     }
 
+    @Override public void e(Throwable t) {
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).e(t);
+      }
+    }
+
     @Override public void wtf(String message, Object... args) {
       List<Tree> forest = FOREST;
       //noinspection ForLoopReplaceableByForEach
@@ -206,6 +276,14 @@ public final class Timber {
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.size(); i < count; i++) {
         forest.get(i).wtf(t, message, args);
+      }
+    }
+
+    @Override public void wtf(Throwable t) {
+      List<Tree> forest = FOREST;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.size(); i < count; i++) {
+        forest.get(i).wtf(t);
       }
     }
 
@@ -240,6 +318,11 @@ public final class Timber {
       prepareLog(Log.VERBOSE, t, message, args);
     }
 
+    /** Log a verbose exception. */
+    public void v(Throwable t) {
+      prepareLog(Log.VERBOSE, t, null);
+    }
+
     /** Log a debug message with optional format args. */
     public void d(String message, Object... args) {
       prepareLog(Log.DEBUG, null, message, args);
@@ -248,6 +331,11 @@ public final class Timber {
     /** Log a debug exception and a message with optional format args. */
     public void d(Throwable t, String message, Object... args) {
       prepareLog(Log.DEBUG, t, message, args);
+    }
+
+    /** Log a debug exception. */
+    public void d(Throwable t) {
+      prepareLog(Log.DEBUG, t, null);
     }
 
     /** Log an info message with optional format args. */
@@ -260,6 +348,11 @@ public final class Timber {
       prepareLog(Log.INFO, t, message, args);
     }
 
+    /** Log an info exception. */
+    public void i(Throwable t) {
+      prepareLog(Log.INFO, t, null);
+    }
+
     /** Log a warning message with optional format args. */
     public void w(String message, Object... args) {
       prepareLog(Log.WARN, null, message, args);
@@ -268,6 +361,11 @@ public final class Timber {
     /** Log a warning exception and a message with optional format args. */
     public void w(Throwable t, String message, Object... args) {
       prepareLog(Log.WARN, t, message, args);
+    }
+
+    /** Log a warning exception. */
+    public void w(Throwable t) {
+      prepareLog(Log.WARN, t, null);
     }
 
     /** Log an error message with optional format args. */
@@ -280,6 +378,11 @@ public final class Timber {
       prepareLog(Log.ERROR, t, message, args);
     }
 
+    /** Log an error exception. */
+    public void e(Throwable t) {
+      prepareLog(Log.ERROR, t, null);
+    }
+
     /** Log an assert message with optional format args. */
     public void wtf(String message, Object... args) {
       prepareLog(Log.ASSERT, null, message, args);
@@ -288,6 +391,11 @@ public final class Timber {
     /** Log an assert exception and a message with optional format args. */
     public void wtf(Throwable t, String message, Object... args) {
       prepareLog(Log.ASSERT, t, message, args);
+    }
+
+    /** Log an assert exception. */
+    public void wtf(Throwable t) {
+      prepareLog(Log.ASSERT, t, null);
     }
 
     /** Return whether a message at {@code priority} should be logged. */
