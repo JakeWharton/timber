@@ -1,0 +1,56 @@
+apply plugin: 'com.android.library'
+apply plugin: 'checkstyle'
+
+task checkstyle(type: Checkstyle) {
+  configFile rootProject.file('checkstyle.xml')
+  source 'src/main/java'
+  ignoreFailures false
+  showViolations true
+  include '**/*.java'
+
+  classpath = files()
+}
+
+afterEvaluate {
+  if (project.tasks.findByName('check')) {
+    check.dependsOn('checkstyle')
+  }
+}
+
+android {
+  compileSdkVersion rootProject.ext.compileSdkVersion
+  buildToolsVersion rootProject.ext.buildToolsVersion
+
+  defaultConfig {
+    minSdkVersion rootProject.ext.minSdkVersion
+    targetSdkVersion rootProject.ext.targetSdkVersion
+  }
+}
+
+configurations {
+  lintChecks
+}
+
+dependencies {
+  testCompile deps.festandroid
+  testCompile deps.festassert
+  testCompile deps.junit
+  testCompile deps.robolectric
+
+  lintChecks project(path: ':timber-lint', configuration: 'lintChecks')
+}
+
+task copyLintJar(type: Copy) {
+  from(configurations.lintChecks) {
+    rename { String fileName -> 'lint.jar'
+    }
+  }
+  into 'build/intermediates/lint/'
+}
+
+project.afterEvaluate {
+  def compileLintTask = project.tasks.find { it.name == 'compileLint' }
+  compileLintTask.dependsOn(copyLintJar)
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
