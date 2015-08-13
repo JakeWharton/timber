@@ -4,8 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
+
+import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Views;
 import com.example.timber.R;
 import timber.log.Timber;
 
@@ -15,7 +16,7 @@ public class DemoActivity extends Activity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.demo_activity);
-    Views.inject(this);
+    ButterKnife.bind(this);
     Timber.tag("LifeCycles");
     Timber.d("Activity Created");
   }

@@ -1,0 +1,18 @@
+apply plugin: 'java'
+
+configurations {
+  lintChecks
+}
+
+dependencies {
+  compile deps.lintapi
+  compile deps.lintchecks
+
+  lintChecks files(jar)
+}
+
+jar {
+  manifest {
+    attributes('Lint-Registry': 'timber.lint.IssueRegistry')
+  }
+}
