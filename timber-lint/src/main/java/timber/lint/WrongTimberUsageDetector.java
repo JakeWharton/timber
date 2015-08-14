@@ -40,7 +40,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import static com.android.SdkConstants.GET_STRING_METHOD;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_BOOLEAN;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_BYTE;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_CHAR;
@@ -55,6 +54,8 @@ import static com.android.tools.lint.client.api.JavaParser.TYPE_STRING;
 
 public final class WrongTimberUsageDetector extends Detector implements Detector.JavaScanner,
     Detector.ClassScanner {
+  private final static String GET_STRING_METHOD = "getString";
+
   @NonNull @Override public Speed getSpeed() {
     return Speed.NORMAL;
   }
