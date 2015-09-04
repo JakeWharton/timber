@@ -320,7 +320,7 @@ public final class Timber {
         }
         message = Log.getStackTraceString(t);
       } else {
-        if (args.length > 0) {
+        if (args != null && args.length > 0) {
           message = String.format(message, args);
         }
         if (t != null) {
