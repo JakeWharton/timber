@@ -1,6 +1,9 @@
 package timber.log;
 
 import android.util.Log;
+
+import org.jetbrains.annotations.NonNls;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -9,62 +12,62 @@ import java.util.regex.Pattern;
 /** Logging for lazy people. */
 public final class Timber {
   /** Log a verbose message with optional format args. */
-  public static void v(String message, Object... args) {
+  public static void v(@NonNls String message, Object... args) {
     TREE_OF_SOULS.v(message, args);
   }
 
   /** Log a verbose exception and a message with optional format args. */
-  public static void v(Throwable t, String message, Object... args) {
+  public static void v(Throwable t, @NonNls String message, Object... args) {
     TREE_OF_SOULS.v(t, message, args);
   }
 
   /** Log a debug message with optional format args. */
-  public static void d(String message, Object... args) {
+  public static void d(@NonNls String message, Object... args) {
     TREE_OF_SOULS.d(message, args);
   }
 
   /** Log a debug exception and a message with optional format args. */
-  public static void d(Throwable t, String message, Object... args) {
+  public static void d(Throwable t, @NonNls String message, Object... args) {
     TREE_OF_SOULS.d(t, message, args);
   }
 
   /** Log an info message with optional format args. */
-  public static void i(String message, Object... args) {
+  public static void i(@NonNls String message, Object... args) {
     TREE_OF_SOULS.i(message, args);
   }
 
   /** Log an info exception and a message with optional format args. */
-  public static void i(Throwable t, String message, Object... args) {
+  public static void i(Throwable t, @NonNls String message, Object... args) {
     TREE_OF_SOULS.i(t, message, args);
   }
 
   /** Log a warning message with optional format args. */
-  public static void w(String message, Object... args) {
+  public static void w(@NonNls String message, Object... args) {
     TREE_OF_SOULS.w(message, args);
   }
 
   /** Log a warning exception and a message with optional format args. */
-  public static void w(Throwable t, String message, Object... args) {
+  public static void w(Throwable t, @NonNls String message, Object... args) {
     TREE_OF_SOULS.w(t, message, args);
   }
 
   /** Log an error message with optional format args. */
-  public static void e(String message, Object... args) {
+  public static void e(@NonNls String message, Object... args) {
     TREE_OF_SOULS.e(message, args);
   }
 
   /** Log an error exception and a message with optional format args. */
-  public static void e(Throwable t, String message, Object... args) {
+  public static void e(Throwable t, @NonNls String message, Object... args) {
     TREE_OF_SOULS.e(t, message, args);
   }
 
   /** Log an assert message with optional format args. */
-  public static void wtf(String message, Object... args) {
+  public static void wtf(@NonNls String message, Object... args) {
     TREE_OF_SOULS.wtf(message, args);
   }
 
   /** Log an assert exception and a message with optional format args. */
-  public static void wtf(Throwable t, String message, Object... args) {
+  public static void wtf(Throwable t, @NonNls String message, Object... args) {
     TREE_OF_SOULS.wtf(t, message, args);
   }
 
