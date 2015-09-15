@@ -31,12 +31,14 @@ configurations {
 }
 
 dependencies {
+  compile 'org.jetbrains:annotations:13.0'
+
   testCompile deps.festandroid
   testCompile deps.festassert
   testCompile deps.junit
   testCompile deps.robolectric
+  
   lintChecks project(path: ':timber-lint', configuration: 'lintChecks')
-  compile files('lib/jetbrains-annotations.jar')
 }
 
 task copyLintJar(type: Copy) {
