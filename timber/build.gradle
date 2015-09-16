@@ -37,7 +37,7 @@ dependencies {
   testCompile deps.festassert
   testCompile deps.junit
   testCompile deps.robolectric
-
+  
   lintChecks project(path: ':timber-lint', configuration: 'lintChecks')
 }
 
