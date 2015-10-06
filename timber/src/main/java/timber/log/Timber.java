@@ -1,13 +1,13 @@
 package timber.log;
 
 import android.util.Log;
-
-import org.jetbrains.annotations.NonNls;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jetbrains.annotations.NonNls;
+
+import static java.util.Collections.unmodifiableList;
 
 /** Logging for lazy people. */
 public final class Timber {
@@ -118,6 +118,13 @@ public final class Timber {
     synchronized (FOREST) {
       FOREST.clear();
       forestAsArray = TREE_ARRAY_EMPTY;
+    }
+  }
+
+  /** Return a copy of all planted {@linkplain Tree trees}. */
+  public static List<Tree> forest() {
+    synchronized (FOREST) {
+      return unmodifiableList(new ArrayList<>(FOREST));
     }
   }
 
