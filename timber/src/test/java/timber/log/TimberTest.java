@@ -58,6 +58,15 @@ public class TimberTest {
     }
   }
 
+  @Test public void forestReturnsAllPlanted() {
+    Timber.DebugTree tree1 = new Timber.DebugTree();
+    Timber.DebugTree tree2 = new Timber.DebugTree();
+    Timber.plant(tree1);
+    Timber.plant(tree2);
+
+    assertThat(Timber.forest()).containsExactly(tree1, tree2);
+  }
+
   @Test public void uprootThrowsIfMissing() {
     try {
       Timber.uproot(new Timber.DebugTree());
