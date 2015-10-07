@@ -28,6 +28,50 @@ Two easy steps:
 Check out the sample app in `timber-sample/` to see it in action.
 
 
+Lint
+----
+
+Timber ships with embedded lint rules to detect problems in your app.
+
+ *  **TimberArgCount** (Error) - Detects an incorrect number of arguments passed to a `Timber` call for
+    the specified format string.
+
+        Example.java:35: Error: Wrong argument count, format string Hello %s %s! requires 2 but format call supplies 1 [TimberArgCount]
+            Timber.d("Hello %s %s!", firstName);
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ *  **TimberArgTypes** (Error) - Detects arguments which are of the wrong type for the specified format string.
+
+        Example.java:35: Error: Wrong argument type for formatting argument '#0' in success = %b: conversion is 'b', received String (argument #2 in method call) [TimberArgTypes]
+            Timber.d("success = %b", taskName);
+                                     ~~~~~~~~
+ *  **TimberTagLength** (Error) - Detects the use of tags which are longer than Android's maximum length of 23.
+
+        Example.java:35: Error: The logging tag can be at most 23 characters, was 35 (TagNameThatIsReallyReallyReallyLong) [TimberTagLength]
+            Timber.tag("TagNameThatIsReallyReallyReallyLong").d("Hello %s %s!", firstName, lastName);
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ *  **LogNotTimber** (Warning) - Detects usages of Android's `Log` that should be using `Timber`.
+
+        Example.java:35: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
+            Log.d("Greeting", "Hello " + firstName + " " + lastName + "!");
+                ~
+
+ *  **StringFormatInTimber** (Warning) - Detects `String.format` used inside of a `Timber` call. Timber
+    handles string formatting automatically.
+
+        Example.java:35: Warning: Using 'String#format' inside of 'Timber' [StringFormatInTimber]
+            Timber.d(String.format("Hello, %s %s", firstName, lastName));
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ *  **BinaryOperationInTimber** (Warning) - Detects string concatenation inside of a `Timber` call. Timber
+    handles string formatting automatically and should be preferred over manual concatenation.
+
+        Example.java:35: Warning: Replace String concatenation with Timber's string formatting [BinaryOperationInTimber]
+            Timber.d("Hello " + firstName + " " + lastName + "!");
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 Download
 --------
 
