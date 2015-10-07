@@ -1,6 +1,8 @@
 package timber.log;
 
 import android.util.Log;
+
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +37,7 @@ public class TimberTest {
     Timber.d("Test");
 
     assertLog()
-        .hasDebugMessage("TimberTest:35", "Test")
+        .hasDebugMessage("TimberTest:37", "Test")
         .hasNoMoreMessages();
   }
 
@@ -272,6 +274,13 @@ public class TimberTest {
     assertLog()
         .hasInfoMessage("TimberTest", "Hello, World!")
         .hasNoMoreMessages();
+  }
+
+  @Test public void logsUnknownHostExceptions() {
+    Timber.plant(new Timber.DebugTree());
+    Timber.e(new UnknownHostException(), null);
+
+    assertExceptionLogged("", "UnknownHostException");
   }
 
   private static String repeat(char c, int number) {

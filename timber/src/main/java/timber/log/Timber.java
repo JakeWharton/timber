@@ -1,6 +1,9 @@
 package timber.log;
 
 import android.util.Log;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -328,17 +331,27 @@ public final class Timber {
         if (t == null) {
           return; // Swallow message if it's null and there's no throwable.
         }
-        message = Log.getStackTraceString(t);
+        message = getStackTraceString(t);
       } else {
         if (args.length > 0) {
           message = String.format(message, args);
         }
         if (t != null) {
-          message += "\n" + Log.getStackTraceString(t);
+          message += "\n" + getStackTraceString(t);
         }
       }
 
       log(priority, getTag(), message, t);
+    }
+
+    private String getStackTraceString(Throwable t) {
+      // Don't replace this with Log.getStackTraceString() - it hides
+      // UnknownHostException, which is not what we want.
+      StringWriter sw = new StringWriter(256);
+      PrintWriter pw = new PrintWriter(sw, false);
+      t.printStackTrace(pw);
+      pw.flush();
+      return sw.toString();
     }
 
     /**
