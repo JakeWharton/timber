@@ -1,7 +1,14 @@
 Change Log
 ==========
 
-Version 4.0.0 *(2015-10-11)*
+Version 4.0.1 *(2015-10-07)*
+----------------------------
+
+ * Fix: TimberArgTypes lint rule now allows booleans and numbers in '%s' format markers.
+ * Fix: Lint rules now support running on Java 7 VMs.
+
+
+Version 4.0.0 *(2015-10-07)*
 ----------------------------
 
  * New: Library is now an .aar! This means the lint rules are automatically applied to consuming
