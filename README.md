@@ -31,18 +31,8 @@ Check out the sample app in `timber-sample/` to see it in action.
 Download
 --------
 
-Download [the latest JAR][2] or grab via Maven:
-
-```xml
-<dependency>
-  <groupId>com.jakewharton.timber</groupId>
-  <artifactId>timber</artifactId>
-  <version>3.1.0</version>
-</dependency>
-```
-or Gradle:
 ```groovy
-compile 'com.jakewharton.timber:timber:3.1.0'
+compile 'com.jakewharton.timber:timber:4.0.0'
 ```
 
 Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].

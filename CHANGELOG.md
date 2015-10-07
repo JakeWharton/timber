@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+Version 4.0.0 *(2015-10-11)*
+----------------------------
+
+ * New: Library is now an .aar! This means the lint rules are automatically applied to consuming
+   projects.
+ * New: `Tree.forest()` returns an immutable copy of all planted trees.
+ * Fix: Ensure thread safety when logging and adding or removing trees concurrently.
+
+
 Version 3.1.0 *(2015-05-11)*
 ----------------------------
 
