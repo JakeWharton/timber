@@ -1,0 +1,1 @@
+-dontwarn org.jetbrains.annotations.**
