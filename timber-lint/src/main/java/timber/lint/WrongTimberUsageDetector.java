@@ -210,10 +210,10 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
             break;
           case 'h':
           case 'H':
-          case 's':
-          case 'S':
             valid = type != Boolean.TYPE && !Number.class.isAssignableFrom(type);
             break;
+          case 's':
+          case 'S':
           default:
             valid = true;
         }
