@@ -17,10 +17,10 @@ android {
     versionName '1.0.0'
   }
 
-  android {
-    lintOptions {
-      ignore 'InvalidPackage'
-    }
+  lintOptions {
+    textReport true
+    textOutput 'stdout'
+    ignore 'InvalidPackage'
   }
 }
 
