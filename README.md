@@ -69,7 +69,7 @@ Timber ships with embedded lint rules to detect problems in your app.
 
         Example.java:35: Warning: Replace String concatenation with Timber's string formatting [BinaryOperationInTimber]
             Timber.d("Hello " + firstName + " " + lastName + "!");
-            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 Download
