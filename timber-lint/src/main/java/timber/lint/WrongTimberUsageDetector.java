@@ -220,7 +220,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         if (!valid) {
           String message = String.format("Wrong argument type for formatting argument '#%1$d' "
                   + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
-                  + "(argument #%5$d in method call)", i, formatString, formatType,
+                  + "(argument #%5$d in method call)", i + 1, formatString, formatType,
               type.getSimpleName(), startIndexOfArguments + i + 1);
           context.report(ISSUE_ARG_TYPES, node, context.getLocation(argument), message);
         }
