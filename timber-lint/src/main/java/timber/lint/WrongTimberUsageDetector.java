@@ -110,7 +110,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         String message = String.format(
             "The logging tag can be at most 23 characters, was %1$d (%2$s)",
             tag.length(), tag);
-        context.report(ISSUE_TAG_LENGTH, node, context.getLocation(node), message);
+        context.report(ISSUE_TAG_LENGTH, node, context.getLocation(argument), message);
       }
     } else {
       if (node.astOperand() instanceof VariableReference) {
