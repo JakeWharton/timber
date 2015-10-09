@@ -242,6 +242,26 @@ public class TimberTest {
     );
   }
 
+  @Test public void logAtSpecifiedPriority() {
+    Timber.plant(new Timber.DebugTree());
+
+    Timber.log(Log.VERBOSE, "Hello, World!");
+    Timber.log(Log.DEBUG, "Hello, World!");
+    Timber.log(Log.INFO, "Hello, World!");
+    Timber.log(Log.WARN, "Hello, World!");
+    Timber.log(Log.ERROR, "Hello, World!");
+    Timber.log(Log.ASSERT, "Hello, World!");
+
+    assertLog()
+        .hasVerboseMessage("TimberTest", "Hello, World!")
+        .hasDebugMessage("TimberTest", "Hello, World!")
+        .hasInfoMessage("TimberTest", "Hello, World!")
+        .hasWarnMessage("TimberTest", "Hello, World!")
+        .hasErrorMessage("TimberTest", "Hello, World!")
+        .hasAssertMessage("TimberTest", "Hello, World!")
+        .hasNoMoreMessages();
+  }
+
   @Test public void formatting() {
     Timber.plant(new Timber.DebugTree());
     Timber.v("Hello, %s!", "World");
@@ -331,6 +351,10 @@ public class TimberTest {
 
     public LogAssert hasErrorMessage(String tag, String message) {
       return hasMessage(Log.ERROR, tag, message);
+    }
+
+    public LogAssert hasAssertMessage(String tag, String message) {
+      return hasMessage(Log.ASSERT, tag, message);
     }
 
     private LogAssert hasMessage(int priority, String tag, String message) {
