@@ -71,6 +71,16 @@ public final class Timber {
     TREE_OF_SOULS.wtf(t, message, args);
   }
 
+  /** Log at {@code priority} a message with optional format args. */
+  public static void log(int priority, @NonNls String message, Object... args) {
+    TREE_OF_SOULS.log(priority, message, args);
+  }
+
+  /** Log at {@code priority} an exception and a message with optional format args. */
+  public static void log(int priority, Throwable t, @NonNls String message, Object... args) {
+    TREE_OF_SOULS.log(priority, t, message, args);
+  }
+
   /**
    * A view into Timber's planted trees as a tree itself. This can be used for injecting a logger
    * instance rather than using static methods or to facilitate testing.
@@ -231,6 +241,22 @@ public final class Timber {
       }
     }
 
+    @Override public void log(int priority, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].log(priority, message, args);
+      }
+    }
+
+    @Override public void log(int priority, Throwable t, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].log(priority, t, message, args);
+      }
+    }
+
     @Override protected void log(int priority, String tag, String message, Throwable t) {
       throw new AssertionError("Missing override for log method.");
     }
@@ -310,6 +336,16 @@ public final class Timber {
     /** Log an assert exception and a message with optional format args. */
     public void wtf(Throwable t, String message, Object... args) {
       prepareLog(Log.ASSERT, t, message, args);
+    }
+
+    /** Log at {@code priority} a message with optional format args. */
+    public void log(int priority, String message, Object... args) {
+      prepareLog(priority, null, message, args);
+    }
+
+    /** Log at {@code priority} an exception and a message with optional format args. */
+    public void log(int priority, Throwable t, String message, Object... args) {
+      prepareLog(priority, t, message, args);
     }
 
     /** Return whether a message at {@code priority} should be logged. */
