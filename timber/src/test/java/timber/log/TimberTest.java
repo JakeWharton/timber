@@ -269,6 +269,7 @@ public class TimberTest {
     Timber.i("Hello, %s!", "World");
     Timber.w("Hello, %s!", "World");
     Timber.e("Hello, %s!", "World");
+    Timber.wtf("Hello, %s!", "World");
 
     assertLog()
         .hasVerboseMessage("TimberTest", "Hello, World!")
@@ -276,6 +277,7 @@ public class TimberTest {
         .hasInfoMessage("TimberTest", "Hello, World!")
         .hasWarnMessage("TimberTest", "Hello, World!")
         .hasErrorMessage("TimberTest", "Hello, World!")
+        .hasAssertMessage("TimberTest", "Hello, World!")
         .hasNoMoreMessages();
   }
 
@@ -290,6 +292,7 @@ public class TimberTest {
     Timber.i("Hello, World!");
     Timber.w("Hello, World!");
     Timber.e("Hello, World!");
+    Timber.wtf("Hello, World!");
 
     assertLog()
         .hasInfoMessage("TimberTest", "Hello, World!")
