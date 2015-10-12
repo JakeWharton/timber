@@ -13,6 +13,11 @@ import com.android.tools.lint.detector.api.JavaContext;
 import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
 import com.android.tools.lint.detector.api.Speed;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Matcher;
 import lombok.ast.AstVisitor;
 import lombok.ast.BinaryExpression;
 import lombok.ast.BinaryOperator;
@@ -33,12 +38,6 @@ import lombok.ast.VariableReference;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Matcher;
 
 import static com.android.tools.lint.client.api.JavaParser.TYPE_BOOLEAN;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_BYTE;
@@ -457,9 +456,12 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
 
   private static boolean checkNode(JavaContext context, MethodInvocation node, Node argument) {
     if (argument instanceof BinaryExpression) {
-      context.report(ISSUE_BINARY, node, context.getLocation(argument),
-          "Replace String concatenation with Timber's string formatting");
-      return true;
+      Class argumentType = getType(context, (BinaryExpression) argument);
+      if (argumentType == String.class) {
+        context.report(ISSUE_BINARY, node, context.getLocation(argument),
+            "Replace String concatenation with Timber's string formatting");
+        return true;
+      }
     } else if (argument instanceof If || argument instanceof InlineIfExpression) {
       return checkConditionalUsage(context, node, argument);
     }
