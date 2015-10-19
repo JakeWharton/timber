@@ -1,6 +1,18 @@
 Change Log
 ==========
 
+Version 4.1.0 *(2015-10-19)*
+----------------------------
+
+ * New: Consumer ProGuard rule automatically suppresses a warning for the use `@NonNls` on the 'message'
+   argument for logging method. The warning was only for users running ProGuard and can safely be ignored.
+ * New: Static `log` methods which accept a priority as a first argument makes dynamic logging at different
+   levels easier to support.
+ * Fix: Replace internal use of `Log.getStackTraceString` with our own implementation. This ensures that
+   `UnknownHostException` errors are logged, which previously were suppressed.
+ * Fix: 'BinaryOperationInTimber' lint rule now only triggers for string concatenation.
+
+
 Version 4.0.1 *(2015-10-07)*
 ----------------------------
 
