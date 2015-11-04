@@ -1,12 +1,5 @@
 package timber.log;
 
-import android.util.Log;
-
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +7,14 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLog;
+
+import android.util.Log;
+
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
@@ -37,7 +38,7 @@ public class TimberTest {
     Timber.d("Test");
 
     assertLog()
-        .hasDebugMessage("TimberTest:37", "Test")
+        .hasDebugMessage("TimberTest:38", "Test at timber.log(TimberTest.java:38)")
         .hasNoMoreMessages();
   }
 
@@ -88,9 +89,9 @@ public class TimberTest {
     Timber.d("Second");
 
     assertLog()
-        .hasDebugMessage("TimberTest", "First")
-        .hasDebugMessage("TimberTest", "First")
-        .hasDebugMessage("TimberTest", "Second")
+        .hasDebugMessage("TimberTest", "First at timber.log(TimberTest.java:87)")
+        .hasDebugMessage("TimberTest", "First at timber.log(TimberTest.java:87)")
+        .hasDebugMessage("TimberTest", "Second at timber.log(TimberTest.java:89)")
         .hasNoMoreMessages();
   }
 
@@ -104,8 +105,8 @@ public class TimberTest {
     Timber.d("Second");
 
     assertLog()
-        .hasDebugMessage("TimberTest", "First")
-        .hasDebugMessage("TimberTest", "First")
+        .hasDebugMessage("TimberTest", "First at timber.log(TimberTest.java:103)")
+        .hasDebugMessage("TimberTest", "First at timber.log(TimberTest.java:103)")
         .hasNoMoreMessages();
   }
 
@@ -114,7 +115,7 @@ public class TimberTest {
     Timber.d("te%st");
 
     assertLog()
-        .hasDebugMessage("TimberTest", "te%st")
+        .hasDebugMessage("TimberTest", "te%st at timber.log(TimberTest.java:115)")
         .hasNoMoreMessages();
   }
 
@@ -123,7 +124,7 @@ public class TimberTest {
     Timber.d("Hello, world!");
 
     assertLog()
-        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasDebugMessage("TimberTest", "Hello, world! at timber.log(TimberTest.java:124)")
         .hasNoMoreMessages();
   }
 
@@ -142,8 +143,8 @@ public class TimberTest {
     }.run();
 
     assertLog()
-        .hasDebugMessage("TimberTest", "Hello, world!")
-        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasDebugMessage("TimberTest", "Hello, world! at timber.log(TimberTest.java:135)")
+        .hasDebugMessage("TimberTest", "Hello, world! at timber.log(TimberTest.java:139)")
         .hasNoMoreMessages();
   }
 
@@ -187,7 +188,7 @@ public class TimberTest {
   }
 
   @Test public void chunkAcrossNewlinesAndLimit() {
-    Timber.plant(new Timber.DebugTree());
+    Timber.plant(new Timber.DebugTree().setCallerInfo(false));
     Timber.d(repeat('a', 3000) + '\n' + repeat('b', 6000) + '\n' + repeat('c', 3000));
 
     assertLog()
@@ -243,7 +244,7 @@ public class TimberTest {
   }
 
   @Test public void logAtSpecifiedPriority() {
-    Timber.plant(new Timber.DebugTree());
+    Timber.plant(new Timber.DebugTree().setCallerInfo(false));
 
     Timber.log(Log.VERBOSE, "Hello, World!");
     Timber.log(Log.DEBUG, "Hello, World!");
@@ -272,12 +273,12 @@ public class TimberTest {
     Timber.wtf("Hello, %s!", "World");
 
     assertLog()
-        .hasVerboseMessage("TimberTest", "Hello, World!")
-        .hasDebugMessage("TimberTest", "Hello, World!")
-        .hasInfoMessage("TimberTest", "Hello, World!")
-        .hasWarnMessage("TimberTest", "Hello, World!")
-        .hasErrorMessage("TimberTest", "Hello, World!")
-        .hasAssertMessage("TimberTest", "Hello, World!")
+        .hasVerboseMessage("TimberTest", "Hello, World! at timber.log(TimberTest.java:268)")
+        .hasDebugMessage("TimberTest", "Hello, World! at timber.log(TimberTest.java:269)")
+        .hasInfoMessage("TimberTest", "Hello, World! at timber.log(TimberTest.java:270)")
+        .hasWarnMessage("TimberTest", "Hello, World! at timber.log(TimberTest.java:271)")
+        .hasErrorMessage("TimberTest", "Hello, World! at timber.log(TimberTest.java:272)")
+        .hasAssertMessage("TimberTest", "Hello, World! at timber.log(TimberTest.java:273)")
         .hasNoMoreMessages();
   }
 
@@ -295,7 +296,7 @@ public class TimberTest {
     Timber.wtf("Hello, World!");
 
     assertLog()
-        .hasInfoMessage("TimberTest", "Hello, World!")
+        .hasInfoMessage("TimberTest", "Hello, World! at timber.log(TimberTest.java:293)")
         .hasNoMoreMessages();
   }
 

@@ -1,5 +1,8 @@
 package timber.log;
 
+import org.jetbrains.annotations.NonNls;
+
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.PrintWriter;
@@ -8,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jetbrains.annotations.NonNls;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -407,6 +409,13 @@ public final class Timber {
     private static final int CALL_STACK_INDEX = 5;
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$");
 
+    private boolean callerInfo = true;
+
+    public DebugTree setCallerInfo(boolean value) {
+      this.callerInfo = value;
+      return this;
+    }
+
     /**
      * Extract the tag which should be used for the message from the {@code element}. By default
      * this will use the class name without any anonymous class suffixes (e.g., {@code Foo$1}
@@ -446,13 +455,11 @@ public final class Timber {
      *
      * {@inheritDoc}
      */
-    @Override protected void log(int priority, String tag, String message, Throwable t) {
+    @Override protected void log(int priority, String tag, String message, Throwable e) {
+      String callerInfo = getCallerInfo(new Throwable().getStackTrace());
+
       if (message.length() < MAX_LOG_LENGTH) {
-        if (priority == Log.ASSERT) {
-          Log.wtf(tag, message);
-        } else {
-          Log.println(priority, tag, message);
-        }
+        logSingle(priority, tag, message + callerInfo, e);
         return;
       }
 
@@ -462,14 +469,36 @@ public final class Timber {
         newline = newline != -1 ? newline : length;
         do {
           int end = Math.min(newline, i + MAX_LOG_LENGTH);
-          String part = message.substring(i, end);
-          if (priority == Log.ASSERT) {
-            Log.wtf(tag, part);
-          } else {
-            Log.println(priority, tag, part);
-          }
+          logSingle(priority, tag, message.substring(i, end), null);
           i = end;
         } while (i < newline);
+
+        if (!TextUtils.isEmpty(callerInfo)) {
+          logSingle(priority, tag, callerInfo, e);
+        }
+      }
+    }
+
+    private void logSingle(int priority, String tag, String message, Throwable e) {
+      if (priority == Log.ASSERT) {
+        Log.wtf(tag, message, e);
+      } else {
+        Log.println(priority, tag, message);
+      }
+    }
+
+    private String getCallerInfo(StackTraceElement[] stackTrace) {
+      return formatCallerInfoForAndroidStudio(stackTrace[CALL_STACK_INDEX]);
+    }
+
+    private String formatCallerInfoForAndroidStudio(StackTraceElement stack) {
+      if (stack.getLineNumber() <= 0 || !callerInfo) {
+        return "";
+      } else {
+        String className = stack.getClassName();
+        String packageName = className.substring(0, className.lastIndexOf("."));
+        return String.format(" at %s(%s:%s)", packageName,
+                stack.getFileName(), stack.getLineNumber());
       }
     }
   }
