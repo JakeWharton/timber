@@ -321,7 +321,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   }
 
   private static boolean isSubclassOf(JavaContext context, VariableReference variableReference,
-      Class clazz) {
+      Class<?> clazz) {
     JavaParser.ResolvedNode resolved = context.resolve(variableReference);
     if (resolved instanceof JavaParser.ResolvedVariable) {
       JavaParser.ResolvedVariable resolvedVariable = (JavaParser.ResolvedVariable) resolved;
@@ -332,7 +332,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   }
 
   private static List<String> getStringArgumentTypes(String formatString) {
-    List<String> types = new ArrayList<String>();
+    List<String> types = new ArrayList<>();
     Matcher matcher = StringFormatDetector.FORMAT.matcher(formatString);
     int index = 0;
     int prevIndex = 0;
