@@ -105,7 +105,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     } else if ("tag".equals(methodName)) {
       Node argument = node.astArguments().iterator().next();
       String tag = findLiteralValue(context, argument);
-      if (tag.length() > 23) {
+      if (tag != null && tag.length() > 23) {
         String message = String.format(
             "The logging tag can be at most 23 characters, was %1$d (%2$s)",
             tag.length(), tag);
