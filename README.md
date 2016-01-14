@@ -27,6 +27,13 @@ Two easy steps:
 
 Check out the sample app in `timber-sample/` to see it in action.
 
+Replace all Log calls (Android Studio/IntelliJ)
+-----------------------------------------------
+In Android Studio, you can make a structural search as outlined in the [Android Dev Summit video](https://youtu.be/Y2GC6P5hPeA?t=6m29s). 
+ 1. Find the action  _"Replace Structurally"_ by `Shift+Cmd+A` (`Ctrl+Shift+A` on Windows/Linux).
+ 2. Search template: `android.util.Log.$log_level$($tag$, $message$)`
+ 3. Replace template: `timber.log.Timber.$log_level$($message$)`
+ 4. Define the scope (whole project, module, etc.)
 
 Lint
 ----
