@@ -140,7 +140,7 @@ public final class Timber {
       return unmodifiableList(new ArrayList<>(FOREST));
     }
   }
-  
+
   /**
    * Returns the amount of trees planted.
    */
