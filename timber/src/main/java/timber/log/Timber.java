@@ -141,9 +141,7 @@ public final class Timber {
     }
   }
 
-  /**
-   * Returns the amount of trees planted.
-   */
+  /** Returns the amount of trees planted. */
   public static int treeCount() {
     synchronized (FOREST) {
       return FOREST.size();
