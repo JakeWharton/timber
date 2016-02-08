@@ -51,6 +51,16 @@ public class TimberTest {
     }
   }
 
+  @Test public void treeCount() {
+    // inserts trees and checks if the amount of returned trees matches.
+    for(int i= 1 ; i < 50 ; i++){
+      Timber.plant(new Timber.DebugTree());
+      assertThat(Timber.treeCount()).isEqualTo(i);
+    }
+    Timber.uprootAll();
+    assertThat(Timber.treeCount()).isEqualTo(0);
+  }
+
   @Test public void nullTree() {
     try {
       Timber.plant(null);
