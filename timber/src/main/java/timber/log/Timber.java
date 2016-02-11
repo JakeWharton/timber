@@ -141,6 +141,12 @@ public final class Timber {
     }
   }
 
+  public static int treeCount() {
+    synchronized (FOREST) {
+      return FOREST.size();
+    }
+  }
+
   private static final Tree[] TREE_ARRAY_EMPTY = new Tree[0];
   // Both fields guarded by 'FOREST'.
   private static final List<Tree> FOREST = new ArrayList<>();
