@@ -76,7 +76,7 @@ Download
 --------
 
 ```groovy
-compile 'com.jakewharton.timber:timber:4.1.0'
+compile 'com.jakewharton.timber:timber:4.1.1'
 ```
 
 Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
@@ -102,7 +102,4 @@ License
 
 
  [1]: http://github.com/JakeWharton/pidcat/
- [2]: https://search.maven.org/remote_content?g=com.jakewharton.timber&a=timber&v=LATEST
- [3]: http://square.github.io/dagger/
- [4]: http://jakewharton.github.io/butterknife/
  [snap]: https://oss.sonatype.org/content/repositories/snapshots/

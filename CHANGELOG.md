@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 4.1.1 *(2016-02-19)*
+----------------------------
+
+ * New: Add method for retreiving the number of installed trees.
+
+
 Version 4.1.0 *(2015-10-19)*
 ----------------------------
 
