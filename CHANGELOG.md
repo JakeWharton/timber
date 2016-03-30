@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 4.1.2 *(2016-03-30)*
+----------------------------
+
+ * Fix: Tag-length lint check now only triggers on calls to `Timber`'s `tag` method. Previously it would
+   match _any_ `tag` method and flag arguments longer than 23 characters.
+
+
 Version 4.1.1 *(2016-02-19)*
 ----------------------------
 
