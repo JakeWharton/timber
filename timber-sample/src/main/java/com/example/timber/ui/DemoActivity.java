@@ -21,9 +21,15 @@ public class DemoActivity extends Activity {
     Timber.d("Activity Created");
   }
 
-  @OnClick({ R.id.hello, R.id.hey, R.id.hi })
+  @OnClick({ R.id.hello,R.id.hi })
   public void greetingClicked(Button button) {
     Timber.i("A button with ID %s was clicked to say '%s'.", button.getId(), button.getText());
     Toast.makeText(this, "Check logcat for a greeting!", LENGTH_SHORT).show();
+  }
+
+  @OnClick(R.id.hey)
+  public void heyClicked(){
+    Timber.e(new NullPointerException("Hey I am a NullPointer"), "I am a message WITH a StackTrace");
+    Timber.e(new NullPointerException("Hey I am a NullPointer"), "I am a message WITHOUT a StackTrace", false);
   }
 }
