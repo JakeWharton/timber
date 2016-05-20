@@ -24,9 +24,11 @@ public final class Timber {
     TREE_OF_SOULS.v(t, message, args);
   }
 
-  /** Log a verbose exception and a message decoupled from the StackTrace with optional format args,  */
-  public static void v(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-    TREE_OF_SOULS.v(t, message, appendStackTrace, args);
+  /** Log a verbose exception and a message without the StackTrace
+   * with optional format args,  */
+  public static void v(Throwable t, @NonNls String message,
+                       Boolean addStackTrace, Object... args) {
+    TREE_OF_SOULS.v(t, message, addStackTrace, args);
   }
 
   /** Log a debug message with optional format args. */
@@ -39,9 +41,11 @@ public final class Timber {
     TREE_OF_SOULS.d(t, message, args);
   }
 
-  /** Log a debug exception and a message decoupled from the StackTrace with optional format args,  */
-  public static void d(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-    TREE_OF_SOULS.d(t, message, appendStackTrace, args);
+  /** Log a debug exception and a message without the StackTrace
+   * with optional format args,  */
+  public static void d(Throwable t, @NonNls String message,
+                       Boolean addStackTrace, Object... args) {
+    TREE_OF_SOULS.d(t, message, addStackTrace, args);
   }
 
   /** Log an info message with optional format args. */
@@ -54,9 +58,11 @@ public final class Timber {
     TREE_OF_SOULS.i(t, message, args);
   }
 
-  /** Log an info exception and a message decoupled from the StackTrace with optional format args,  */
-  public static void i(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-    TREE_OF_SOULS.i(t, message, appendStackTrace, args);
+  /** Log an info exception and a message without the StackTrace
+   * with optional format args,  */
+  public static void i(Throwable t, @NonNls String message,
+                       Boolean addStackTrace, Object... args) {
+    TREE_OF_SOULS.i(t, message, addStackTrace, args);
   }
 
   /** Log a warning message with optional format args. */
@@ -69,9 +75,11 @@ public final class Timber {
     TREE_OF_SOULS.w(t, message, args);
   }
 
-  /** Log a warning exception and a message decoupled from the StackTrace with optional format args,  */
-  public static void w(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-    TREE_OF_SOULS.w(t, message, appendStackTrace, args);
+  /** Log a warning exception and a message without the StackTrace
+   * with optional format args,  */
+  public static void w(Throwable t, @NonNls String message,
+                       Boolean addStackTrace, Object... args) {
+    TREE_OF_SOULS.w(t, message, addStackTrace, args);
   }
 
   /** Log an error message with optional format args. */
@@ -84,9 +92,11 @@ public final class Timber {
     TREE_OF_SOULS.e(t, message, args);
   }
 
-  /** Log an error exception and a message decoupled from the StackTrace with optional format args,  */
-  public static void e(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-    TREE_OF_SOULS.e(t, message, appendStackTrace, args);
+  /** Log an error exception and a message without the StackTrace
+   * with optional format args,  */
+  public static void e(Throwable t, @NonNls String message,
+                       Boolean addStackTrace, Object... args) {
+    TREE_OF_SOULS.e(t, message, addStackTrace, args);
   }
 
   /** Log an assert message with optional format args. */
@@ -99,9 +109,11 @@ public final class Timber {
     TREE_OF_SOULS.wtf(t, message, args);
   }
 
-  /** Log an assert exception and a message decoupled from the StackTrace with optional format args,  */
-  public static void wtf(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-    TREE_OF_SOULS.wtf(t, message, appendStackTrace, args);
+  /** Log an assert exception and a message without the StackTrace
+   *  with optional format args,  */
+  public static void wtf(Throwable t, @NonNls String message,
+                         Boolean addStackTrace, Object... args) {
+    TREE_OF_SOULS.wtf(t, message, addStackTrace, args);
   }
 
   /** Log at {@code priority} a message with optional format args. */
@@ -114,9 +126,11 @@ public final class Timber {
     TREE_OF_SOULS.log(priority, t, message, args);
   }
 
-  /** Log at {@code priority} an exception and a message decoupled from the StackTrace with optional format args. */
-  public static void log(int priority, Throwable t, Boolean appendStackTrace, @NonNls String message, Object... args) {
-    TREE_OF_SOULS.log(priority, t, message, appendStackTrace, args);
+  /** Log at {@code priority} an exception and a message without the StackTrace
+   * with optional format args. */
+  public static void log(int priority, Throwable t, Boolean addStackTrace,
+                         @NonNls String message, Object... args) {
+    TREE_OF_SOULS.log(priority, t, message, addStackTrace, args);
   }
 
   /**
@@ -205,11 +219,11 @@ public final class Timber {
       }
     }
 
-    @Override public void v(Throwable t, String message, Boolean appendStackTrace, Object... args) {
+    @Override public void v(Throwable t, String message, Boolean addStackTrace, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].v(t, message, appendStackTrace, args);
+        forest[i].v(t, message, addStackTrace, args);
       }
     }
 
@@ -229,11 +243,11 @@ public final class Timber {
       }
     }
 
-    @Override public void d(Throwable t, String message, Boolean appendStackTrace, Object... args) {
+    @Override public void d(Throwable t, String message, Boolean addStackTrace, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].d(t, message, appendStackTrace, args);
+        forest[i].d(t, message, addStackTrace, args);
       }
     }
 
@@ -253,11 +267,11 @@ public final class Timber {
       }
     }
 
-    @Override public void i(Throwable t, String message, Boolean appendStackTrace, Object... args) {
+    @Override public void i(Throwable t, String message, Boolean addStackTrace, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].i(t, message, appendStackTrace, args);
+        forest[i].i(t, message, addStackTrace, args);
       }
     }
 
@@ -277,11 +291,11 @@ public final class Timber {
       }
     }
 
-    @Override public void w(Throwable t, String message, Boolean appendStackTrace, Object... args) {
+    @Override public void w(Throwable t, String message, Boolean addStackTrace, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].w(t, message, appendStackTrace, args);
+        forest[i].w(t, message, addStackTrace, args);
       }
     }
 
@@ -301,11 +315,11 @@ public final class Timber {
       }
     }
 
-    @Override public void e(Throwable t, String message, Boolean appendStackTrace, Object... args) {
+    @Override public void e(Throwable t, String message, Boolean addStackTrace, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].e(t, message, appendStackTrace, args);
+        forest[i].e(t, message, addStackTrace, args);
       }
     }
 
@@ -325,11 +339,11 @@ public final class Timber {
       }
     }
 
-    @Override public void wtf(Throwable t, String message, Boolean appendStackTrace, Object... args) {
+    @Override public void wtf(Throwable t, String message, Boolean addStackTrace, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].wtf(t, message, appendStackTrace, args);
+        forest[i].wtf(t, message, addStackTrace, args);
       }
     }
 
@@ -349,11 +363,12 @@ public final class Timber {
       }
     }
 
-    @Override public void log(int priority, Throwable t, String message, Boolean appendStackTrace, Object... args) {
+    @Override public void log(int priority, Throwable t, String message,
+                              Boolean addStackTrace, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].log(priority, t, message, appendStackTrace, args);
+        forest[i].log(priority, t, message, addStackTrace, args);
       }
     }
 
@@ -388,9 +403,9 @@ public final class Timber {
       prepareLog(Log.VERBOSE, t, message, true, args);
     }
 
-    /** Log a verbose exception and a message decoupled from the StackTrace with optional format args. */
-    public void v(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-      prepareLog(Log.VERBOSE, t, message, appendStackTrace, args);
+    /** Log a verbose exception and a message without the StackTrace with optional format args. */
+    public void v(Throwable t, @NonNls String message, Boolean addStackTrace, Object... args) {
+      prepareLog(Log.VERBOSE, t, message, addStackTrace, args);
     }
 
     /** Log a debug message with optional format args. */
@@ -403,9 +418,9 @@ public final class Timber {
       prepareLog(Log.DEBUG, t, message, true, args);
     }
 
-    /** Log a debug exception and a message decoupled from the StackTrace with optional format args. */
-    public void d(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-      prepareLog(Log.VERBOSE, t, message, appendStackTrace, args);
+    /** Log a debug exception and a message without the StackTrace with optional format args. */
+    public void d(Throwable t, @NonNls String message, Boolean addStackTrace, Object... args) {
+      prepareLog(Log.VERBOSE, t, message, addStackTrace, args);
     }
 
     /** Log an info message with optional format args. */
@@ -418,9 +433,9 @@ public final class Timber {
       prepareLog(Log.INFO, t, message, true, args);
     }
 
-    /** Log an info exception and a message decoupled from the StackTrace with optional format args. */
-    public void i(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-      prepareLog(Log.VERBOSE, t, message, appendStackTrace, args);
+    /** Log an info exception and a message without the StackTrace with optional format args. */
+    public void i(Throwable t, @NonNls String message, Boolean addStackTrace, Object... args) {
+      prepareLog(Log.VERBOSE, t, message, addStackTrace, args);
     }
 
     /** Log a warning message with optional format args. */
@@ -433,9 +448,9 @@ public final class Timber {
       prepareLog(Log.WARN, t, message, true, args);
     }
 
-    /** Log a warning exception and a message decoupled from the StackTrace with optional format args. */
-    public void w(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-      prepareLog(Log.WARN, t, message, appendStackTrace, args);
+    /** Log a warning exception and a message without the StackTrace with optional format args. */
+    public void w(Throwable t, @NonNls String message, Boolean addStackTrace, Object... args) {
+      prepareLog(Log.WARN, t, message, addStackTrace, args);
     }
 
     /** Log an error message with optional format args. */
@@ -448,9 +463,9 @@ public final class Timber {
       prepareLog(Log.ERROR, t, message, true, args);
     }
 
-    /** Log an error exception and a message decoupled from the StackTrace with optional format args. */
-    public void e(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-      prepareLog(Log.ERROR, t, message, appendStackTrace, args);
+    /** Log an error exception and a message without the StackTrace with optional format args. */
+    public void e(Throwable t, @NonNls String message, Boolean addStackTrace, Object... args) {
+      prepareLog(Log.ERROR, t, message, addStackTrace, args);
     }
 
     /** Log an assert message with optional format args. */
@@ -458,14 +473,14 @@ public final class Timber {
       prepareLog(Log.ASSERT, null, message, true, args);
     }
 
-    /** Log an assert exception and a message decoupled from the StackTrace with optional format args. */
+    /** Log an assert exception and a message without the StackTrace with optional format args. */
     public void wtf(Throwable t, String message, Object... args) {
       prepareLog(Log.ASSERT, t, message, true, args);
     }
 
-    /** Log an assert exception and a message decoupled from the StackTrace with optional format args. */
-    public void wtf(Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-      prepareLog(Log.ASSERT, t, message, appendStackTrace, args);
+    /** Log an assert exception and a message without the StackTrace with optional format args. */
+    public void wtf(Throwable t, @NonNls String message, Boolean addStackTrace, Object... args) {
+      prepareLog(Log.ASSERT, t, message, addStackTrace, args);
     }
 
     /** Log at {@code priority} a message with optional format args. */
@@ -478,9 +493,11 @@ public final class Timber {
       prepareLog(priority, t, message, true, args);
     }
 
-    /** Log at {@code priority} an exception and a message decoupled from the StackTrace with optional format args. */
-    public void log(int priority, Throwable t, @NonNls String message, Boolean appendStackTrace, Object... args) {
-      prepareLog(priority, t, message, appendStackTrace, args);
+    /** Log at {@code priority} an exception and a message without the StackTrace
+     * with optional format args. */
+    public void log(int priority, Throwable t, @NonNls String message,
+                    Boolean addStackTrace, Object... args) {
+      prepareLog(priority, t, message, addStackTrace, args);
     }
 
     /** Return whether a message at {@code priority} should be logged. */
@@ -488,7 +505,8 @@ public final class Timber {
       return true;
     }
 
-    private void prepareLog(int priority, Throwable t, String message, Boolean appendStackTrace, Object... args) {
+    private void prepareLog(int priority, Throwable t, String message,
+                            Boolean addStackTrace, Object... args) {
       if (!isLoggable(priority)) {
         return;
       }
@@ -504,7 +522,7 @@ public final class Timber {
         if (args.length > 0) {
           message = String.format(message, args);
         }
-        if ((t != null) && (appendStackTrace)){
+        if ((t != null) && (addStackTrace)){
           message += "\n" + getStackTraceString(t);
         }
       }
