@@ -522,7 +522,7 @@ public final class Timber {
         if (args.length > 0) {
           message = String.format(message, args);
         }
-        if ((t != null) && (addStackTrace)){
+        if ((t != null) && (addStackTrace)) {
           message += "\n" + getStackTraceString(t);
         }
       }
