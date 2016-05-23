@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.ast.AstVisitor;
 import lombok.ast.BinaryExpression;
 import lombok.ast.BinaryOperator;
@@ -97,7 +98,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         return;
       }
       ExpressionStatement statement = (ExpressionStatement) current;
-      if (!statement.toString().startsWith("Timber.")) {
+      if (!Pattern.matches("^Timber\\.(v|d|i|w|e|wtf).*", statement.toString())) {
         return;
       }
       context.report(ISSUE_FORMAT, node, context.getLocation(node),
