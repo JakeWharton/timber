@@ -25,6 +25,11 @@ android {
     minSdkVersion rootProject.ext.minSdkVersion
     consumerProguardFiles 'consumer-proguard-rules.pro'
   }
+
+  lintOptions {
+    textReport true
+    textOutput 'stdout'
+  }
 }
 
 configurations {
