@@ -2,10 +2,10 @@ language: android
 
 android:
   components:
+    - platform-tools
+    - tools
     - build-tools-23.0.1
     - android-23
-  licenses:
-    - android-sdk-license-5be876d5
 
 jdk:
   - oraclejdk7
