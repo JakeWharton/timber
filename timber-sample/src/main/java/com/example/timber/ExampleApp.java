@@ -10,6 +10,7 @@ public class ExampleApp extends Application {
   @Override public void onCreate() {
     super.onCreate();
 
+    new RequestCreator().tag("");
     if (BuildConfig.DEBUG) {
       Timber.plant(new DebugTree());
     } else {
@@ -33,6 +34,12 @@ public class ExampleApp extends Application {
           FakeCrashLibrary.logWarning(t);
         }
       }
+    }
+  }
+
+  private static class RequestCreator {
+    public RequestCreator tag(Object tag) {
+      return this;
     }
   }
 }
