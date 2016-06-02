@@ -103,7 +103,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       }
       context.report(ISSUE_FORMAT, node, context.getLocation(node),
           "Using 'String#format' inside of 'Timber'");
-    } else if ("tag".equals(methodName)) {
+    } else if ("tag".equals(methodName) && node.toString().contains("Timber")) {
       VariableReference ref = (VariableReference) node.astOperand();
       if (!"Timber".equals(ref.astIdentifier().astValue())) {
         return;
