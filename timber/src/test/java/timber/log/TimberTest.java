@@ -64,7 +64,7 @@ public class TimberTest {
 
   @Test public void nullTree() {
     try {
-      Timber.plant(null);
+      Timber.plant((Timber.Tree) null);
       fail();
     } catch (NullPointerException e) {
       assertThat(e).hasMessage("tree == null");
@@ -76,6 +76,14 @@ public class TimberTest {
     Timber.DebugTree tree2 = new Timber.DebugTree();
     Timber.plant(tree1);
     Timber.plant(tree2);
+
+    assertThat(Timber.forest()).containsExactly(tree1, tree2);
+  }
+
+  @Test public void forestReturnsAllTreesPlanted() {
+    Timber.DebugTree tree1 = new Timber.DebugTree();
+    Timber.DebugTree tree2 = new Timber.DebugTree();
+    Timber.plant(tree1, tree2);
 
     assertThat(Timber.forest()).containsExactly(tree1, tree2);
   }
