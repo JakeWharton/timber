@@ -1,10 +1,10 @@
 package timber.log;
 
 import android.util.Log;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -112,6 +112,25 @@ public final class Timber {
     }
     synchronized (FOREST) {
       FOREST.add(tree);
+      forestAsArray = FOREST.toArray(new Tree[FOREST.size()]);
+    }
+  }
+
+  /** Adds new logging trees. */
+  public static void plant(Tree... trees) {
+    if (trees == null) {
+      throw new NullPointerException("trees == null");
+    }
+    for (Tree tree : trees) {
+      if (tree == null) {
+        throw new NullPointerException("trees contains null");
+      }
+      if (tree == TREE_OF_SOULS) {
+        throw new IllegalArgumentException("Cannot plant Timber into itself.");
+      }
+    }
+    synchronized (FOREST) {
+      Collections.addAll(FOREST, trees);
       forestAsArray = FOREST.toArray(new Tree[FOREST.size()]);
     }
   }
