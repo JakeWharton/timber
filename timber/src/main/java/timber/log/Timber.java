@@ -376,15 +376,29 @@ public final class Timber {
       prepareLog(priority, t, message, args);
     }
 
+    /** Return whether a message at {@code priority} with a specific {@code tag} should be logged. */
+    protected Boolean isLoggable(int priority, String tag) {
+      return null;
+    }
+
     /** Return whether a message at {@code priority} should be logged. */
     protected boolean isLoggable(int priority) {
       return true;
     }
 
     private void prepareLog(int priority, Throwable t, String message, Object... args) {
-      if (!isLoggable(priority)) {
+      final String tag = getTag();
+
+      Boolean isLoggableWithTag = isLoggable(priority, tag);
+      if(isLoggableWithTag == null) {
+        if(!isLoggable(priority)) {
+          return;
+        }
+      }
+      else if(!isLoggableWithTag) {
         return;
       }
+
       if (message != null && message.length() == 0) {
         message = null;
       }
@@ -402,7 +416,7 @@ public final class Timber {
         }
       }
 
-      log(priority, getTag(), message, t);
+      log(priority, tag, message, t);
     }
 
     private String getStackTraceString(Throwable t) {

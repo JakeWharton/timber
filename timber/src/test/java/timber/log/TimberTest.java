@@ -344,6 +344,31 @@ public class TimberTest {
         .hasNoMoreMessages();
   }
 
+  @Test public void isLoggableWithATagWhenImplementedAlwaysOverridesIsLoggableWithoutATag() {
+    final String TAG = "TAG";
+
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected Boolean isLoggable(int priority, String tag) {
+        return TAG.equals(tag);
+      }
+
+      @Override protected boolean isLoggable(int priority) {
+        return priority != Log.INFO;
+      }
+    });
+    Timber.v("Hello, World!");
+    Timber.d("Hello, World!");
+    Timber.tag(TAG);
+    Timber.i("Hello, World!");
+    Timber.w("Hello, World!");
+    Timber.e("Hello, World!");
+    Timber.wtf("Hello, World!");
+
+    assertLog()
+        .hasInfoMessage(TAG, "Hello, World!")
+        .hasNoMoreMessages();
+  }
+
   @Test public void logsUnknownHostExceptions() {
     Timber.plant(new Timber.DebugTree());
     Timber.e(new UnknownHostException(), null);
