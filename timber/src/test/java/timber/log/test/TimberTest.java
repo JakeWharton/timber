@@ -1,30 +1,25 @@
-package timber.log;
+package timber.log.test;
 
 import android.util.Log;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import org.robolectric.shadows.ShadowLog;
+
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
+import timber.log.Timber;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.robolectric.shadows.ShadowLog.LogItem;
 
 @RunWith(RobolectricTestRunner.class) //
 @Config(manifest = Config.NONE)
-public class TimberTest {
-  @Before @After public void setUpAndTearDown() {
-    Timber.uprootAll();
-  }
+public class TimberTest extends BaseTest{
 
   // NOTE: This class references the line number. Keep it at the top so it does not change.
   @Test public void debugTreeCanAlterCreatedTag() {
@@ -124,8 +119,8 @@ public class TimberTest {
   }
 
   @Test public void uprootRemovesTree() {
-    Timber.DebugTree tree1 = new Timber.DebugTree();
     Timber.DebugTree tree2 = new Timber.DebugTree();
+    Timber.DebugTree tree1 = new Timber.DebugTree();
     Timber.plant(tree1);
     Timber.plant(tree2);
     Timber.d("First");
@@ -349,72 +344,5 @@ public class TimberTest {
     Timber.e(new UnknownHostException(), null);
 
     assertExceptionLogged("", "UnknownHostException");
-  }
-
-  private static String repeat(char c, int number) {
-    char[] data = new char[number];
-    Arrays.fill(data, c);
-    return new String(data);
-  }
-
-  private static void assertExceptionLogged(String message, String exceptionClassname) {
-    List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(1);
-    LogItem log = logs.get(0);
-    assertThat(log.type).isEqualTo(Log.ERROR);
-    assertThat(log.tag).isEqualTo("TimberTest");
-    assertThat(log.msg).startsWith(message);
-    assertThat(log.msg).contains(exceptionClassname);
-    // We use a low-level primitive that Robolectric doesn't populate.
-    assertThat(log.throwable).isNull();
-  }
-
-  private static LogAssert assertLog() {
-    return new LogAssert(ShadowLog.getLogs());
-  }
-
-  private static final class LogAssert {
-    private final List<LogItem> items;
-    private int index = 0;
-
-    private LogAssert(List<LogItem> items) {
-      this.items = items;
-    }
-
-    public LogAssert hasVerboseMessage(String tag, String message) {
-      return hasMessage(Log.VERBOSE, tag, message);
-    }
-
-    public LogAssert hasDebugMessage(String tag, String message) {
-      return hasMessage(Log.DEBUG, tag, message);
-    }
-
-    public LogAssert hasInfoMessage(String tag, String message) {
-      return hasMessage(Log.INFO, tag, message);
-    }
-
-    public LogAssert hasWarnMessage(String tag, String message) {
-      return hasMessage(Log.WARN, tag, message);
-    }
-
-    public LogAssert hasErrorMessage(String tag, String message) {
-      return hasMessage(Log.ERROR, tag, message);
-    }
-
-    public LogAssert hasAssertMessage(String tag, String message) {
-      return hasMessage(Log.ASSERT, tag, message);
-    }
-
-    private LogAssert hasMessage(int priority, String tag, String message) {
-      LogItem item = items.get(index++);
-      assertThat(item.type).isEqualTo(priority);
-      assertThat(item.tag).isEqualTo(tag);
-      assertThat(item.msg).isEqualTo(message);
-      return this;
-    }
-
-    public void hasNoMoreMessages() {
-      assertThat(items).hasSize(index);
-    }
   }
 }

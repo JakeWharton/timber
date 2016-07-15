@@ -1,6 +1,9 @@
 package timber.log;
 
 import android.util.Log;
+
+import org.jetbrains.annotations.NonNls;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -8,12 +11,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jetbrains.annotations.NonNls;
 
 import static java.util.Collections.unmodifiableList;
 
 /** Logging for lazy people. */
 public final class Timber {
+
   /** Log a verbose message with optional format args. */
   public static void v(@NonNls String message, Object... args) {
     TREE_OF_SOULS.v(message, args);
@@ -461,7 +464,20 @@ public final class Timber {
         throw new IllegalStateException(
             "Synthetic stacktrace didn't have enough elements: are you using proguard?");
       }
-      return createStackElementTag(stackTrace[CALL_STACK_INDEX]);
+
+      // Select first StrackTraceElement outside Timber or Lumber
+      int stackLevel = CALL_STACK_INDEX;
+      for (int i = 0; i<stackTrace.length;i++)
+      {
+          if (!stackTrace[i].getClassName().startsWith("timber.log.Timber") &&
+              !stackTrace[i].getClassName().startsWith("timber.log.Lumber"))    {
+
+              stackLevel = i;
+              break;
+          }
+      }
+
+      return createStackElementTag(stackTrace[stackLevel]);
     }
 
     /**

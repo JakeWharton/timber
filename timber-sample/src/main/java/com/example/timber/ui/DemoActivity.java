@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.timber.R;
+
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.example.timber.R;
+import timber.log.Lumber;
 import timber.log.Timber;
 
 import static android.widget.Toast.LENGTH_SHORT;
@@ -19,11 +21,14 @@ public class DemoActivity extends Activity {
     ButterKnife.bind(this);
     Timber.tag("LifeCycles");
     Timber.d("Activity Created");
+    Lumber.addChip(this,"Activity created");
   }
 
   @OnClick({ R.id.hello, R.id.hey, R.id.hi })
   public void greetingClicked(Button button) {
     Timber.i("A button with ID %s was clicked to say '%s'.", button.getId(), button.getText());
     Toast.makeText(this, "Check logcat for a greeting!", LENGTH_SHORT).show();
+    Lumber.addChip(this,"Activity created");
+    Lumber.d(this);
   }
 }
