@@ -27,9 +27,9 @@ public class LumberTest extends BaseTest {
         Timber.plant(tree);
 
         Object key = new Object();
-        Lumber.startSplit(key,"TRACE");
-        Lumber.addSplit(key,"MIDDLE");
-        Lumber.addSplit(key,"END");
+        Lumber.startSplit(key, "TRACE");
+        Lumber.addSplit(key, "MIDDLE");
+        Lumber.addSplit(key, "END");
         Lumber.d(key);
 
         assertLog()

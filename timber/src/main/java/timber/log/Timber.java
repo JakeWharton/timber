@@ -467,11 +467,9 @@ public final class Timber {
 
       // Select first StrackTraceElement outside Timber or Lumber
       int stackLevel = CALL_STACK_INDEX;
-      for (int i = 0; i<stackTrace.length;i++)
-      {
-          if (!stackTrace[i].getClassName().startsWith("timber.log.Timber") &&
-              !stackTrace[i].getClassName().startsWith("timber.log.Lumber"))    {
-
+      for (int i = 0; i < stackTrace.length; i++) {
+          if (!stackTrace[i].getClassName().startsWith("timber.log.Timber")
+                  && !stackTrace[i].getClassName().startsWith("timber.log.Lumber")) {
               stackLevel = i;
               break;
           }

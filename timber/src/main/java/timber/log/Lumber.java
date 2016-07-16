@@ -73,7 +73,9 @@ public final class Lumber {
                 now = mSplinters.get(i);
                 final Splinter prev = mSplinters.get(i - 1);
 
-                logs.add(mLabel + ":      " + (now.getTime() - prev.getTime()) + " ms, " + now.getLabel());
+                logs.add(String.format("%s:      %d ms, %s", mLabel,
+                                                            now.getTime() - prev.getTime(),
+                                                            now.getLabel()));
             }
             logs.add(mLabel + ": end, " + (now.getTime() - first.getTime()) + " ms");
             return logs;
@@ -81,11 +83,13 @@ public final class Lumber {
     }
 
     static final Map<Object, Split> WOOD_SPLITS = new ConcurrentHashMap<Object, Split>();
+    static final String NOT_STARTED_FMT = "Cannot call '%s'. Split '%s' hasn't been started yet";
 
     public static void d(Object key) {
 
-        for (String l : getSplitLogs(key))
+        for (String l : getSplitLogs(key)) {
             Timber.d(l);
+        }
     }
 
     private static List<String> getSplitLogs(Object key) {
@@ -94,10 +98,11 @@ public final class Lumber {
         synchronized (WOOD_SPLITS) {
 
             if (WOOD_SPLITS.containsKey(key)) {
-
                 logs  = WOOD_SPLITS.get(key).getSplitLogs();
+            } else {
+                throw new IllegalStateException(String.format(NOT_STARTED_FMT,
+                        "getSplitLogs", key.toString()));
             }
-            else { throw new IllegalStateException(String.format("Cannot get split logs. Split '%s' hasn't been started yet",key.toString())); }
         }
         return logs;
     }
@@ -110,9 +115,11 @@ public final class Lumber {
 
                 Split split = new Split(name);
                 WOOD_SPLITS.put(key, split);
-                addSplit(key,name);
+                addSplit(key, name);
+            } else {
+                throw new IllegalStateException(String.format(NOT_STARTED_FMT,
+                        "startSplit", key.toString()));
             }
-            else { throw new IllegalStateException(String.format("Cannot call startSplit. Split '%s' has been already started",key.toString())); }
         }
     }
 
@@ -121,10 +128,11 @@ public final class Lumber {
         synchronized (WOOD_SPLITS) {
 
             if (WOOD_SPLITS.containsKey(key)) {
-
                 WOOD_SPLITS.get(key).addSplit(label);
+            } else {
+                throw new IllegalStateException(String.format(NOT_STARTED_FMT,
+                        "addSplit", key.toString()));
             }
-            else { throw new IllegalStateException(String.format("Cannot call addSplit. Split '%s' hasn't been started yet",key.toString())); }
         }
     }
 
@@ -133,22 +141,24 @@ public final class Lumber {
         synchronized (WOOD_SPLITS) {
 
             if (WOOD_SPLITS.containsKey(key)) {
-
                 WOOD_SPLITS.get(key).clearSplits();
+            } else {
+                throw new IllegalStateException(String.format(NOT_STARTED_FMT,
+                        "clear", key.toString()));
             }
-            else { throw new IllegalStateException(String.format("Cannot call clear. Split '%s' hasn't been started yet",key.toString())); }
         }
     }
 
-    public static void remove(Object key) {
+    public static Split remove(Object key) {
 
         synchronized (WOOD_SPLITS) {
 
             if (WOOD_SPLITS.containsKey(key)) {
-
-                WOOD_SPLITS.remove(key);
+                return WOOD_SPLITS.remove(key);
+            } else {
+                throw new IllegalStateException(String.format(NOT_STARTED_FMT,
+                        "remove", key.toString()));
             }
-            else { throw new IllegalStateException(String.format("Cannot call remove. Split '%s' hasn't been started yet",key.toString())); }
         }
     }
 
