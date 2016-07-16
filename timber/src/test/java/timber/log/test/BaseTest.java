@@ -11,6 +11,8 @@ import java.util.List;
 
 import timber.log.Timber;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 public class BaseTest {
@@ -55,24 +57,48 @@ public class BaseTest {
             return hasMessage(Log.VERBOSE, tag, message);
         }
 
+        public LogAssert containsVerboseMessage(String message) {
+            return containsMessage(Log.VERBOSE, message);
+        }
+
         public LogAssert hasDebugMessage(String tag, String message) {
             return hasMessage(Log.DEBUG, tag, message);
+        }
+
+        public LogAssert containsDebugMessage(String message) {
+            return containsMessage(Log.DEBUG, message);
         }
 
         public LogAssert hasInfoMessage(String tag, String message) {
             return hasMessage(Log.INFO, tag, message);
         }
 
+        public LogAssert containsInfoMessage(String message) {
+            return containsMessage(Log.INFO, message);
+        }
+
         public LogAssert hasWarnMessage(String tag, String message) {
             return hasMessage(Log.WARN, tag, message);
+        }
+
+        public LogAssert containsWarnMessage(String message) {
+            return containsMessage(Log.WARN, message);
         }
 
         public LogAssert hasErrorMessage(String tag, String message) {
             return hasMessage(Log.ERROR, tag, message);
         }
 
+        public LogAssert containsErrorMessage(String message) {
+            return containsMessage(Log.ERROR, message);
+        }
+
         public LogAssert hasAssertMessage(String tag, String message) {
             return hasMessage(Log.ASSERT, tag, message);
+        }
+
+        public LogAssert hasAssertMessage(String message) {
+            return containsMessage(Log.ASSERT, message);
         }
 
         private LogAssert hasMessage(int priority, String tag, String message) {
@@ -80,6 +106,15 @@ public class BaseTest {
             assertThat(item.type).isEqualTo(priority);
             assertThat(item.tag).isEqualTo(tag);
             assertThat(item.msg).isEqualTo(message);
+            return this;
+        }
+
+        private LogAssert containsMessage(int priority, String message) {
+            ShadowLog.LogItem item = items.get(index++);
+
+            assertEquals(item.type, priority);
+            assertTrue(item.msg.contains(message));
+
             return this;
         }
 
