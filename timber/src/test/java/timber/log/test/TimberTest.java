@@ -32,7 +32,7 @@ public class TimberTest extends BaseTest{
     Timber.d("Test");
 
     assertLog()
-        .hasDebugMessage("TimberTest:37", "Test")
+        .hasDebugMessage("TimberTest:32", "Test")
         .hasNoMoreMessages();
   }
 
