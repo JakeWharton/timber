@@ -11,10 +11,15 @@ import java.util.concurrent.ConcurrentHashMap;
 /** Timber timing logger utility */
 public final class Lumber {
 
-    public static class Woodchip {
+    public static class Splinter {
 
-        private long mTime;
-        private String mLabel;
+        private final int mPosition;
+        private final long mTime;
+        private final String mLabel;
+
+        public int getPosition() {
+            return mPosition;
+        }
 
         public long getTime() {
             return mTime;
@@ -24,45 +29,49 @@ public final class Lumber {
             return mLabel;
         }
 
-        public Woodchip(long time, String label) {
+        public Splinter(long time, String label, int position) {
 
             mTime = time;
             mLabel = label;
+            mPosition = position;
         }
     }
 
-    public static class Trace {
+    public static class Split {
 
         String mLabel = null;
-        List<Woodchip> mChips;
+        List<Splinter> mSplinters;
 
-        public Trace(String label) {
+        public Split(String label) {
+
             mLabel = label;
-            mChips = new ArrayList<>();
+            mSplinters = new ArrayList<>();
         }
 
-        public void addTrace(String chipLabel) {
+        public void addSplit(String chipLabel) {
 
             long now = SystemClock.elapsedRealtime();
-            Woodchip chip = new Woodchip(now, chipLabel);
-            mChips.add(chip);
+            Splinter chip = new Splinter(now, chipLabel, mSplinters.size());
+            mSplinters.add(chip);
         }
 
-        public List<Woodchip> getWoodchips() {
+        public void clearSplits() {
 
-            return mChips;
+            Splinter splinter = mSplinters.remove(0);
+            mSplinters.clear();
+            mSplinters.add(splinter);
         }
 
-        public List<String> getTraceLogs() {
+        public List<String> getSplitLogs() {
 
             List<String> logs = new ArrayList<>();
             logs.add(mLabel + ": begin");
-            final Woodchip first = mChips.get(0);
-            Woodchip now = first;
+            final Splinter first = mSplinters.get(0);
+            Splinter now = first;
 
-            for (int i = 1; i < mChips.size(); i++) {
-                now = mChips.get(i);
-                final Woodchip prev = mChips.get(i - 1);
+            for (int i = 1; i < mSplinters.size(); i++) {
+                now = mSplinters.get(i);
+                final Splinter prev = mSplinters.get(i - 1);
 
                 logs.add(mLabel + ":      " + (now.getTime() - prev.getTime()) + " ms, " + now.getLabel());
             }
@@ -71,47 +80,75 @@ public final class Lumber {
         }
     }
 
-    static final Map<Object, Trace> WOODCHIPS = new ConcurrentHashMap<Object, Trace>();
+    static final Map<Object, Split> WOOD_SPLITS = new ConcurrentHashMap<Object, Split>();
 
     public static void d(Object key) {
 
-        synchronized (WOODCHIPS) {
+        for (String l : getSplitLogs(key))
+            Timber.d(l);
+    }
 
-            if (WOODCHIPS.containsKey(key)) {
+    private static List<String> getSplitLogs(Object key) {
 
-                List<String> logs = WOODCHIPS.get(key).getTraceLogs();
-                for (String l : logs)
-                    Timber.d(l);
+        List<String> logs = new ArrayList<>();
+        synchronized (WOOD_SPLITS) {
+
+            if (WOOD_SPLITS.containsKey(key)) {
+
+                logs  = WOOD_SPLITS.get(key).getSplitLogs();
             }
+            else { throw new IllegalStateException(String.format("Cannot get split logs. Split '%s' hasn't been started yet",key.toString())); }
+        }
+        return logs;
+    }
+
+    public static void startSplit(Object key, String name) {
+
+        synchronized (WOOD_SPLITS) {
+
+            if (!WOOD_SPLITS.containsKey(key)) {
+
+                Split split = new Split(name);
+                WOOD_SPLITS.put(key, split);
+                addSplit(key,name);
+            }
+            else { throw new IllegalStateException(String.format("Cannot call startSplit. Split '%s' has been already started",key.toString())); }
         }
     }
 
-    public static void startTrace(Object key, String name) {
+    public static void addSplit(Object key, String label) {
 
-        synchronized (WOODCHIPS) {
+        synchronized (WOOD_SPLITS) {
 
-            if (!WOODCHIPS.containsKey(key)) {
+            if (WOOD_SPLITS.containsKey(key)) {
 
-                Trace trace = new Trace(name);
-                WOODCHIPS.put(key, trace);
+                WOOD_SPLITS.get(key).addSplit(label);
             }
-            else
-            {
-                throw new IllegalStateException(String.format("Cannot call startTrace. Trace for key '%s' has been already started",key.toString()));
-            }
+            else { throw new IllegalStateException(String.format("Cannot call addSplit. Split '%s' hasn't been started yet",key.toString())); }
         }
     }
 
-    public static void addTrace(Object key, String label) {
+    public static void clear(Object key) {
 
-        synchronized (WOODCHIPS) {
+        synchronized (WOOD_SPLITS) {
 
-            if (!WOODCHIPS.containsKey(key)) {
+            if (WOOD_SPLITS.containsKey(key)) {
 
-                throw new IllegalStateException(String.format("Cannot call addTrace. Trace for key '%s' hasn't been started yet",key.toString()));
+                WOOD_SPLITS.get(key).clearSplits();
             }
+            else { throw new IllegalStateException(String.format("Cannot call clear. Split '%s' hasn't been started yet",key.toString())); }
+        }
+    }
 
-            WOODCHIPS.get(key).addTrace(label);
+    public static void remove(Object key) {
+
+        synchronized (WOOD_SPLITS) {
+
+            if (WOOD_SPLITS.containsKey(key)) {
+
+                WOOD_SPLITS.remove(key);
+            }
+            else { throw new IllegalStateException(String.format("Cannot call remove. Split '%s' hasn't been started yet",key.toString())); }
         }
     }
 
