@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-/** Timber timing logger utility */
+/**
+ * Timber timing logger utility
+ */
 public final class Lumber {
 
     public static class Splinter {
@@ -73,9 +75,9 @@ public final class Lumber {
                 now = mSplinters.get(i);
                 final Splinter prev = mSplinters.get(i - 1);
 
-                logs.add(String.format("%s:      %d ms, %s", mLabel,
-                                                            now.getTime() - prev.getTime(),
-                                                            now.getLabel()));
+                logs.add(String.format("%s:      %dumpD ms, %s", mLabel,
+                        now.getTime() - prev.getTime(),
+                        now.getLabel()));
             }
             logs.add(mLabel + ": end, " + (now.getTime() - first.getTime()) + " ms");
             return logs;
@@ -85,10 +87,45 @@ public final class Lumber {
     static final Map<Object, Split> WOOD_SPLITS = new ConcurrentHashMap<Object, Split>();
     static final String NOT_STARTED_FMT = "Cannot call '%s'. Split '%s' hasn't been started yet";
 
-    public static void d(Object key) {
+    public static void dumpV(Object key) {
+        for (String l : getSplitLogs(key)) {
+            Timber.v(l);
+        }
+    }
 
+    public static void dumpD(Object key) {
         for (String l : getSplitLogs(key)) {
             Timber.d(l);
+        }
+    }
+
+    public static void dumpI(Object key) {
+        for (String l : getSplitLogs(key)) {
+            Timber.i(l);
+        }
+    }
+
+    public static void dumpW(Object key) {
+        for (String l : getSplitLogs(key)) {
+            Timber.w(l);
+        }
+    }
+
+    public static void dumpE(Object key) {
+        for (String l : getSplitLogs(key)) {
+            Timber.e(l);
+        }
+    }
+
+    public static void dumpWTF(Object key) {
+        for (String l : getSplitLogs(key)) {
+            Timber.wtf(l);
+        }
+    }
+
+    public static void dumpLog(int priority, Object key) {
+        for (String l : getSplitLogs(key)) {
+            Timber.log(priority, l);
         }
     }
 
@@ -98,7 +135,7 @@ public final class Lumber {
         synchronized (WOOD_SPLITS) {
 
             if (WOOD_SPLITS.containsKey(key)) {
-                logs  = WOOD_SPLITS.get(key).getSplitLogs();
+                logs = WOOD_SPLITS.get(key).getSplitLogs();
             } else {
                 throw new IllegalStateException(String.format(NOT_STARTED_FMT,
                         "getSplitLogs", key.toString()));

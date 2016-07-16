@@ -38,7 +38,7 @@ public class DemoActivity extends Activity {
     Timber.i("A button with ID %s was clicked to say '%s'.", button.getId(), button.getText());
     Toast.makeText(this, "Check logcat for a greeting!", LENGTH_SHORT).show();
     Lumber.addSplit(this,"Toast shown");
-    Lumber.d(this);
+    Lumber.dumpD(this);
   }
 
   @OnClick(R.id.clearLumber)
@@ -47,6 +47,6 @@ public class DemoActivity extends Activity {
     Lumber.clear(this);
     Lumber.addSplit(this,"Lumber cleared");
     Toast.makeText(this, "Check logcat for a cleared Lumber!", LENGTH_SHORT).show();
-    Lumber.d(this);
+    Lumber.dumpD(this);
   }
 }

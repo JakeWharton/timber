@@ -1,5 +1,7 @@
 package timber.log.test;
 
+import android.util.Log;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +32,7 @@ public class LumberTest extends BaseTest {
         Lumber.startSplit(key, "TRACE");
         Lumber.addSplit(key, "MIDDLE");
         Lumber.addSplit(key, "END");
-        Lumber.d(key);
+        Lumber.dumpLog(Log.DEBUG, key);
 
         assertLog()
                 .containsDebugMessage("LumberTest", "TRACE: begin")
