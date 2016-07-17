@@ -6,4 +6,5 @@
   <string name="hello">Hello</string>
   <string name="hi">Hi</string>
   <string name="hey">Hey</string>
+  <string name="clear_lumber">Clear Lumber</string>
 </resources>

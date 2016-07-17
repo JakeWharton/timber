@@ -23,6 +23,14 @@
       android:id="@+id/hey"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:layout_marginBottom="10dp"
       android:text="@string/hey"
+      />
+  <Button
+      android:id="@+id/clearLumber"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="10dp"
+      android:text="@string/clear_lumber"
       />
 </LinearLayout>
