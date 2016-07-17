@@ -75,7 +75,7 @@ public final class Lumber {
                 now = mSplinters.get(i);
                 final Splinter prev = mSplinters.get(i - 1);
 
-                logs.add(String.format("%s:      %dumpD ms, %s", mLabel,
+                logs.add(String.format("%s:      %d ms, %s", mLabel,
                         now.getTime() - prev.getTime(),
                         now.getLabel()));
             }
