@@ -34,7 +34,7 @@ public class LumberTest extends BaseTest {
     }
 
     @Test
-    public void baseTest() {
+    public void baseUsage() {
 
         Lumber.startSplit("KEY", "TRACE");
         Lumber.addSplit("KEY", "MIDDLE");
@@ -50,7 +50,7 @@ public class LumberTest extends BaseTest {
     }
 
     @Test
-    public void multipleKeysTest() {
+    public void multipleKeysAndPrio() {
 
         Lumber.startSplit("KEY1", "TRACE 1");
         Lumber.startSplit("KEY2", "TRACE 2");
@@ -69,7 +69,7 @@ public class LumberTest extends BaseTest {
         Lumber.dumpLog(Log.WARN, "KEY3");
 
         assertLog()
-                .debugLogs()
+//                .debugLogs()
                 .containsDebugMessage("LumberTest", "TRACE 1: begin")
                 .containsDebugMessage("LumberTest", "START 1")
                 .containsDebugMessage("LumberTest", "END 1")
@@ -86,7 +86,28 @@ public class LumberTest extends BaseTest {
     }
 
     @Test
-    public void testAddWithoutStart() {
+    public void resetSplit() {
+
+        Lumber.startSplit("KEY", "TRACE");
+        Lumber.addSplit("KEY", "1");
+        Lumber.addSplit("KEY", "2");
+        Lumber.addSplit("KEY", "3");
+        Lumber.addSplit("KEY", "4");
+        Lumber.addSplit("KEY", "5");
+        Lumber.addSplit("KEY", "6");
+        Lumber.addSplit("KEY", "END");
+        Lumber.resetSplit("KEY");
+        Lumber.dumpD("KEY");
+
+        assertLog()
+//                .debugLogs()
+                .containsDebugMessage("LumberTest", "TRACE: begin")
+                .containsDebugMessage("LumberTest", "TRACE: end")
+                .hasNoMoreMessages();
+    }
+
+    @Test
+    public void addWithoutStart() {
 
         try {
             Lumber.addSplit("KEY", "TRACE");
@@ -97,7 +118,22 @@ public class LumberTest extends BaseTest {
     }
 
     @Test
-    public void testSameKeyStart() {
+    public void removeSplit() {
+
+        try {
+            Lumber.startSplit("KEY", "TRACE");
+            Lumber.addSplit("KEY", "TRACE 1");
+            Lumber.addSplit("KEY", "TRACE 2");
+            Lumber.remove("KEY");
+            Lumber.addSplit("KEY", "TRACE 3");
+            fail();
+        } catch (IllegalStateException e) {
+            assertThat(e).hasMessage("Cannot call 'addSplit'. Split 'KEY' hasn't been started yet");
+        }
+    }
+
+    @Test
+    public void sameKeyStart() {
 
         try {
             Lumber.startSplit("KEY", "TRACE");
@@ -108,6 +144,4 @@ public class LumberTest extends BaseTest {
                     + "Split 'KEY' has been already started");
         }
     }
-
-
 }
