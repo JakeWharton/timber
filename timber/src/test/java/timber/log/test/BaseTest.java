@@ -53,6 +53,17 @@ public class BaseTest {
             this.items = items;
         }
 
+        public LogAssert debugLogs() {
+
+            if (items != null) {
+                for (ShadowLog.LogItem item : items) {
+                    System.out.println(item.toString());
+                }
+            }
+
+            return this;
+        }
+
         public LogAssert hasVerboseMessage(String tag, String message) {
             return hasMessage(Log.VERBOSE, tag, message);
         }
