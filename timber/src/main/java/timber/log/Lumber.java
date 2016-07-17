@@ -70,13 +70,16 @@ public final class Lumber {
             logs.add(mLabel + ": begin");
             final Splinter first = mSplinters.get(0);
             Splinter now = first;
+            Long partial = 0L;
 
             for (int i = 1; i < mSplinters.size(); i++) {
                 now = mSplinters.get(i);
                 final Splinter prev = mSplinters.get(i - 1);
-
-                logs.add(String.format("%s:      %d ms, %s", mLabel,
-                        now.getTime() - prev.getTime(),
+                final long diff = now.getTime() - prev.getTime();
+                partial += diff;
+                logs.add(String.format("%s:      %d ms (%d ms), %s", mLabel,
+                        diff,
+                        partial,
                         now.getLabel()));
             }
             logs.add(mLabel + ": end, " + (now.getTime() - first.getTime()) + " ms");
