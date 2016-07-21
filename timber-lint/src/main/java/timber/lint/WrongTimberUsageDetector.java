@@ -56,7 +56,7 @@ import static com.android.tools.lint.client.api.JavaParser.TYPE_STRING;
 public final class WrongTimberUsageDetector extends Detector implements Detector.JavaScanner,
     Detector.ClassScanner {
   private final static String GET_STRING_METHOD = "getString";
-  private static final String TIMBER_TREE_LOG_METHOD_REGEXP = "(v|d|i|w|e|wtf)";
+  private final static String TIMBER_TREE_LOG_METHOD_REGEXP = "(v|d|i|w|e|wtf)";
 
   @NonNull @Override public Speed getSpeed() {
     return Speed.NORMAL;
