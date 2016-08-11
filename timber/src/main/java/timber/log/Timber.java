@@ -382,6 +382,9 @@ public final class Timber {
     }
 
     private void prepareLog(int priority, Throwable t, String message, Object... args) {
+      // Consume tag even when message is not loggable so that next message is correctly tagged.
+      String tag = getTag();
+
       if (!isLoggable(priority)) {
         return;
       }
@@ -402,7 +405,7 @@ public final class Timber {
         }
       }
 
-      log(priority, getTag(), message, t);
+      log(priority, tag, message, t);
     }
 
     private String getStackTraceString(Throwable t) {

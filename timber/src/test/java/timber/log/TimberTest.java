@@ -351,6 +351,21 @@ public class TimberTest {
     assertExceptionLogged("", "UnknownHostException");
   }
 
+  @Test public void tagIsClearedWhenNotLoggable() {
+    Timber.plant(new Timber.DebugTree() {
+      @Override
+      protected boolean isLoggable(int priority) {
+        return priority >= Log.WARN;
+      }
+    });
+    Timber.tag("NotLogged").i("Message not logged");
+    Timber.w("Message logged");
+
+    assertLog()
+        .hasWarnMessage("TimberTest", "Message logged")
+        .hasNoMoreMessages();
+  }
+
   private static String repeat(char c, int number) {
     char[] data = new char[number];
     Arrays.fill(data, c);
