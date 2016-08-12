@@ -383,7 +383,7 @@ public final class Timber {
 
     private void prepareLog(int priority, Throwable t, String message, Object... args) {
 
-      // consume tag, even if priority is not loggable, otherwise next message without explicit tag and loggable, will take erroneous tag
+      // Consume tag even when message is not loggable. So that next message is correctly tagged.
       final String tag = getTag();
 
       if (!isLoggable(priority)) {
