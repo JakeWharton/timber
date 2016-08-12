@@ -24,6 +24,7 @@ import lombok.ast.BinaryExpression;
 import lombok.ast.BinaryOperator;
 import lombok.ast.BooleanLiteral;
 import lombok.ast.CharLiteral;
+import lombok.ast.DescribedNode;
 import lombok.ast.Expression;
 import lombok.ast.ExpressionStatement;
 import lombok.ast.FloatingPointLiteral;
@@ -55,6 +56,7 @@ import static com.android.tools.lint.client.api.JavaParser.TYPE_STRING;
 public final class WrongTimberUsageDetector extends Detector implements Detector.JavaScanner,
     Detector.ClassScanner {
   private final static String GET_STRING_METHOD = "getString";
+  private final static String TIMBER_TREE_LOG_METHOD_REGEXP = "(v|d|i|w|e|wtf)";
 
   @NonNull @Override public Speed getSpeed() {
     return Speed.NORMAL;
@@ -98,7 +100,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         return;
       }
       ExpressionStatement statement = (ExpressionStatement) current;
-      if (!Pattern.matches("^Timber\\.(v|d|i|w|e|wtf).*", statement.toString())) {
+      if (!Pattern.matches("^Timber\\." + TIMBER_TREE_LOG_METHOD_REGEXP + ".*", statement.toString())) {
         return;
       }
       context.report(ISSUE_FORMAT, node, context.getLocation(node),
@@ -116,29 +118,77 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
             tag.length(), tag);
         context.report(ISSUE_TAG_LENGTH, node, context.getLocation(argument), message);
       }
-    } else {
-      if (node.astOperand() instanceof VariableReference) {
-        VariableReference ref = (VariableReference) node.astOperand();
-        if (!"Timber".equals(ref.astIdentifier().astValue())) {
-          return;
+    } else if (node.astOperand() instanceof VariableReference) {
+      VariableReference ref = (VariableReference) node.astOperand();
+      if (!"Timber".equals(ref.astIdentifier().astValue())) {
+        return;
+      }
+      checkThrowablePosition(context, node);
+      checkArguments(context, node);
+    } else if (isAstOperandTimberTagLogPattern(node)) {
+      List<Node> siblings = node.astOperand().getParent().getChildren();
+
+      List<Node> logNodes = siblings.subList(1, siblings.size());
+      List<Expression> expressionNodes = new ArrayList<>(); // casted version of logNodes
+
+      List<Node> logArgs = logNodes.subList(1, logNodes.size());
+      for (Node n : logArgs) {
+        if (!(n instanceof lombok.ast.Expression)) {
+          continue; // this is a failure; see `if` guard just outside of this loop
         }
-        checkThrowablePosition(context, node);
-        checkArguments(context, node);
+        expressionNodes.add((Expression) n);
+      }
+
+      // If we're short an Expression, then our guess about this node and its siblings may be wrong,
+      if (expressionNodes.size() == logArgs.size()) {
+        checkStringFormatArguments(
+            context, node, expressionNodes.iterator(), expressionNodes.size());
       }
     }
   }
 
+  /**
+   * Rough guess as to whether node represents a `Timber.tag(TAG).v(...)` style log experssion.
+   *
+   * TODO: "Rough guess" because a proper check would check that `v` is being called on an instance
+   * of a planted tree, but this is a quick & dirty hack in place of that (eg: generalized something
+   * like a JavaContext.resolve check on `node`?).
+   */
+  private static boolean isAstOperandTimberTagLogPattern(MethodInvocation node) {
+    Expression astOperand = node.astOperand();
+    if (!(astOperand instanceof MethodInvocation)) {
+      return false;
+    }
+    MethodInvocation m = (MethodInvocation) astOperand;
+
+    if (!"Timber".equals(m.rawOperand().toString())
+        || !"tag".equals(m.astName().toString())
+        || !Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, node.astName().getDescription())) {
+      // Is not of the form "Timber.tag(...).w(...)" (where "w()" can be any valid log method)
+      return false;
+    }
+
+    return (m.getParent().getChildren().get(1) instanceof DescribedNode);
+  }
+
   private static void checkArguments(JavaContext context, MethodInvocation node) {
     StrictListAccessor<Expression, MethodInvocation> astArguments = node.astArguments();
-    Iterator<Expression> iterator = astArguments.iterator();
-    if (!iterator.hasNext()) {
+    checkStringFormatArguments(context, node, astArguments.iterator(), astArguments.size());
+  }
+
+  private static void checkStringFormatArguments(
+      JavaContext context,
+      MethodInvocation reportNode,
+      Iterator<Expression> logArguments,
+      int originalArgSize) {
+    if (!logArguments.hasNext()) {
       return;
     }
     int startIndexOfArguments = 1;
-    Expression formatStringArg = iterator.next();
+    Expression formatStringArg = logArguments.next();
     if (formatStringArg instanceof VariableReference) {
       if (isSubclassOf(context, (VariableReference) formatStringArg, Throwable.class)) {
-        formatStringArg = iterator.next();
+        formatStringArg = logArguments.next();
         startIndexOfArguments++;
       }
     }
@@ -149,9 +199,9 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       return;
     }
     int argumentCount = getFormatArgumentCount(formatString);
-    int passedArgCount = astArguments.size() - startIndexOfArguments;
+    int passedArgCount = originalArgSize - startIndexOfArguments;
     if (argumentCount < passedArgCount) {
-      context.report(ISSUE_ARG_COUNT, node, context.getLocation(node), String.format(
+      context.report(ISSUE_ARG_COUNT, reportNode, context.getLocation(reportNode), String.format(
               "Wrong argument count, format string `%1$s` requires "
                   + "`%2$d` but format call supplies `%3$d`", formatString, argumentCount,
               passedArgCount));
@@ -167,10 +217,10 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     boolean valid;
     for (int i = 0; i < types.size(); i++) {
       String formatType = types.get(i);
-      if (iterator.hasNext()) {
-        argument = iterator.next();
+      if (logArguments.hasNext()) {
+        argument = logArguments.next();
       } else {
-        context.report(ISSUE_ARG_COUNT, node, context.getLocation(node), String.format(
+        context.report(ISSUE_ARG_COUNT, reportNode, context.getLocation(reportNode), String.format(
                 "Wrong argument count, format string `%1$s` requires "
                     + "`%2$d` but format call supplies `%3$d`", formatString, argumentCount,
                 passedArgCount));
@@ -226,7 +276,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
                   + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
                   + "(argument #%5$d in method call)", i + 1, formatString, formatType,
               type.getSimpleName(), startIndexOfArguments + i + 1);
-          context.report(ISSUE_ARG_TYPES, node, context.getLocation(argument), message);
+          context.report(ISSUE_ARG_TYPES, reportNode, context.getLocation(argument), message);
         }
       }
     }
