@@ -1,9 +1,6 @@
 package timber.log;
 
 import android.util.Log;
-
-import org.jetbrains.annotations.NonNls;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -11,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jetbrains.annotations.NonNls;
 
 import static java.util.Collections.unmodifiableList;
 
