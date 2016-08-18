@@ -207,79 +207,51 @@ public class TimberTest {
     NullPointerException datThrowable = new NullPointerException();
     Timber.e(datThrowable, "OMFG!");
 
-    assertExceptionLogged("OMFG!", "java.lang.NullPointerException");
+    assertExceptionLogged(Log.ERROR, "OMFG!", "java.lang.NullPointerException", null, null);
   }
 
-  @Test public void shortcutExceptionVerbose() {
+  @Test public void exceptionOnly() {
     Timber.plant(new Timber.DebugTree());
+
     Timber.v(new IllegalArgumentException());
-    assertExceptionLogged(Log.VERBOSE, "java.lang.IllegalArgumentException", "TimberTest");
-  }
+    assertExceptionLogged(Log.VERBOSE, null, "java.lang.IllegalArgumentException", "TimberTest", 0);
 
-  @Test public void shortcutExceptionInfo() {
-    Timber.plant(new Timber.DebugTree());
     Timber.i(new NullPointerException());
-    assertExceptionLogged(Log.INFO, "java.lang.NullPointerException", "TimberTest");
-  }
+    assertExceptionLogged(Log.INFO, null, "java.lang.NullPointerException", "TimberTest", 1);
 
-  @Test public void shortcutExceptionDebug() {
-    Timber.plant(new Timber.DebugTree());
     Timber.d(new UnsupportedOperationException());
-    assertExceptionLogged(Log.DEBUG, "java.lang.UnsupportedOperationException", "TimberTest");
-  }
+    assertExceptionLogged(Log.DEBUG, null, "java.lang.UnsupportedOperationException", "TimberTest", 2);
 
-  @Test public void shortcutExceptionWarn() {
-    Timber.plant(new Timber.DebugTree());
     Timber.w(new UnknownHostException());
-    assertExceptionLogged(Log.WARN, "java.net.UnknownHostException", "TimberTest");
-  }
+    assertExceptionLogged(Log.WARN, null, "java.net.UnknownHostException", "TimberTest", 3);
 
-  @Test public void shortcutExceptionError() {
-    Timber.plant(new Timber.DebugTree());
     Timber.e(new ConnectException());
-    assertExceptionLogged(Log.ERROR, "java.net.ConnectException", "TimberTest");
-  }
+    assertExceptionLogged(Log.ERROR, null, "java.net.ConnectException", "TimberTest", 4);
 
-  @Test public void shortcutExceptionAssert() {
-    Timber.plant(new Timber.DebugTree());
     Timber.wtf(new AssertionError());
-    assertExceptionLogged(Log.ASSERT, "java.lang.AssertionError", "TimberTest");
+    assertExceptionLogged(Log.ASSERT, null, "java.lang.AssertionError", "TimberTest", 5);
   }
 
-  @Test public void shortcutExceptionVerboseCustomTag() {
+  @Test public void exceptionOnlyCustomTag() {
     Timber.plant(new Timber.DebugTree());
+
     Timber.tag("Custom").v(new IllegalArgumentException());
-    assertExceptionLogged(Log.VERBOSE, "java.lang.IllegalArgumentException", "Custom");
-  }
+    assertExceptionLogged(Log.VERBOSE, null, "java.lang.IllegalArgumentException", "Custom", 0);
 
-  @Test public void shortcutExceptionInfoCustomTag() {
-    Timber.plant(new Timber.DebugTree());
     Timber.tag("Custom").i(new NullPointerException());
-    assertExceptionLogged(Log.INFO, "java.lang.NullPointerException", "Custom");
-  }
+    assertExceptionLogged(Log.INFO, null, "java.lang.NullPointerException", "Custom", 1);
 
-  @Test public void shortcutExceptionDebugCustomTag() {
-    Timber.plant(new Timber.DebugTree());
     Timber.tag("Custom").d(new UnsupportedOperationException());
-    assertExceptionLogged(Log.DEBUG, "java.lang.UnsupportedOperationException", "Custom");
-  }
+    assertExceptionLogged(Log.DEBUG, null, "java.lang.UnsupportedOperationException", "Custom", 2);
 
-  @Test public void shortcutExceptionWarnCustomTag() {
-    Timber.plant(new Timber.DebugTree());
     Timber.tag("Custom").w(new UnknownHostException());
-    assertExceptionLogged(Log.WARN, "java.net.UnknownHostException", "Custom");
-  }
+    assertExceptionLogged(Log.WARN, null, "java.net.UnknownHostException", "Custom", 3);
 
-  @Test public void shortcutExceptionErrorCustomTag() {
-    Timber.plant(new Timber.DebugTree());
     Timber.tag("Custom").e(new ConnectException());
-    assertExceptionLogged(Log.ERROR, "java.net.ConnectException", "Custom");
-  }
+    assertExceptionLogged(Log.ERROR, null, "java.net.ConnectException", "Custom", 4);
 
-  @Test public void shortcutExceptionAssertCustomTag() {
-    Timber.plant(new Timber.DebugTree());
     Timber.tag("Custom").wtf(new AssertionError());
-    assertExceptionLogged(Log.ASSERT, "java.lang.AssertionError", "Custom");
+    assertExceptionLogged(Log.ASSERT, null, "java.lang.AssertionError", "Custom", 5);
   }
 
   @Test public void exceptionFromSpawnedThread() throws InterruptedException {
@@ -293,7 +265,7 @@ public class TimberTest {
       }
     }.run();
     latch.await();
-    assertExceptionLogged("OMFG!", "java.lang.NullPointerException");
+    assertExceptionLogged(Log.ERROR, "OMFG!", "java.lang.NullPointerException", null, null);
   }
 
   @Test public void nullMessageWithThrowable() {
@@ -301,7 +273,7 @@ public class TimberTest {
     final NullPointerException datThrowable = new NullPointerException();
     Timber.e(datThrowable, null);
 
-    assertExceptionLogged("", "java.lang.NullPointerException");
+    assertExceptionLogged(Log.ERROR, "", "java.lang.NullPointerException", null, null);
   }
 
   @Test public void chunkAcrossNewlinesAndLimit() {
@@ -421,7 +393,7 @@ public class TimberTest {
     Timber.plant(new Timber.DebugTree());
     Timber.e(new UnknownHostException(), null);
 
-    assertExceptionLogged("", "UnknownHostException");
+    assertExceptionLogged(Log.ERROR, "", "UnknownHostException", null, null);
   }
 
   @Test public void tagIsClearedWhenNotLoggable() {
@@ -445,24 +417,19 @@ public class TimberTest {
     return new String(data);
   }
 
-  private static void assertExceptionLogged(String message, String exceptionClassname) {
-    List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(1);
-    LogItem log = logs.get(0);
-    assertThat(log.type).isEqualTo(Log.ERROR);
-    assertThat(log.tag).isEqualTo("TimberTest");
-    assertThat(log.msg).startsWith(message);
-    assertThat(log.msg).contains(exceptionClassname);
-    // We use a low-level primitive that Robolectric doesn't populate.
-    assertThat(log.throwable).isNull();
-  }
+  private static void assertExceptionLogged(int logType, String message, String exceptionClassname, String tag, Integer index) {
+    if (index == null) index = 0;
 
-  private static void assertExceptionLogged(int logType, String exceptionClassname, String tag) {
     List<LogItem> logs = ShadowLog.getLogs();
-    assertThat(logs).hasSize(1);
-    LogItem log = logs.get(0);
+    assertThat(logs).hasSize(index + 1);
+    LogItem log = logs.get(index);
     assertThat(log.type).isEqualTo(logType);
-    assertThat(log.tag).isEqualTo(tag);
+    assertThat(log.tag).isEqualTo(tag != null ? tag : "TimberTest");
+
+    if (message != null) {
+      assertThat(log.msg).startsWith(message);
+    }
+
     assertThat(log.msg).contains(exceptionClassname);
     // We use a low-level primitive that Robolectric doesn't populate.
     assertThat(log.throwable).isNull();
