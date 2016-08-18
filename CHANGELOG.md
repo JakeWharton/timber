@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 4.3.0 *(2016-08-18)*
+----------------------------
+
+ * New: Overloads for all log methods which accept only a `Throwable` without a message.
+
+
 Version 4.2.0 *(2016-08-12)*
 ----------------------------
 
