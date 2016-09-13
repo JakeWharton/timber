@@ -263,7 +263,7 @@ public class TimberTest {
         Timber.e(datThrowable, "OMFG!");
         latch.countDown();
       }
-    }.run();
+    }.start();
     latch.await();
     assertExceptionLogged(Log.ERROR, "OMFG!", "java.lang.NullPointerException");
   }
