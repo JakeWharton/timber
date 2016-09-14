@@ -389,6 +389,24 @@ public class TimberTest {
         .hasNoMoreMessages();
   }
 
+  @Test public void isLoggableTagControlsLogging() {
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected boolean isLoggable(String tag, int priority) {
+        return "FILTER".equals(tag);
+      }
+    });
+    Timber.tag("FILTER").v("Hello, World!");
+    Timber.d("Hello, World!");
+    Timber.i("Hello, World!");
+    Timber.w("Hello, World!");
+    Timber.e("Hello, World!");
+    Timber.wtf("Hello, World!");
+
+    assertLog()
+        .hasVerboseMessage("FILTER", "Hello, World!")
+        .hasNoMoreMessages();
+  }
+
   @Test public void logsUnknownHostExceptions() {
     Timber.plant(new Timber.DebugTree());
     Timber.e(new UnknownHostException(), null);
