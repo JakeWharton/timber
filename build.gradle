@@ -3,7 +3,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:2.1.2'
+    classpath 'com.android.tools.build:gradle:2.1.3'
   }
 }
 
@@ -20,6 +20,7 @@ ext {
   buildToolsVersion = '24.0.0'
   sourceCompatibilityVersion = JavaVersion.VERSION_1_7
   targetCompatibilityVersion = JavaVersion.VERSION_1_7
+  lintVersion = '25.1.2'
 }
 
 ext.deps = [
@@ -31,6 +32,6 @@ ext.deps = [
     robolectric: 'org.robolectric:robolectric:3.0',
 
     // Lint dependencies
-    lintapi    : 'com.android.tools.lint:lint-api:24.3.1',
-    lintchecks : 'com.android.tools.lint:lint-checks:24.3.1'
+    lintapi    : "com.android.tools.lint:lint-api:${lintVersion}",
+    lintchecks : "com.android.tools.lint:lint-checks:${lintVersion}"
 ]
