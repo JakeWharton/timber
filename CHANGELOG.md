@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 4.3.1 *(2016-09-19)*
+----------------------------
+
+ * New: Add convenience method `isLoggable` convenience method which also provides the tag.
+
+
 Version 4.3.0 *(2016-08-18)*
 ----------------------------
 
