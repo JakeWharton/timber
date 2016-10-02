@@ -39,7 +39,7 @@ public class TimberTest {
     Timber.d("Test");
 
     assertLog()
-        .hasDebugMessage("TimberTest:38", "Test")
+        .hasDebugMessage("TimberTest:39", "Test")
         .hasNoMoreMessages();
   }
 
