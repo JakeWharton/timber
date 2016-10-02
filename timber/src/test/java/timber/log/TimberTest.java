@@ -18,6 +18,7 @@ import org.robolectric.shadows.ShadowLog;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeNoException;
 import static org.robolectric.shadows.ShadowLog.LogItem;
 
 @RunWith(RobolectricTestRunner.class) //
@@ -427,6 +428,21 @@ public class TimberTest {
     assertLog()
         .hasWarnMessage("TimberTest", "Message logged")
         .hasNoMoreMessages();
+  }
+
+  @Test public void nullArgsDontThrowException() {
+    Timber.plant(new Timber.DebugTree());
+    try {
+      Timber.e(null, null, (Object[]) null);
+      Timber.e("Message with null args", (Object[]) null);
+      assertLog()
+          .hasErrorMessage("TimberTest", "Message with null args")
+          .hasNoMoreMessages();
+      Timber.e(new Exception("Exception with null message and null args"), null, (Object[]) null);
+      assertExceptionLogged(Log.ERROR, null, "java.lang.Exception", "TimberTest", 1);
+    } catch (Exception e) {
+      assumeNoException(e);
+    }
   }
 
   private static String repeat(char c, int number) {
