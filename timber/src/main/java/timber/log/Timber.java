@@ -487,6 +487,15 @@ public final class Timber {
       prepareLog(Log.ASSERT, t, null);
     }
 
+    /** Log a "Loud Assertion" */
+    public void loud(String message) {
+      prepareLog(Log.ASSERT, null,  "============================================== \n" +
+                                    "============================================== \n" +
+                                     message +
+                                    "============================================== \n" +
+                                    "==============================================", null);
+    }
+
     /** Log at {@code priority} a message with optional format args. */
     public void log(int priority, String message, Object... args) {
       prepareLog(priority, null, message, args);
