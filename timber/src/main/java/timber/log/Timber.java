@@ -547,8 +547,8 @@ public final class Timber {
      * Formats log message with arguments.
      * @param message Formatted log message.
      * @param args optional arguments used by log message.
-       * @return
-       */
+     * @return formatted message.
+     */
     protected String formatMessage(String message, Object[] args) {
       return String.format(message, args);
     }
