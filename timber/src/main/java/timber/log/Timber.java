@@ -533,7 +533,7 @@ public final class Timber {
         message = getStackTraceString(t);
       } else {
         if (args.length > 0) {
-          message = String.format(message, args);
+          message = formatMessage(message, args);
         }
         if (t != null) {
           message += "\n" + getStackTraceString(t);
@@ -541,6 +541,16 @@ public final class Timber {
       }
 
       log(priority, tag, message, t);
+    }
+
+    /**
+     * Formats log message with arguments.
+     * @param message Formatted log message.
+     * @param args optional arguments used by log message.
+       * @return
+       */
+    protected String formatMessage(String message, Object[] args) {
+      return String.format(message, args);
     }
 
     private String getStackTraceString(Throwable t) {
