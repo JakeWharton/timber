@@ -429,6 +429,19 @@ public class TimberTest {
         .hasNoMoreMessages();
   }
 
+  @Test public void logsWithCustomFormatter() {
+    Timber.plant(new Timber.DebugTree() {
+      @Override
+      protected String formatMessage(String message, Object[] args) {
+        return String.format("Test formatting: "+message, args);
+      }
+    });
+    Timber.d("Test message logged. %d", 100);
+
+    assertLog()
+        .hasDebugMessage("TimberTest", "Test formatting: Test message logged. 100");
+  }
+
   private static String repeat(char c, int number) {
     char[] data = new char[number];
     Arrays.fill(data, c);
