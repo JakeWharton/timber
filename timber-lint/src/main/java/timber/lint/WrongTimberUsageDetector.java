@@ -500,7 +500,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       }
       if (argument instanceof VariableReference) {
         VariableReference variableReference = (VariableReference) argument;
-        if (isSubclassOf(context, variableReference, Throwable.class) && index > 0) {
+        if (index > 0 && isSubclassOf(context, variableReference, Throwable.class)) {
           context.report(ISSUE_THROWABLE, node, context.getLocation(node),
               "Throwable should be first argument");
         }
