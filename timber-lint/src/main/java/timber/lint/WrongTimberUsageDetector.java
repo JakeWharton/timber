@@ -5,7 +5,6 @@ import com.android.annotations.Nullable;
 import com.android.tools.lint.checks.StringFormatDetector;
 import com.android.tools.lint.client.api.JavaParser;
 import com.android.tools.lint.detector.api.Category;
-import com.android.tools.lint.detector.api.ClassContext;
 import com.android.tools.lint.detector.api.Detector;
 import com.android.tools.lint.detector.api.Implementation;
 import com.android.tools.lint.detector.api.Issue;
@@ -37,9 +36,6 @@ import lombok.ast.NullLiteral;
 import lombok.ast.StrictListAccessor;
 import lombok.ast.StringLiteral;
 import lombok.ast.VariableReference;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 
 import static com.android.tools.lint.client.api.JavaParser.TYPE_BOOLEAN;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_BYTE;
@@ -53,8 +49,7 @@ import static com.android.tools.lint.client.api.JavaParser.TYPE_OBJECT;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_SHORT;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_STRING;
 
-public final class WrongTimberUsageDetector extends Detector implements Detector.JavaScanner,
-    Detector.ClassScanner {
+public final class WrongTimberUsageDetector extends Detector implements Detector.JavaScanner {
   private final static String GET_STRING_METHOD = "getString";
   private final static String TIMBER_TREE_LOG_METHOD_REGEXP = "(v|d|i|w|e|wtf)";
 
@@ -62,21 +57,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return Speed.NORMAL;
   }
 
-  @Override public List<String> getApplicableCallNames() {
-    return Arrays.asList("v", "d", "i", "w", "e", "wtf");
-  }
-
   @Override public List<String> getApplicableMethodNames() {
     return Arrays.asList("tag", "format", "v", "d", "i", "w", "e", "wtf");
-  }
-
-  @Override public void checkCall(@NonNull ClassContext context, @NonNull ClassNode classNode,
-      @NonNull MethodNode method, @NonNull MethodInsnNode call) {
-    String owner = call.owner;
-    if (owner.startsWith("android/util/Log")) {
-      context.report(ISSUE_LOG, method, call, context.getLocation(call),
-          "Using 'Log' instead of 'Timber'");
-    }
   }
 
   @Override public void visitMethod(@NonNull JavaContext context, AstVisitor visitor,
@@ -123,6 +105,11 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       }
     } else if (node.astOperand() instanceof VariableReference) {
       VariableReference ref = (VariableReference) node.astOperand();
+      if ("Log".equals(ref.astIdentifier().astValue())) {
+        context.report(ISSUE_LOG, node, context.getLocation(node),
+            "Using 'Log' instead of 'Timber'");
+        return;
+      }
       if (!"Timber".equals(ref.astIdentifier().astValue())) {
         return;
       }
@@ -551,7 +538,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       Issue.create("LogNotTimber", "Logging call to Log instead of Timber",
           "Since Timber is included in the project, it is likely that calls to Log should instead"
               + " be going to Timber.", Category.MESSAGES, 5, Severity.WARNING,
-          new Implementation(WrongTimberUsageDetector.class, Scope.CLASS_FILE_SCOPE));
+          new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
   public static final Issue ISSUE_FORMAT =
       Issue.create("StringFormatInTimber", "Logging call with Timber contains String#format()",
           "Since Timber handles String.format automatically, you may not use String#format().",
