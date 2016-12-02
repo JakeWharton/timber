@@ -113,6 +113,10 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
           return;
         }
       }
+
+      if (node.astArguments().isEmpty()) {
+        return;
+      }
       Node argument = node.astArguments().iterator().next();
       String tag = findLiteralValue(context, argument);
       if (tag != null && tag.length() > 23) {
