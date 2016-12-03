@@ -110,7 +110,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     } else if (node.astOperand() instanceof VariableReference) {
       VariableReference ref = (VariableReference) node.astOperand();
       if ("Log".equals(ref.astIdentifier().astValue())) {
-        context.report(ISSUE_LOG, node, context.getLocation(node),
+        context.report(ISSUE_LOG, node, context.getRangeLocation(node, 0, node.astName(), 0),
             "Using 'Log' instead of 'Timber'");
         return;
       }
