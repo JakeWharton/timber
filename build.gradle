@@ -33,5 +33,9 @@ ext.deps = [
 
     // Lint dependencies
     lintapi    : "com.android.tools.lint:lint-api:${lintVersion}",
-    lintchecks : "com.android.tools.lint:lint-checks:${lintVersion}"
+    lintchecks : "com.android.tools.lint:lint-checks:${lintVersion}",
+
+    // Lint test dependencies
+    lint       : "com.android.tools.lint:lint:${lintVersion}",
+    linttests  : "com.android.tools.lint:lint-tests:${lintVersion}",
 ]

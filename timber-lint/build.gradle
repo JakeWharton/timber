@@ -10,6 +10,9 @@ configurations {
 dependencies {
   compile deps.lintapi
   compile deps.lintchecks
+  testCompile deps.lint
+  testCompile deps.linttests
+  testCompile deps.festassert
 
   lintChecks files(jar)
 }

@@ -538,6 +538,13 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return checkNode(context, node, elseStatement);
   }
 
+  static Issue[] getIssues() {
+    return new Issue[] {
+        ISSUE_LOG, ISSUE_FORMAT, ISSUE_THROWABLE, ISSUE_BINARY, ISSUE_ARG_COUNT, ISSUE_ARG_TYPES,
+        ISSUE_TAG_LENGTH
+    };
+  }
+
   public static final Issue ISSUE_LOG =
       Issue.create("LogNotTimber", "Logging call to Log instead of Timber",
           "Since Timber is included in the project, it is likely that calls to Log should instead"
