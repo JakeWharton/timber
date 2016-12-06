@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 4.4.0 *(2016-12-06)*
+----------------------------
+
+ * New: `Tree.formatMessage` method allows customization of message formatting and rendering.
+ * New: Lint checks ported to new IntelliJ PSI infrastructure.
+
+
 Version 4.3.1 *(2016-09-19)*
 ----------------------------
 

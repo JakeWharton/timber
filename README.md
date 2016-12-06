@@ -76,7 +76,7 @@ Download
 --------
 
 ```groovy
-compile 'com.jakewharton.timber:timber:4.3.1'
+compile 'com.jakewharton.timber:timber:4.4.0'
 ```
 
 Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
