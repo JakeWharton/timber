@@ -1,6 +1,5 @@
 package timber.log;
 
-import android.text.TextUtils;
 import android.util.Log;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -524,7 +523,10 @@ public final class Timber {
       if (!isLoggable(tag, priority)) {
         return;
       }
-      if (TextUtils.isEmpty(message)) {
+      if (message != null && message.length() == 0) {
+        message = null;
+      }
+      if (message == null) {
         if (t == null) {
           return; // Swallow message if it's null and there's no throwable.
         }
