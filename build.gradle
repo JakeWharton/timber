@@ -1,15 +1,16 @@
 buildscript {
   repositories {
-    mavenCentral()
+    jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:2.1.3'
+    classpath 'com.android.tools.build:gradle:2.2.2'
   }
 }
 
 allprojects {
   repositories {
     mavenCentral()
+    jcenter()
   }
 }
 
@@ -20,7 +21,7 @@ ext {
   buildToolsVersion = '24.0.0'
   sourceCompatibilityVersion = JavaVersion.VERSION_1_7
   targetCompatibilityVersion = JavaVersion.VERSION_1_7
-  lintVersion = '25.1.2'
+  lintVersion = '25.2.0'
 }
 
 ext.deps = [
