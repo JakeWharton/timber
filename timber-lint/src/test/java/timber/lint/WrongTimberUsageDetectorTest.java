@@ -38,7 +38,7 @@ public class WrongTimberUsageDetectorTest extends LintDetectorTest {
         + "0 errors, 1 warnings\n");
   }
 
-  public void testInnerStringFormat() throws Exception {
+  public void testInnerStringFormatInNestedMethods() throws Exception {
     @Language("JAVA") String source = ""
         + "package foo;\n"
         + "import timber.log.Timber;\n"
@@ -53,6 +53,37 @@ public class WrongTimberUsageDetectorTest extends LintDetectorTest {
         + "     Timber.d(id(String.format(\"%s\", \"arg1\")));\n"
         + "                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
         + "0 errors, 1 warnings\n");
+  }
+
+  public void testInnerStringFormatInNestedAssignment() throws Exception {
+    @Language("JAVA") String source = ""
+        + "package foo;\n"
+        + "import timber.log.Timber;\n"
+        + "public class Example {\n"
+        + "  public void log() {\n"
+        + "    String msg = null;\n"
+        + "    Timber.d(msg = String.format(\"msg\"));\n"
+        + "  }\n"
+        + "}";
+    assertThat(lintProject(java(source), timberStub)).isEqualTo("src/foo/Example.java:6: "
+        + "Warning: Using 'String#format' inside of 'Timber' [StringFormatInTimber]\n"
+        + "    Timber.d(msg = String.format(\"msg\"));\n"
+        + "                   ~~~~~~~~~~~~~~~~~~~~\n"
+        + "0 errors, 1 warnings\n");
+  }
+
+  public void testValidStringFormatInCodeBlock() throws Exception {
+    @Language("JAVA") String source = ""
+        + "package foo;\n"
+        + "import timber.log.Timber;\n"
+        + "public class Example {\n"
+        + "  public void log() {\n"
+        + "    for(;;) {\n"
+        + "      String name = String.format(\"msg\");\n"
+        + "    }\n"
+        + "  }\n"
+        + "}";
+    assertThat(lintProject(java(source), timberStub)).isEqualTo(NO_WARNINGS);
   }
 
   public void testThrowableNotAtBeginning() throws Exception {
