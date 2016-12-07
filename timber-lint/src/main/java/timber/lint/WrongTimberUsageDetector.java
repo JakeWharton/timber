@@ -16,10 +16,10 @@ import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.PsiBinaryExpression;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiCodeBlock;
 import com.intellij.psi.PsiConditionalExpression;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiExpression;
-import com.intellij.psi.PsiExpressionStatement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiIfStatement;
 import com.intellij.psi.PsiLiteralExpression;
@@ -79,27 +79,23 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   }
 
   private static void checkNestedStringFormat(JavaContext context, PsiMethodCallExpression call) {
-    // PsiExpressionList
-    PsiElement current = LintUtils.skipParentheses(call.getParent());
-    while (current != null && !(current instanceof PsiExpressionStatement)) {
-      // PsiMethodCallExpression
+    PsiElement current = call;
+    while (true) {
       current = LintUtils.skipParentheses(current.getParent());
-      // PsiExpressionList or PsiExpressionStatement
-      current = LintUtils.skipParentheses(current.getParent());
+      if (current == null || current instanceof PsiCodeBlock) {
+        // Reached AST root or code block node; String.format not inside Timber.X(..).
+        return;
+      }
+      if (current instanceof PsiMethodCallExpression) {
+        PsiMethodCallExpression maybeTimberLog = (PsiMethodCallExpression) current;
+        if (Pattern.matches("timber\\.log\\.Timber\\." + TIMBER_TREE_LOG_METHOD_REGEXP,
+            maybeTimberLog.getMethodExpression().getQualifiedName())) {
+          context.report(ISSUE_FORMAT, call, context.getLocation(call),
+              "Using 'String#format' inside of 'Timber'");
+          return;
+        }
+      }
     }
-    if (current == null) {
-      return;
-    }
-    PsiExpressionStatement expressionStatement = (PsiExpressionStatement) current;
-    PsiMethodCallExpression outerCall =
-        (PsiMethodCallExpression) expressionStatement.getExpression();
-    PsiReferenceExpression maybeTimberLog = outerCall.getMethodExpression();
-    if (!Pattern.matches("timber\\.log\\.Timber\\." + TIMBER_TREE_LOG_METHOD_REGEXP,
-        maybeTimberLog.getQualifiedName())) {
-      return;
-    }
-    context.report(ISSUE_FORMAT, call, context.getLocation(call),
-        "Using 'String#format' inside of 'Timber'");
   }
 
   private static void checkTagLength(JavaContext context, PsiMethodCallExpression call) {
