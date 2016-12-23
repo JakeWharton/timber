@@ -74,6 +74,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     if (fullyQualifiedMethodName.startsWith("timber.log.Timber.")) {
       checkMethodArguments(context, call);
       checkFormatArguments(context, call);
+      checkExceptionLogging(context, call);
       return;
     }
   }
@@ -445,6 +446,31 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     }
   }
 
+  private static void checkExceptionLogging(JavaContext context, PsiMethodCallExpression call) {
+    PsiExpression[] arguments = call.getArgumentList().getExpressions();
+
+    if (arguments.length > 1) {
+      boolean isFirstParameterThrowable = isSubclassOf(context, arguments[0], Throwable.class);
+
+      if (isFirstParameterThrowable) {
+        PsiExpression secondArgument = arguments[1];
+        String message = findLiteralValue(secondArgument);
+
+        boolean callsGetMessage = false;
+
+        if (secondArgument instanceof PsiMethodCallExpression) {
+          PsiMethodCallExpression callExpression = (PsiMethodCallExpression) secondArgument;
+          callsGetMessage = callExpression.getMethodExpression().getCanonicalText().endsWith("getMessage");
+        }
+
+        if (message == null || "".equals(message) || callsGetMessage) {
+          context.report(ISSUE_EXCEPTION_LOGGING, call, context.getLocation(call),
+              "Message part can be omitted");
+        }
+      }
+    }
+  }
+
   private static boolean checkElement(JavaContext context, PsiMethodCallExpression call,
       PsiElement element) {
     if (element instanceof PsiBinaryExpression) {
@@ -484,7 +510,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   static Issue[] getIssues() {
     return new Issue[] {
         ISSUE_LOG, ISSUE_FORMAT, ISSUE_THROWABLE, ISSUE_BINARY, ISSUE_ARG_COUNT, ISSUE_ARG_TYPES,
-        ISSUE_TAG_LENGTH
+        ISSUE_TAG_LENGTH, ISSUE_EXCEPTION_LOGGING
     };
   }
 
@@ -522,5 +548,9 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   public static final Issue ISSUE_TAG_LENGTH =
       Issue.create("TimberTagLength", "Too Long Log Tags", "Log tags are only allowed to be at most"
               + " 23 tag characters long.", Category.CORRECTNESS, 5, Severity.ERROR,
+          new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
+  public static final Issue ISSUE_EXCEPTION_LOGGING =
+      Issue.create("TimberExceptionLogging", "Exception Logging", "Exceptions only should be logged"
+              + " in a certain way.", Category.CORRECTNESS, 5, Severity.WARNING,
           new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
 }
