@@ -11,7 +11,7 @@ Version 4.4.0 *(2016-12-06)*
 Version 4.3.1 *(2016-09-19)*
 ----------------------------
 
- * New: Add convenience method `isLoggable` convenience method which also provides the tag.
+ * New: Add `isLoggable` convenience method which also provides the tag.
 
 
 Version 4.3.0 *(2016-08-18)*
