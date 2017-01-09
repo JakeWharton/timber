@@ -463,9 +463,12 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
           callsGetMessage = callExpression.getMethodExpression().getCanonicalText().endsWith("getMessage");
         }
 
-        if (message == null || "".equals(message) || callsGetMessage) {
-          context.report(ISSUE_EXCEPTION_LOGGING, call, context.getLocation(call),
-              "Message part can be omitted");
+        if (callsGetMessage) {
+          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(call),
+              "Explicitly logging exception message is redundant");
+        } else if (message == null || "".equals(message)) {
+          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(call),
+              "Use single-argument log method instead of null/empty message");
         }
       }
     }
@@ -550,7 +553,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
               + " 23 tag characters long.", Category.CORRECTNESS, 5, Severity.ERROR,
           new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
   public static final Issue ISSUE_EXCEPTION_LOGGING =
-      Issue.create("TimberExceptionLogging", "Exception Logging", "Exceptions only should be logged"
-              + " in a certain way.", Category.CORRECTNESS, 5, Severity.WARNING,
+      Issue.create("TimberExceptionLogging", "Exception Logging", "Explicitly including the"
+              + " exception message is redundant when supplying an exception to log.",
+          Category.CORRECTNESS, 3, Severity.WARNING,
           new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
 }
