@@ -51,7 +51,7 @@ public class TimberTest {
       assertThat(e).hasMessage("Cannot plant Timber into itself.");
     }
     try {
-      Timber.plant(new Timber.Tree[] { timber });
+      Timber.plant(new Timber.Tree[]{timber});
       fail();
     } catch (IllegalArgumentException e) {
       assertThat(e).hasMessage("Cannot plant Timber into itself.");
@@ -61,7 +61,7 @@ public class TimberTest {
   @Test public void treeCount() {
     // inserts trees and checks if the amount of returned trees matches.
     assertThat(Timber.treeCount()).isEqualTo(0);
-    for(int i= 1 ; i < 50 ; i++){
+    for (int i = 1; i < 50; i++) {
       Timber.plant(new Timber.DebugTree());
       assertThat(Timber.treeCount()).isEqualTo(i);
     }
@@ -89,7 +89,7 @@ public class TimberTest {
     } catch (NullPointerException e) {
       assertThat(e).hasMessage("trees == null");
     }
-    nullTrees = new Timber.Tree[] { null };
+    nullTrees = new Timber.Tree[]{null};
     try {
       Timber.plant(nullTrees);
       fail();
@@ -190,6 +190,31 @@ public class TimberTest {
     assertLog()
         .hasDebugMessage("TimberTest", "Hello, world!")
         .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasNoMoreMessages();
+  }
+
+  @Test public void debugTreeGeneratedTagIsLoggable() {
+    Timber.plant(new Timber.DebugTree() {
+      private static final int MAX_TAG_LENGTH = 23;
+
+      @Override protected void log(int priority, String tag, String message, Throwable t) {
+        try {
+          assertThat(Log.isLoggable(tag, priority));
+          assertThat(tag.length() <= MAX_TAG_LENGTH);
+        } catch (IllegalArgumentException e) {
+          fail(e.getMessage());
+        }
+        super.log(priority, tag, message, t);
+      }
+    });
+    class ClassNameThatIsReallyReallyReallyLong {
+      {
+        Timber.d("Hello, world!");
+      }
+    }
+    new ClassNameThatIsReallyReallyReallyLong();
+    assertLog()
+        .hasDebugMessage("TimberTest$1ClassNameTh", "Hello, world!")
         .hasNoMoreMessages();
   }
 
@@ -433,7 +458,7 @@ public class TimberTest {
     Timber.plant(new Timber.DebugTree() {
       @Override
       protected String formatMessage(String message, Object[] args) {
-        return String.format("Test formatting: "+message, args);
+        return String.format("Test formatting: " + message, args);
       }
     });
     Timber.d("Test message logged. %d", 100);
@@ -452,7 +477,8 @@ public class TimberTest {
     assertExceptionLogged(logType, message, exceptionClassname, null, 0);
   }
 
-  private static void assertExceptionLogged(int logType, String message, String exceptionClassname, String tag, int index) {
+  private static void assertExceptionLogged(int logType, String message, String exceptionClassname, String tag,
+                                            int index) {
     List<LogItem> logs = ShadowLog.getLogs();
     assertThat(logs).hasSize(index + 1);
     LogItem log = logs.get(index);

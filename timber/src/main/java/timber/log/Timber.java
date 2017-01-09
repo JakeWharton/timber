@@ -1,6 +1,9 @@
 package timber.log;
 
 import android.util.Log;
+
+import org.jetbrains.annotations.NonNls;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -8,7 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jetbrains.annotations.NonNls;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -574,6 +576,7 @@ public final class Timber {
   /** A {@link Tree Tree} for debug builds. Automatically infers the tag from the calling class. */
   public static class DebugTree extends Tree {
     private static final int MAX_LOG_LENGTH = 4000;
+    private static final int MAX_TAG_LENGTH = 23;
     private static final int CALL_STACK_INDEX = 5;
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$");
 
@@ -590,7 +593,8 @@ public final class Timber {
       if (m.find()) {
         tag = m.replaceAll("");
       }
-      return tag.substring(tag.lastIndexOf('.') + 1);
+      tag = tag.substring(tag.lastIndexOf('.') + 1);
+      return tag.length() > MAX_TAG_LENGTH ? tag.substring(0, MAX_TAG_LENGTH) : tag;
     }
 
     @Override final String getTag() {
