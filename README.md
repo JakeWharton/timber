@@ -71,12 +71,19 @@ Timber ships with embedded lint rules to detect problems in your app.
             Timber.d("Hello " + firstName + " " + lastName + "!");
                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+  * **TimberExceptionLogging** (Warning) - Detects the use of null or empty messages, or using the exception message
+    when logging an exception.
+
+        Example.java:35: Warning: Explicitly logging exception message is redundant [TimberExceptionLogging]
+             Timber.d(e, e.getMessage());
+                         ~~~~~~~~~~~~~~
+
 
 Download
 --------
 
 ```groovy
-compile 'com.jakewharton.timber:timber:4.4.0'
+compile 'com.jakewharton.timber:timber:4.5.0'
 ```
 
 Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].

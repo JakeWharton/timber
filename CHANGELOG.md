@@ -1,6 +1,15 @@
 Change Log
 ==========
 
+Version 4.5.0 *(2017-01-09)*
+----------------------------
+
+ * New: Automatically truncate class name tags to Android's limit of 23 characters.
+ * New: Lint check for detecting null/empty messages or using the exception message when logging an
+   exception. Use the single-argument logging overloads instead.
+ * Fix: Correct NPE in lint check when using String.format.
+
+
 Version 4.4.0 *(2016-12-06)*
 ----------------------------
 
