@@ -464,10 +464,10 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         }
 
         if (callsGetMessage) {
-          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(call),
+          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
               "Explicitly logging exception message is redundant");
         } else if (message == null || "".equals(message)) {
-          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(call),
+          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
               "Use single-argument log method instead of null/empty message");
         }
       }

@@ -279,7 +279,7 @@ public class WrongTimberUsageDetectorTest extends LintDetectorTest {
     assertThat(lintProject(java(source), timberStub)).isEqualTo("src/foo/Example.java:6: "
         + "Warning: Explicitly logging exception message is redundant [TimberExceptionLogging]\n"
         + "     Timber.d(e, e.getMessage());\n"
-        + "     ~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+        + "                 ~~~~~~~~~~~~~~\n"
         + "0 errors, 1 warnings\n");
   }
 
@@ -296,7 +296,7 @@ public class WrongTimberUsageDetectorTest extends LintDetectorTest {
     assertThat(lintProject(java(source), timberStub)).isEqualTo("src/foo/Example.java:6: "
         + "Warning: Use single-argument log method instead of null/empty message [TimberExceptionLogging]\n"
         + "     Timber.d(e, \"\");\n"
-        + "     ~~~~~~~~~~~~~~~\n"
+        + "                 ~~\n"
         + "0 errors, 1 warnings\n");
   }
 
@@ -313,7 +313,7 @@ public class WrongTimberUsageDetectorTest extends LintDetectorTest {
     assertThat(lintProject(java(source), timberStub)).isEqualTo("src/foo/Example.java:6: "
         + "Warning: Use single-argument log method instead of null/empty message [TimberExceptionLogging]\n"
         + "     Timber.d(e, null);\n"
-        + "     ~~~~~~~~~~~~~~~~~\n"
+        + "                 ~~~~\n"
         + "0 errors, 1 warnings\n");
   }
 
