@@ -266,6 +266,70 @@ public class WrongTimberUsageDetectorTest extends LintDetectorTest {
         + "1 errors, 0 warnings\n");
   }
 
+  public void testExceptionLoggingUsingMessage() throws Exception {
+    @Language("JAVA") String source = ""
+        + "package foo;\n"
+        + "import timber.log.Timber;\n"
+        + "public class Example {\n"
+        + "  public void log() {\n"
+        + "     Exception e = new Exception();\n"
+        + "     Timber.d(e, e.getMessage());\n"
+        + "  }\n"
+        + "}";
+    assertThat(lintProject(java(source), timberStub)).isEqualTo("src/foo/Example.java:6: "
+        + "Warning: Explicitly logging exception message is redundant [TimberExceptionLogging]\n"
+        + "     Timber.d(e, e.getMessage());\n"
+        + "                 ~~~~~~~~~~~~~~\n"
+        + "0 errors, 1 warnings\n");
+  }
+
+  public void testExceptionLoggingUsingEmptyStringMessage() throws Exception {
+    @Language("JAVA") String source = ""
+        + "package foo;\n"
+        + "import timber.log.Timber;\n"
+        + "public class Example {\n"
+        + "  public void log() {\n"
+        + "     Exception e = new Exception();\n"
+        + "     Timber.d(e, \"\");\n"
+        + "  }\n"
+        + "}";
+    assertThat(lintProject(java(source), timberStub)).isEqualTo("src/foo/Example.java:6: "
+        + "Warning: Use single-argument log method instead of null/empty message [TimberExceptionLogging]\n"
+        + "     Timber.d(e, \"\");\n"
+        + "                 ~~\n"
+        + "0 errors, 1 warnings\n");
+  }
+
+  public void testExceptionLoggingUsingNullMessage() throws Exception {
+    @Language("JAVA") String source = ""
+        + "package foo;\n"
+        + "import timber.log.Timber;\n"
+        + "public class Example {\n"
+        + "  public void log() {\n"
+        + "     Exception e = new Exception();\n"
+        + "     Timber.d(e, null);\n"
+        + "  }\n"
+        + "}";
+    assertThat(lintProject(java(source), timberStub)).isEqualTo("src/foo/Example.java:6: "
+        + "Warning: Use single-argument log method instead of null/empty message [TimberExceptionLogging]\n"
+        + "     Timber.d(e, null);\n"
+        + "                 ~~~~\n"
+        + "0 errors, 1 warnings\n");
+  }
+
+  public void testExceptionLoggingUsingValidMessage() throws Exception {
+    @Language("JAVA") String source = ""
+        + "package foo;\n"
+        + "import timber.log.Timber;\n"
+        + "public class Example {\n"
+        + "  public void log() {\n"
+        + "     Exception e = new Exception();\n"
+        + "     Timber.d(e, \"Valid message\");\n"
+        + "  }\n"
+        + "}";
+    assertThat(lintProject(java(source), timberStub)).isEqualTo(NO_WARNINGS);
+  }
+
   @Override protected Detector getDetector() {
     return new WrongTimberUsageDetector();
   }
