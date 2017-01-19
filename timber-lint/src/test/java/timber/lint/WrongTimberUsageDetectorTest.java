@@ -330,6 +330,18 @@ public class WrongTimberUsageDetectorTest extends LintDetectorTest {
     assertThat(lintProject(java(source), timberStub)).isEqualTo(NO_WARNINGS);
   }
 
+  public void testDateFormatNotDisplayingWarning() throws Exception {
+    @Language("JAVA") String source = ""
+        + "package foo;\n"
+        + "import timber.log.Timber;\n"
+        + "public class Example {\n"
+        + "  public void log() {\n"
+        + "    Timber.d(\"%tc\", 567834);\n"
+        + "  }\n"
+        + "}";
+    assertThat(lintProject(java(source), timberStub)).isEqualTo(NO_WARNINGS);
+  }
+
   @Override protected Detector getDetector() {
     return new WrongTimberUsageDetector();
   }

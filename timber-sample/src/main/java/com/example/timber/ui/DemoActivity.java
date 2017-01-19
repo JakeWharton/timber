@@ -10,6 +10,8 @@ import butterknife.OnClick;
 import com.example.timber.R;
 import timber.log.Timber;
 
+import java.util.Date;
+
 import static android.widget.Toast.LENGTH_SHORT;
 
 public class DemoActivity extends Activity {
@@ -23,7 +25,7 @@ public class DemoActivity extends Activity {
 
   @OnClick({ R.id.hello, R.id.hey, R.id.hi })
   public void greetingClicked(Button button) {
-    Timber.i("A button with ID %s was clicked to say '%s'.", button.getId(), button.getText());
+    Timber.i("A button with ID %s was clicked at %tc to say '%s'.", button.getId(), new Date(), button.getText());
     Toast.makeText(this, "Check logcat for a greeting!", LENGTH_SHORT).show();
   }
 }
