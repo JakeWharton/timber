@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+Version 4.5.1 *(2017-01-20)*
+----------------------------
+
+ Fix: String formatting lint check now correctly works with dates.
+
+
 Version 4.5.0 *(2017-01-09)*
 ----------------------------
 
