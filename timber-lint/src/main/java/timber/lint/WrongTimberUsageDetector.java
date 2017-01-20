@@ -29,6 +29,8 @@ import com.intellij.psi.PsiReferenceExpression;
 import com.intellij.psi.PsiType;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -161,58 +163,112 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
             passedArgCount));
       }
 
+      Class type = getType(argument);
+      if (type == null) {
+        continue;
+      }
+
       char last = formatType.charAt(formatType.length() - 1);
       if (formatType.length() >= 2
           && Character.toLowerCase(formatType.charAt(formatType.length() - 2)) == 't') {
         // Date time conversion.
-        // TODO
+        switch(last) {
+          // time
+          case 'H':
+          case 'I':
+          case 'k':
+          case 'l':
+          case 'M':
+          case 'S':
+          case 'L':
+          case 'N':
+          case 'p':
+          case 'z':
+          case 'Z':
+          case 's':
+          case 'Q':
+            // date
+          case 'B':
+          case 'b':
+          case 'h':
+          case 'A':
+          case 'a':
+          case 'C':
+          case 'Y':
+          case 'y':
+          case 'j':
+          case 'm':
+          case 'd':
+          case 'e':
+            // date/time
+          case 'R':
+          case 'T':
+          case 'r':
+          case 'D':
+          case 'F':
+          case 'c':
+            valid = type == Integer.TYPE
+                    || type == Calendar.class
+                    || type == Date.class;
+            if (!valid) {
+              String message = String.format("Wrong argument type for date formatting argument '#%1$d' "
+                              + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
+                              + "(argument #%5$d in method call)", i + 1, formatString, formatType,
+                      type.getSimpleName(), startIndexOfArguments + i + 1);
+              context.report(ISSUE_ARG_TYPES, call, context.getLocation(argument), message);
+            }
+            break;
+          default:
+            String message = String.format("Wrong suffix for date format '#%1$d' "
+                            + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
+                            + "(argument #%5$d in method call)", i + 1, formatString, formatType,
+                    type.getSimpleName(), startIndexOfArguments + i + 1);
+            context.report(ISSUE_FORMAT, call, context.getLocation(argument), message);
+        }
         continue;
       }
-      Class type = getType(argument);
-      if (type != null) {
-        switch (last) {
-          case 'b':
-          case 'B':
-            valid = type == Boolean.TYPE;
-            break;
-          case 'x':
-          case 'X':
-          case 'd':
-          case 'o':
-          case 'e':
-          case 'E':
-          case 'f':
-          case 'g':
-          case 'G':
-          case 'a':
-          case 'A':
-            valid = type == Integer.TYPE
-                || type == Float.TYPE
-                || type == Double.TYPE
-                || type == Long.TYPE
-                || type == Byte.TYPE
-                || type == Short.TYPE;
-            break;
-          case 'c':
-          case 'C':
-            valid = type == Character.TYPE;
-            break;
-          case 'h':
-          case 'H':
-            valid = type != Boolean.TYPE && !Number.class.isAssignableFrom(type);
-            break;
-          case 's':
-          case 'S':
-          default:
-            valid = true;
-        }
-        if (!valid) {
-          String message = String.format("Wrong argument type for formatting argument '#%1$d' "
-                  + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
-                  + "(argument #%5$d in method call)", i + 1, formatString, formatType,
-              type.getSimpleName(), startIndexOfArguments + i + 1);
-          context.report(ISSUE_ARG_TYPES, call, context.getLocation(argument), message);
-        }
+      switch (last) {
+        case 'b':
+        case 'B':
+          valid = type == Boolean.TYPE;
+          break;
+        case 'x':
+        case 'X':
+        case 'd':
+        case 'o':
+        case 'e':
+        case 'E':
+        case 'f':
+        case 'g':
+        case 'G':
+        case 'a':
+        case 'A':
+          valid = type == Integer.TYPE
+              || type == Float.TYPE
+              || type == Double.TYPE
+              || type == Long.TYPE
+              || type == Byte.TYPE
+              || type == Short.TYPE;
+          break;
+        case 'c':
+        case 'C':
+          valid = type == Character.TYPE;
+          break;
+        case 'h':
+        case 'H':
+          valid = type != Boolean.TYPE && !Number.class.isAssignableFrom(type);
+          break;
+        case 's':
+        case 'S':
+        default:
+          valid = true;
+      }
+      if (!valid) {
+        String message = String.format("Wrong argument type for formatting argument '#%1$d' "
+                + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
+                + "(argument #%5$d in method call)", i + 1, formatString, formatType,
+            type.getSimpleName(), startIndexOfArguments + i + 1);
+        context.report(ISSUE_ARG_TYPES, call, context.getLocation(argument), message);
       }
     }
   }
@@ -306,6 +362,10 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       return Byte.TYPE;
     } else if (typeClassName.equals(TYPE_SHORT)) {
       return Short.TYPE;
+    } else if ("Date".equals(typeClassName) || "java.util.Date".equals(typeClassName)) {
+      return Date.class;
+    } else if ("Calendar".equals(typeClassName) || "java.util.Calendar".equals(typeClassName)) {
+      return Calendar.class;
     } else {
       return null;
     }
@@ -346,7 +406,12 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         if ("%%".equals(str) || "%n".equals(str)) {
           continue;
         }
-        types.add(matcher.group(6));
+        String time = matcher.group(5);
+        if ("t".equalsIgnoreCase(time)) {
+          types.add(time + matcher.group(6));
+        } else {
+          types.add(matcher.group(6));
+        }
       } else {
         break;
       }
