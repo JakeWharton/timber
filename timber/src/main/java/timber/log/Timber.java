@@ -567,8 +567,8 @@ public final class Timber {
      *
      * @param priority Log level. See {@link Log} for constants.
      * @param tag Explicit or inferred tag. May be {@code null}.
-     * @param message Formatted log message. May be {@code null}, but then {@code t} will not be.
-     * @param t Accompanying exceptions. May be {@code null}, but then {@code message} will not be.
+     * @param message Formatted log message. Never {@code null}. If {@code t} is provided, this includes the stack trace.
+     * @param t Accompanying exceptions. May be {@code null}.
      */
     protected abstract void log(int priority, String tag, String message, Throwable t);
   }
