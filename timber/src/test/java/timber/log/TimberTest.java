@@ -496,6 +496,29 @@ public class TimberTest {
 
   }
 
+  @Test public void logsWithMultipleTreesMultipleTags() {
+    Timber.plant(new Timber.DebugTree() {
+      @Override
+      protected String getDefaultTag() {
+        return "CUSTOMTAG";
+      }
+    });
+
+    Timber.plant(new Timber.DebugTree() {
+      @Override
+      protected String getDefaultTag() {
+        return "DIFFERENTTAG";
+      }
+    });
+
+    Timber.d("multiple tags");
+
+    assertLog()
+            .hasDebugMessage("CUSTOMTAG", "multiple tags")
+            .hasDebugMessage("DIFFERENTTAG", "multiple tags");
+
+  }
+
   private static String repeat(char c, int number) {
     char[] data = new char[number];
     Arrays.fill(data, c);
