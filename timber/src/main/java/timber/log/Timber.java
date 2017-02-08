@@ -391,12 +391,22 @@ public final class Timber {
   public static abstract class Tree {
     final ThreadLocal<String> explicitTag = new ThreadLocal<>();
 
-    String getTag() {
+    private String getTag() {
       String tag = explicitTag.get();
       if (tag != null) {
         explicitTag.remove();
+      } else {
+        tag = getDefaultTag();
       }
       return tag;
+    }
+
+    /**
+     * If no tag is explicitly set (e.g. Timber.tag("foo").d("bar")), then the tree will fall back to this tag.
+     * @return The default tag for this tree
+     */
+    protected String getDefaultTag() {
+      return null;
     }
 
     /** Log a verbose message with optional format args. */
@@ -577,7 +587,7 @@ public final class Timber {
   public static class DebugTree extends Tree {
     private static final int MAX_LOG_LENGTH = 4000;
     private static final int MAX_TAG_LENGTH = 23;
-    private static final int CALL_STACK_INDEX = 5;
+    private static final int CALL_STACK_INDEX = 6;
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$");
 
     /**
@@ -597,11 +607,7 @@ public final class Timber {
       return tag.length() > MAX_TAG_LENGTH ? tag.substring(0, MAX_TAG_LENGTH) : tag;
     }
 
-    @Override final String getTag() {
-      String tag = super.getTag();
-      if (tag != null) {
-        return tag;
-      }
+    @Override protected String getDefaultTag() {
 
       // DO NOT switch this to Thread.getCurrentThread().getStackTrace(). The test will pass
       // because Robolectric runs them on the JVM but on Android the elements are different.

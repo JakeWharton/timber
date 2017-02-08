@@ -467,6 +467,35 @@ public class TimberTest {
         .hasDebugMessage("TimberTest", "Test formatting: Test message logged. 100");
   }
 
+  @Test public void logsWithCustomTag() {
+    Timber.plant(new Timber.DebugTree() {
+      @Override
+      protected String getDefaultTag() {
+        return "CUSTOMTAG";
+      }
+    });
+
+    Timber.d("Test with custom tag");
+    assertLog()
+            .hasDebugMessage("CUSTOMTAG", "Test with custom tag");
+
+  }
+
+  @Test public void logsWithCustomTagOverridden() {
+    Timber.plant(new Timber.DebugTree() {
+      @Override
+      protected String getDefaultTag() {
+        return "CUSTOMTAG";
+      }
+    });
+
+    Timber.tag("NewTag").d("Tag manually set");
+
+    assertLog()
+            .hasDebugMessage("NewTag", "Tag manually set");
+
+  }
+
   private static String repeat(char c, int number) {
     char[] data = new char[number];
     Arrays.fill(data, c);
