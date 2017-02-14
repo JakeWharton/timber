@@ -355,6 +355,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       } else if ("java.lang.Float".equals(typeClassName) || "java.lang.Double".equals(
           typeClassName)) {
         return Float.TYPE;
+      } else if ("java.lang.Boolean".equals(typeClassName)) {
+        return Boolean.TYPE;
       } else {
         return null;
       }
