@@ -21,7 +21,7 @@ ext {
   buildToolsVersion = '25.0.1'
   sourceCompatibilityVersion = JavaVersion.VERSION_1_7
   targetCompatibilityVersion = JavaVersion.VERSION_1_7
-  lintVersion = '25.2.0'
+  lintVersion = '25.3.0'
 }
 
 ext.deps = [
