@@ -71,12 +71,18 @@ Timber ships with embedded lint rules to detect problems in your app.
             Timber.d("Hello " + firstName + " " + lastName + "!");
                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  * **TimberExceptionLogging** (Warning) - Detects the use of null or empty messages, or using the exception message
+ * **TimberExceptionLogging** (Warning) - Detects the use of null or empty messages, or using the exception message
     when logging an exception.
 
         Example.java:35: Warning: Explicitly logging exception message is redundant [TimberExceptionLogging]
              Timber.d(e, e.getMessage());
                          ~~~~~~~~~~~~~~
+
+If you wish to suppress the lint rules in your project, add the below gradle configuration:
+
+     lintOptions {
+        disable 'TimberArgCount',  'TimberArgTypes', 'TimberTagLength', 'LogNotTimber', 'StringFormatInTimber', 'BinaryOperationInTimber', 'TimberExceptionLogging', 'ThrowableNotAtBeginning'
+     }
 
 
 Download
