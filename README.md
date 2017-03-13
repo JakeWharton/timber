@@ -78,6 +78,13 @@ Timber ships with embedded lint rules to detect problems in your app.
              Timber.d(e, e.getMessage());
                          ~~~~~~~~~~~~~~
 
+ *  **ThrowableNotAtBeginning** (Warning) - Detects `Throwable` in the wrong position inside of a `Timber` call. In Timber
+    you have to pass a Throwable at the beginning of the call.
+
+        Example.java:35: Warning: Throwable should be first argument [ThrowableNotAtBeginning]
+            Timber.e("Error occured", e);
+                                     ~~~
+
 
 Download
 --------
