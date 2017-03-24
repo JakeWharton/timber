@@ -12,6 +12,7 @@ public class ExampleApp extends Application {
 
     if (BuildConfig.DEBUG) {
       Timber.plant(new DebugTree());
+      Timber.plant(new LogFileTree());
     } else {
       Timber.plant(new CrashReportingTree());
     }
@@ -33,6 +34,14 @@ public class ExampleApp extends Application {
           FakeCrashLibrary.logWarning(t);
         }
       }
+    }
+  }
+
+  /** A tree which logs all information to a text file */
+  private static class LogFileTree extends Timber.Tree {
+    @Override
+    protected void log(int priority, String tag, String message, Throwable t) {
+      FakeTextFileLogger.log(priority, tag, message);
     }
   }
 }
