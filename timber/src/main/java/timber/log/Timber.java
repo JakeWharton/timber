@@ -123,6 +123,11 @@ public final class Timber {
     TREE_OF_SOULS.log(priority, t);
   }
 
+  /** Return whether a message at {@code priority} or {@code tag} should be logged. */
+  public static boolean isLoggable(String tag, int priority) {
+    return TREE_OF_SOULS.isLoggable(tag, priority);
+  }
+
   /**
    * A view into Timber's planted trees as a tree itself. This can be used for injecting a logger
    * instance rather than using static methods or to facilitate testing.
@@ -387,6 +392,18 @@ public final class Timber {
 
     @Override protected void log(int priority, String tag, @NotNull String message, Throwable t) {
       throw new AssertionError("Missing override for log method.");
+    }
+
+    @Override public boolean isLoggable(String tag, int priority) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        if (forest[i].isLoggable(tag, priority)) {
+          return true;
+        }
+      }
+
+      return false;
     }
   };
 
