@@ -142,6 +142,10 @@ public final class Timber {
     return TREE_OF_SOULS;
   }
 
+  public static Tree tagPermanent(String permanentTag) {
+    return new PermanentTagTree(forestAsArray, permanentTag);
+  }
+
   /** Add a new logging tree. */
   @SuppressWarnings("ConstantConditions") // Validating public API contract.
   public static void plant(@NotNull Tree tree) {
@@ -637,6 +641,27 @@ public final class Timber {
           }
           i = end;
         } while (i < newline);
+      }
+    }
+  }
+
+  private static class PermanentTagTree extends Tree {
+
+    private final Tree[] forest;
+
+    private final String permanentTag;
+
+
+    PermanentTagTree(Tree[] forest, String permanentTag) {
+      this.forest = forest;
+      this.permanentTag = permanentTag;
+    }
+
+
+    @Override
+    protected void log(int priority, String tag, String message, Throwable t) {
+      for (Tree tree : forest) {
+        tree.log(priority, permanentTag, message, t);
       }
     }
   }
