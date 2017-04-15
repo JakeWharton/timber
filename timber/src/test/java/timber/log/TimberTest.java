@@ -327,6 +327,26 @@ public class TimberTest {
     assertExceptionLogged(Log.ERROR, "OMFG!", "java.lang.NullPointerException");
   }
 
+  @Test public void keepsPermanentTag() {
+    Timber.plant(new Timber.DebugTree());
+    final Timber.Tree log = Timber.tagPermanent("p");
+
+    log.d("test debug");
+    log.e("test error");
+    log.i("test info");
+    log.v("test verbose");
+    log.w("test warning");
+    log.wtf("test wtf");
+
+    assertLog()
+      .hasDebugMessage("p", "test debug")
+      .hasErrorMessage("p", "test error")
+      .hasInfoMessage("p", "test info")
+      .hasVerboseMessage("p", "test verbose")
+      .hasWarnMessage("p", "test warning")
+      .hasAssertMessage("p", "test wtf"); // LOG_ID_MAIN = 0
+  }
+
   @Test public void nullMessageWithThrowable() {
     Timber.plant(new Timber.DebugTree());
     NullPointerException datThrowable = truncatedThrowable(NullPointerException.class);
