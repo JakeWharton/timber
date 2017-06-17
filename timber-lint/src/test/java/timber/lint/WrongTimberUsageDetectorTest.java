@@ -283,6 +283,57 @@ public class WrongTimberUsageDetectorTest extends LintDetectorTest {
         + "0 errors, 1 warnings\n");
   }
 
+  public void testExceptionLoggingUsingVariable() throws Exception {
+    @Language("JAVA")
+    String source2= ""
+        + "package foo;\n"
+        + "import timber.log.Timber;\n"
+        + "public class Example {\n"
+        + "  public void log() {\n"
+        + "     String msg = \"Hello\";\n"
+        + "     Exception e = new Exception();\n"
+        + "     Timber.d(e, msg);\n"
+        + "  }\n"
+        + "}";
+    assertThat(lintProject(java(source2), timberStub)).isEqualTo(NO_WARNINGS);
+  }
+
+  public void testExceptionLoggingUsingNull() throws Exception {
+    @Language("JAVA")
+    String source2= ""
+        + "package foo;\n"
+        + "import timber.log.Timber;\n"
+        + "public class Example {\n"
+        + "  public void log() {\n"
+        + "     Exception e = new Exception();\n"
+        + "     Timber.d(e, null);\n"
+        + "  }\n"
+        + "}";
+    assertThat(lintProject(java(source2), timberStub)).isEqualTo("src/foo/Example.java:6: "
+        + "Warning: Use single-argument log method instead of null/empty message [TimberExceptionLogging]\n"
+        + "     Timber.d(e, null);\n"
+        + "                 ~~~~\n"
+        + "0 errors, 1 warnings\n");
+  }
+
+  public void testExceptionLoggingUsingEmpty() throws Exception {
+    @Language("JAVA")
+    String source2= ""
+        + "package foo;\n"
+        + "import timber.log.Timber;\n"
+        + "public class Example {\n"
+        + "  public void log() {\n"
+        + "     Exception e = new Exception();\n"
+        + "     Timber.d(e, \"\");\n"
+        + "  }\n"
+        + "}";
+    assertThat(lintProject(java(source2), timberStub)).isEqualTo("src/foo/Example.java:6: "
+        + "Warning: Use single-argument log method instead of null/empty message [TimberExceptionLogging]\n"
+        + "     Timber.d(e, \"\");\n"
+        + "                 ~~\n"
+        + "0 errors, 1 warnings\n");
+  }
+
   public void testExceptionLoggingUsingEmptyStringMessage() throws Exception {
     @Language("JAVA") String source = ""
         + "package foo;\n"
