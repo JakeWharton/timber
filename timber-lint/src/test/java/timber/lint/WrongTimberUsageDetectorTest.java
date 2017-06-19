@@ -283,6 +283,20 @@ public class WrongTimberUsageDetectorTest extends LintDetectorTest {
         + "0 errors, 1 warnings\n");
   }
 
+  public void testExceptionLoggingUsingVariable() throws Exception {
+    @Language("JAVA") String source = ""
+        + "package foo;\n"
+        + "import timber.log.Timber;\n"
+        + "public class Example {\n"
+        + "  public void log() {\n"
+        + "     String msg = \"Hello\";\n"
+        + "     Exception e = new Exception();\n"
+        + "     Timber.d(e, msg);\n"
+        + "  }\n"
+        + "}";
+    assertThat(lintProject(java(source), timberStub)).isEqualTo(NO_WARNINGS);
+  }
+
   public void testExceptionLoggingUsingEmptyStringMessage() throws Exception {
     @Language("JAVA") String source = ""
         + "package foo;\n"

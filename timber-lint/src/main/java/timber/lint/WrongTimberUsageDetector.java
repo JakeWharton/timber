@@ -452,6 +452,33 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return null;
   }
 
+  private static boolean isLiteralValueEmpty(PsiExpression argument) {
+    if (argument instanceof PsiLiteralExpression) {
+      PsiLiteralExpression literalExpression = (PsiLiteralExpression) argument;
+      Object value = literalExpression.getValue();
+      return value == null || "".equals(value);
+    } else if (argument instanceof PsiBinaryExpression) {
+      PsiBinaryExpression binaryExpression = (PsiBinaryExpression) argument;
+      if (binaryExpression.getOperationTokenType() == JavaTokenType.PLUS) {
+        String left = findLiteralValue(binaryExpression.getLOperand());
+        String right = findLiteralValue(binaryExpression.getROperand());
+        if (left == null && right == null) {
+          return true;
+        }
+      }
+    } else if (argument instanceof PsiReferenceExpression) {
+      PsiReferenceExpression referenceExpression = (PsiReferenceExpression) argument;
+      PsiElement resolved = referenceExpression.resolve();
+      if (resolved instanceof PsiField) {
+        PsiField field = (PsiField) resolved;
+        Object value = field.computeConstantValue();
+        return value == null || "".equals(value);
+      }
+    }
+
+    return false;
+  }
+
   private static int getFormatArgumentCount(@NonNull String s) {
     Matcher matcher = StringFormatDetector.FORMAT.matcher(s);
     int index = 0;
@@ -521,7 +548,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
 
       if (isFirstParameterThrowable) {
         PsiExpression secondArgument = arguments[1];
-        String message = findLiteralValue(secondArgument);
+        boolean isMessageEmpty = isLiteralValueEmpty(secondArgument);
 
         boolean callsGetMessage = false;
 
@@ -533,7 +560,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         if (callsGetMessage) {
           context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
               "Explicitly logging exception message is redundant");
-        } else if (message == null || "".equals(message)) {
+        } else if (isMessageEmpty) {
           context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
               "Use single-argument log method instead of null/empty message");
         }
