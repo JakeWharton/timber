@@ -37,7 +37,7 @@ configurations {
 }
 
 dependencies {
-  provided 'org.jetbrains:annotations:13.0'
+  provided 'org.jetbrains:annotations:15.0'
 
   testCompile deps.festandroid
   testCompile deps.festassert

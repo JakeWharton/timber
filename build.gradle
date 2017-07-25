@@ -1,9 +1,12 @@
+apply plugin: 'com.github.ben-manes.versions'
+
 buildscript {
   repositories {
     jcenter()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:2.2.3'
+    classpath 'com.android.tools.build:gradle:2.3.3'
+    classpath 'com.github.ben-manes:gradle-versions-plugin:0.15.0'
   }
 }
 
@@ -16,9 +19,9 @@ allprojects {
 
 ext {
   minSdkVersion = 9
-  targetSdkVersion = 25
-  compileSdkVersion = 25
-  buildToolsVersion = '25.0.1'
+  targetSdkVersion = 26
+  compileSdkVersion = 26
+  buildToolsVersion = '26.0.1'
   sourceCompatibilityVersion = JavaVersion.VERSION_1_7
   targetCompatibilityVersion = JavaVersion.VERSION_1_7
   lintVersion = '25.3.0'
@@ -28,7 +31,7 @@ ext.deps = [
     // Test dependencies
     junit      : 'junit:junit:4.12',
     festassert : 'org.easytesting:fest-assert-core:2.0M10',
-    festandroid: 'com.squareup:fest-android:1.0.7',
+    festandroid: 'com.squareup:fest-android:1.0.8',
     mockitocore: 'org.mockito:mockito-core:1.9.5',
     robolectric: 'org.robolectric:robolectric:3.0',
 
