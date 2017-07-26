@@ -4,11 +4,11 @@ targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
-  compile deps.lintapi
-  compile deps.lintchecks
-  testCompile deps.lint
-  testCompile deps.linttests
-  testCompile deps.festassert
+  implementation deps.lintapi
+  implementation deps.lintchecks
+  testImplementation deps.lint
+  testImplementation deps.linttests
+  testImplementation deps.festassert
 }
 
 jar {

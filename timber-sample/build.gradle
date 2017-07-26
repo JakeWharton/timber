@@ -25,7 +25,7 @@ android {
 }
 
 dependencies {
-  compile project(':timber')
-  compile 'com.jakewharton:butterknife:8.7.0'
+  implementation project(':timber')
+  implementation 'com.jakewharton:butterknife:8.7.0'
   annotationProcessor 'com.jakewharton:butterknife-compiler:8.7.0'
 }
