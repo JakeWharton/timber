@@ -34,12 +34,12 @@ android {
 }
 
 dependencies {
-  provided 'org.jetbrains:annotations:15.0'
+  compileOnly 'org.jetbrains:annotations:15.0'
 
-  testCompile deps.festandroid
-  testCompile deps.festassert
-  testCompile deps.junit
-  testCompile deps.robolectric
+  testImplementation deps.festandroid
+  testImplementation deps.festassert
+  testImplementation deps.junit
+  testImplementation deps.robolectric
 
   lintRules project(':timber-lint')
 }

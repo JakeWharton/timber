@@ -229,7 +229,7 @@ public class TimberTest {
 
   @Test public void messageWithException() {
     Timber.plant(new Timber.DebugTree());
-    NullPointerException datThrowable = new NullPointerException();
+    NullPointerException datThrowable = truncatedThrowable(NullPointerException.class);
     Timber.e(datThrowable, "OMFG!");
 
     assertExceptionLogged(Log.ERROR, "OMFG!", "java.lang.NullPointerException");
@@ -238,50 +238,50 @@ public class TimberTest {
   @Test public void exceptionOnly() {
     Timber.plant(new Timber.DebugTree());
 
-    Timber.v(new IllegalArgumentException());
+    Timber.v(truncatedThrowable(IllegalArgumentException.class));
     assertExceptionLogged(Log.VERBOSE, null, "java.lang.IllegalArgumentException", "TimberTest", 0);
 
-    Timber.i(new NullPointerException());
+    Timber.i(truncatedThrowable(NullPointerException.class));
     assertExceptionLogged(Log.INFO, null, "java.lang.NullPointerException", "TimberTest", 1);
 
-    Timber.d(new UnsupportedOperationException());
+    Timber.d(truncatedThrowable(UnsupportedOperationException.class));
     assertExceptionLogged(Log.DEBUG, null, "java.lang.UnsupportedOperationException", "TimberTest", 2);
 
-    Timber.w(new UnknownHostException());
+    Timber.w(truncatedThrowable(UnknownHostException.class));
     assertExceptionLogged(Log.WARN, null, "java.net.UnknownHostException", "TimberTest", 3);
 
-    Timber.e(new ConnectException());
+    Timber.e(truncatedThrowable(ConnectException.class));
     assertExceptionLogged(Log.ERROR, null, "java.net.ConnectException", "TimberTest", 4);
 
-    Timber.wtf(new AssertionError());
+    Timber.wtf(truncatedThrowable(AssertionError.class));
     assertExceptionLogged(Log.ASSERT, null, "java.lang.AssertionError", "TimberTest", 5);
   }
 
   @Test public void exceptionOnlyCustomTag() {
     Timber.plant(new Timber.DebugTree());
 
-    Timber.tag("Custom").v(new IllegalArgumentException());
+    Timber.tag("Custom").v(truncatedThrowable(IllegalArgumentException.class));
     assertExceptionLogged(Log.VERBOSE, null, "java.lang.IllegalArgumentException", "Custom", 0);
 
-    Timber.tag("Custom").i(new NullPointerException());
+    Timber.tag("Custom").i(truncatedThrowable(NullPointerException.class));
     assertExceptionLogged(Log.INFO, null, "java.lang.NullPointerException", "Custom", 1);
 
-    Timber.tag("Custom").d(new UnsupportedOperationException());
+    Timber.tag("Custom").d(truncatedThrowable(UnsupportedOperationException.class));
     assertExceptionLogged(Log.DEBUG, null, "java.lang.UnsupportedOperationException", "Custom", 2);
 
-    Timber.tag("Custom").w(new UnknownHostException());
+    Timber.tag("Custom").w(truncatedThrowable(UnknownHostException.class));
     assertExceptionLogged(Log.WARN, null, "java.net.UnknownHostException", "Custom", 3);
 
-    Timber.tag("Custom").e(new ConnectException());
+    Timber.tag("Custom").e(truncatedThrowable(ConnectException.class));
     assertExceptionLogged(Log.ERROR, null, "java.net.ConnectException", "Custom", 4);
 
-    Timber.tag("Custom").wtf(new AssertionError());
+    Timber.tag("Custom").wtf(truncatedThrowable(AssertionError.class));
     assertExceptionLogged(Log.ASSERT, null, "java.lang.AssertionError", "Custom", 5);
   }
 
   @Test public void exceptionFromSpawnedThread() throws InterruptedException {
     Timber.plant(new Timber.DebugTree());
-    final NullPointerException datThrowable = new NullPointerException();
+    final NullPointerException datThrowable = truncatedThrowable(NullPointerException.class);
     final CountDownLatch latch = new CountDownLatch(1);
     new Thread() {
       @Override public void run() {
@@ -295,7 +295,7 @@ public class TimberTest {
 
   @Test public void nullMessageWithThrowable() {
     Timber.plant(new Timber.DebugTree());
-    final NullPointerException datThrowable = new NullPointerException();
+    NullPointerException datThrowable = truncatedThrowable(NullPointerException.class);
     Timber.e(datThrowable, null);
 
     assertExceptionLogged(Log.ERROR, "", "java.lang.NullPointerException");
@@ -434,7 +434,7 @@ public class TimberTest {
 
   @Test public void logsUnknownHostExceptions() {
     Timber.plant(new Timber.DebugTree());
-    Timber.e(new UnknownHostException(), null);
+    Timber.e(truncatedThrowable(UnknownHostException.class), null);
 
     assertExceptionLogged(Log.ERROR, "", "UnknownHostException");
   }
@@ -465,6 +465,18 @@ public class TimberTest {
 
     assertLog()
         .hasDebugMessage("TimberTest", "Test formatting: Test message logged. 100");
+  }
+
+  private static <T extends Throwable> T truncatedThrowable(Class<T> throwableClass) {
+    try {
+      T throwable = throwableClass.newInstance();
+      StackTraceElement[] stackTrace = throwable.getStackTrace();
+      int traceLength = stackTrace.length > 5 ? 5 : stackTrace.length;
+      throwable.setStackTrace(Arrays.copyOf(stackTrace, traceLength));
+      return throwable;
+    } catch (InstantiationException | IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private static String repeat(char c, int number) {
