@@ -77,7 +77,6 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       checkMethodArguments(context, call);
       checkFormatArguments(context, call);
       checkExceptionLogging(context, call);
-      return;
     }
   }
 
