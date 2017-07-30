@@ -491,12 +491,9 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       PsiExpression secondArgument = arguments[1];
 
       if (secondArgument instanceof PsiMethodCallExpression) {
-        PsiMethodCallExpression secondArgumentCall = (PsiMethodCallExpression) secondArgument;
-        JavaEvaluator evaluator = context.getEvaluator();
-        PsiMethod method = secondArgumentCall.resolveMethod();
-        if (method != null //
-            && "getMessage".equals(secondArgumentCall.getMethodExpression().getReferenceName()) //
-            && evaluator.isMemberInSubClassOf(method, "java.lang.Throwable", false)) {
+        PsiMethodCallExpression arg2Call = (PsiMethodCallExpression) secondArgument;
+
+        if (isCallFromMethodInSubclassOf(context, arg2Call, "getMessage", "java.lang.Throwable")) {
           context.report(ISSUE_EXCEPTION_LOGGING, secondArgument,
               context.getLocation(secondArgument),
               "Explicitly logging exception message is redundant");
@@ -510,6 +507,15 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
             "Use single-argument log method instead of null/empty message");
       }
     }
+  }
+
+  private static boolean isCallFromMethodInSubclassOf(JavaContext context,
+      PsiMethodCallExpression call, String methodName, String className) {
+    JavaEvaluator evaluator = context.getEvaluator();
+    PsiMethod method = call.resolveMethod();
+    return method != null //
+        && methodName.equals(call.getMethodExpression().getReferenceName()) //
+        && evaluator.isMemberInSubClassOf(method, className, false);
   }
 
   private static boolean checkElement(JavaContext context, PsiMethodCallExpression call,
