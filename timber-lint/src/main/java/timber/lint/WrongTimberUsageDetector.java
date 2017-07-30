@@ -3,6 +3,7 @@ package timber.lint;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.tools.lint.checks.StringFormatDetector;
+import com.android.tools.lint.client.api.JavaEvaluator;
 import com.android.tools.lint.detector.api.Category;
 import com.android.tools.lint.detector.api.Detector;
 import com.android.tools.lint.detector.api.Implementation;
@@ -58,22 +59,25 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   @Override public void visitMethod(JavaContext context, JavaElementVisitor visitor,
       PsiMethodCallExpression call, PsiMethod method) {
     PsiReferenceExpression methodExpression = call.getMethodExpression();
-    String fullyQualifiedMethodName = methodExpression.getQualifiedName();
-    if ("java.lang.String.format".equals(fullyQualifiedMethodName)) {
+    String methodName = methodExpression.getReferenceName();
+    JavaEvaluator evaluator = context.getEvaluator();
+
+    if ("format".equals(methodName) && evaluator.isMemberInClass(method, "java.lang.String")) {
       checkNestedStringFormat(context, call);
       return;
     }
-    if (fullyQualifiedMethodName.startsWith("timber.log.Timber.tag")) {
+    if ("tag".equals(methodName) && evaluator.isMemberInClass(method, "timber.log.Timber")) {
       checkTagLength(context, call);
       return;
     }
-    if (fullyQualifiedMethodName.startsWith("android.util.Log.")) {
+    if (evaluator.isMemberInClass(method, "android.util.Log")) {
       context.report(ISSUE_LOG, methodExpression, context.getLocation(methodExpression),
           "Using 'Log' instead of 'Timber'");
       return;
     }
     // Handles Timber.X(..) and Timber.tag(..).X(..) where X in (v|d|i|w|e|wtf).
-    if (fullyQualifiedMethodName.startsWith("timber.log.Timber.")) {
+    if (evaluator.isMemberInClass(method, "timber.log.Timber") //
+        || evaluator.isMemberInClass(method, "timber.log.Timber.Tree")) {
       checkMethodArguments(context, call);
       checkFormatArguments(context, call);
       checkExceptionLogging(context, call);
