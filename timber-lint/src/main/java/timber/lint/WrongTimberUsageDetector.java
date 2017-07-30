@@ -13,7 +13,6 @@ import com.android.tools.lint.detector.api.LintUtils;
 import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
 import com.intellij.psi.JavaElementVisitor;
-import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.PsiBinaryExpression;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
@@ -21,7 +20,6 @@ import com.intellij.psi.PsiCodeBlock;
 import com.intellij.psi.PsiConditionalExpression;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiExpression;
-import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiIfStatement;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
@@ -47,6 +45,7 @@ import static com.android.tools.lint.client.api.JavaParser.TYPE_NULL;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_OBJECT;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_SHORT;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_STRING;
+import static com.android.tools.lint.detector.api.ConstantEvaluator.evaluateString;
 
 public final class WrongTimberUsageDetector extends Detector implements Detector.JavaPsiScanner {
   private final static String GET_STRING_METHOD = "getString";
@@ -106,7 +105,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
 
   private static void checkTagLength(JavaContext context, PsiMethodCallExpression call) {
     PsiExpression argument = call.getArgumentList().getExpressions()[0];
-    String tag = findLiteralValue(argument);
+    String tag = evaluateString(context, argument, true);
     if (tag != null && tag.length() > 23) {
       String message =
           String.format("The logging tag can be at most 23 characters, was %1$d (%2$s)",
@@ -131,7 +130,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       startIndexOfArguments++;
     }
 
-    String formatString = findLiteralValue(formatStringArg);
+    String formatString = evaluateString(context, formatStringArg, true);
     // We passed for example a method call
     if (formatString == null) {
       return;
@@ -424,64 +423,6 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return types;
   }
 
-  private static String findLiteralValue(PsiExpression argument) {
-    if (argument instanceof PsiLiteralExpression) {
-      PsiLiteralExpression literalExpression = (PsiLiteralExpression) argument;
-      Object value = literalExpression.getValue();
-      if (value instanceof String) {
-        return (String) value;
-      }
-    } else if (argument instanceof PsiBinaryExpression) {
-      PsiBinaryExpression binaryExpression = (PsiBinaryExpression) argument;
-      if (binaryExpression.getOperationTokenType() == JavaTokenType.PLUS) {
-        String left = findLiteralValue(binaryExpression.getLOperand());
-        String right = findLiteralValue(binaryExpression.getROperand());
-        if (left != null && right != null) {
-          return left + right;
-        }
-      }
-    } else if (argument instanceof PsiReferenceExpression) {
-      PsiReferenceExpression referenceExpression = (PsiReferenceExpression) argument;
-      PsiElement resolved = referenceExpression.resolve();
-      if (resolved instanceof PsiField) {
-        PsiField field = (PsiField) resolved;
-        Object value = field.computeConstantValue();
-        if (value instanceof String) {
-          return (String) value;
-        }
-      }
-    }
-
-    return null;
-  }
-
-  private static boolean isLiteralValueEmpty(PsiExpression argument) {
-    if (argument instanceof PsiLiteralExpression) {
-      PsiLiteralExpression literalExpression = (PsiLiteralExpression) argument;
-      Object value = literalExpression.getValue();
-      return value == null || "".equals(value);
-    } else if (argument instanceof PsiBinaryExpression) {
-      PsiBinaryExpression binaryExpression = (PsiBinaryExpression) argument;
-      if (binaryExpression.getOperationTokenType() == JavaTokenType.PLUS) {
-        String left = findLiteralValue(binaryExpression.getLOperand());
-        String right = findLiteralValue(binaryExpression.getROperand());
-        if (left == null && right == null) {
-          return true;
-        }
-      }
-    } else if (argument instanceof PsiReferenceExpression) {
-      PsiReferenceExpression referenceExpression = (PsiReferenceExpression) argument;
-      PsiElement resolved = referenceExpression.resolve();
-      if (resolved instanceof PsiField) {
-        PsiField field = (PsiField) resolved;
-        Object value = field.computeConstantValue();
-        return value == null || "".equals(value);
-      }
-    }
-
-    return false;
-  }
-
   private static int getFormatArgumentCount(@NonNull String s) {
     Matcher matcher = StringFormatDetector.FORMAT.matcher(s);
     int index = 0;
@@ -551,7 +492,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
 
       if (isFirstParameterThrowable) {
         PsiExpression secondArgument = arguments[1];
-        boolean isMessageEmpty = isLiteralValueEmpty(secondArgument);
+        String secondArgAsString = evaluateString(context, secondArgument, true);
+        boolean isMessageEmpty = secondArgAsString == null || secondArgAsString.isEmpty();
 
         boolean callsGetMessage = false;
 
