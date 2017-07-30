@@ -487,28 +487,27 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   private static void checkExceptionLogging(JavaContext context, PsiMethodCallExpression call) {
     PsiExpression[] arguments = call.getArgumentList().getExpressions();
 
-    if (arguments.length > 1) {
-      boolean isFirstParameterThrowable = isSubclassOf(context, arguments[0], Throwable.class);
+    if (arguments.length > 1 && isSubclassOf(context, arguments[0], Throwable.class)) {
+      PsiExpression secondArgument = arguments[1];
 
-      if (isFirstParameterThrowable) {
-        PsiExpression secondArgument = arguments[1];
-        String secondArgAsString = evaluateString(context, secondArgument, true);
-        boolean isMessageEmpty = secondArgAsString == null || secondArgAsString.isEmpty();
-
-        boolean callsGetMessage = false;
-
-        if (secondArgument instanceof PsiMethodCallExpression) {
-          PsiMethodCallExpression callExpression = (PsiMethodCallExpression) secondArgument;
-          callsGetMessage = callExpression.getMethodExpression().getCanonicalText().endsWith("getMessage");
-        }
-
-        if (callsGetMessage) {
-          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
+      if (secondArgument instanceof PsiMethodCallExpression) {
+        PsiMethodCallExpression secondArgumentCall = (PsiMethodCallExpression) secondArgument;
+        JavaEvaluator evaluator = context.getEvaluator();
+        PsiMethod method = secondArgumentCall.resolveMethod();
+        if (method != null //
+            && "getMessage".equals(secondArgumentCall.getMethodExpression().getReferenceName()) //
+            && evaluator.isMemberInSubClassOf(method, "java.lang.Throwable", false)) {
+          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument,
+              context.getLocation(secondArgument),
               "Explicitly logging exception message is redundant");
-        } else if (isMessageEmpty) {
-          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
-              "Use single-argument log method instead of null/empty message");
+          return;
         }
+      }
+
+      String s = evaluateString(context, secondArgument, true);
+      if (s == null || s.isEmpty()) {
+        context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
+            "Use single-argument log method instead of null/empty message");
       }
     }
   }
