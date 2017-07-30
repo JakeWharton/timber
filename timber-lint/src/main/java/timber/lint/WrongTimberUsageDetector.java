@@ -3,6 +3,7 @@ package timber.lint;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.tools.lint.checks.StringFormatDetector;
+import com.android.tools.lint.client.api.JavaEvaluator;
 import com.android.tools.lint.detector.api.Category;
 import com.android.tools.lint.detector.api.Detector;
 import com.android.tools.lint.detector.api.Implementation;
@@ -12,7 +13,6 @@ import com.android.tools.lint.detector.api.LintUtils;
 import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
 import com.intellij.psi.JavaElementVisitor;
-import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.PsiBinaryExpression;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
@@ -20,7 +20,6 @@ import com.intellij.psi.PsiCodeBlock;
 import com.intellij.psi.PsiConditionalExpression;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiExpression;
-import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiIfStatement;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
@@ -46,6 +45,7 @@ import static com.android.tools.lint.client.api.JavaParser.TYPE_NULL;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_OBJECT;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_SHORT;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_STRING;
+import static com.android.tools.lint.detector.api.ConstantEvaluator.evaluateString;
 
 public final class WrongTimberUsageDetector extends Detector implements Detector.JavaPsiScanner {
   private final static String GET_STRING_METHOD = "getString";
@@ -58,26 +58,28 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   @Override public void visitMethod(JavaContext context, JavaElementVisitor visitor,
       PsiMethodCallExpression call, PsiMethod method) {
     PsiReferenceExpression methodExpression = call.getMethodExpression();
-    String fullyQualifiedMethodName = methodExpression.getQualifiedName();
-    if ("java.lang.String.format".equals(fullyQualifiedMethodName)) {
+    String methodName = methodExpression.getReferenceName();
+    JavaEvaluator evaluator = context.getEvaluator();
+
+    if ("format".equals(methodName) && evaluator.isMemberInClass(method, "java.lang.String")) {
       checkNestedStringFormat(context, call);
       return;
     }
-    if (fullyQualifiedMethodName.startsWith("timber.log.Timber.tag")) {
+    if ("tag".equals(methodName) && evaluator.isMemberInClass(method, "timber.log.Timber")) {
       checkTagLength(context, call);
       return;
     }
-    if (fullyQualifiedMethodName.startsWith("android.util.Log.")) {
+    if (evaluator.isMemberInClass(method, "android.util.Log")) {
       context.report(ISSUE_LOG, methodExpression, context.getLocation(methodExpression),
           "Using 'Log' instead of 'Timber'");
       return;
     }
     // Handles Timber.X(..) and Timber.tag(..).X(..) where X in (v|d|i|w|e|wtf).
-    if (fullyQualifiedMethodName.startsWith("timber.log.Timber.")) {
+    if (evaluator.isMemberInClass(method, "timber.log.Timber") //
+        || evaluator.isMemberInClass(method, "timber.log.Timber.Tree")) {
       checkMethodArguments(context, call);
       checkFormatArguments(context, call);
       checkExceptionLogging(context, call);
-      return;
     }
   }
 
@@ -103,7 +105,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
 
   private static void checkTagLength(JavaContext context, PsiMethodCallExpression call) {
     PsiExpression argument = call.getArgumentList().getExpressions()[0];
-    String tag = findLiteralValue(argument);
+    String tag = evaluateString(context, argument, true);
     if (tag != null && tag.length() > 23) {
       String message =
           String.format("The logging tag can be at most 23 characters, was %1$d (%2$s)",
@@ -128,7 +130,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       startIndexOfArguments++;
     }
 
-    String formatString = findLiteralValue(formatStringArg);
+    String formatString = evaluateString(context, formatStringArg, true);
     // We passed for example a method call
     if (formatString == null) {
       return;
@@ -421,64 +423,6 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return types;
   }
 
-  private static String findLiteralValue(PsiExpression argument) {
-    if (argument instanceof PsiLiteralExpression) {
-      PsiLiteralExpression literalExpression = (PsiLiteralExpression) argument;
-      Object value = literalExpression.getValue();
-      if (value instanceof String) {
-        return (String) value;
-      }
-    } else if (argument instanceof PsiBinaryExpression) {
-      PsiBinaryExpression binaryExpression = (PsiBinaryExpression) argument;
-      if (binaryExpression.getOperationTokenType() == JavaTokenType.PLUS) {
-        String left = findLiteralValue(binaryExpression.getLOperand());
-        String right = findLiteralValue(binaryExpression.getROperand());
-        if (left != null && right != null) {
-          return left + right;
-        }
-      }
-    } else if (argument instanceof PsiReferenceExpression) {
-      PsiReferenceExpression referenceExpression = (PsiReferenceExpression) argument;
-      PsiElement resolved = referenceExpression.resolve();
-      if (resolved instanceof PsiField) {
-        PsiField field = (PsiField) resolved;
-        Object value = field.computeConstantValue();
-        if (value instanceof String) {
-          return (String) value;
-        }
-      }
-    }
-
-    return null;
-  }
-
-  private static boolean isLiteralValueEmpty(PsiExpression argument) {
-    if (argument instanceof PsiLiteralExpression) {
-      PsiLiteralExpression literalExpression = (PsiLiteralExpression) argument;
-      Object value = literalExpression.getValue();
-      return value == null || "".equals(value);
-    } else if (argument instanceof PsiBinaryExpression) {
-      PsiBinaryExpression binaryExpression = (PsiBinaryExpression) argument;
-      if (binaryExpression.getOperationTokenType() == JavaTokenType.PLUS) {
-        String left = findLiteralValue(binaryExpression.getLOperand());
-        String right = findLiteralValue(binaryExpression.getROperand());
-        if (left == null && right == null) {
-          return true;
-        }
-      }
-    } else if (argument instanceof PsiReferenceExpression) {
-      PsiReferenceExpression referenceExpression = (PsiReferenceExpression) argument;
-      PsiElement resolved = referenceExpression.resolve();
-      if (resolved instanceof PsiField) {
-        PsiField field = (PsiField) resolved;
-        Object value = field.computeConstantValue();
-        return value == null || "".equals(value);
-      }
-    }
-
-    return false;
-  }
-
   private static int getFormatArgumentCount(@NonNull String s) {
     Matcher matcher = StringFormatDetector.FORMAT.matcher(s);
     int index = 0;
@@ -543,29 +487,35 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   private static void checkExceptionLogging(JavaContext context, PsiMethodCallExpression call) {
     PsiExpression[] arguments = call.getArgumentList().getExpressions();
 
-    if (arguments.length > 1) {
-      boolean isFirstParameterThrowable = isSubclassOf(context, arguments[0], Throwable.class);
+    if (arguments.length > 1 && isSubclassOf(context, arguments[0], Throwable.class)) {
+      PsiExpression secondArgument = arguments[1];
 
-      if (isFirstParameterThrowable) {
-        PsiExpression secondArgument = arguments[1];
-        boolean isMessageEmpty = isLiteralValueEmpty(secondArgument);
+      if (secondArgument instanceof PsiMethodCallExpression) {
+        PsiMethodCallExpression arg2Call = (PsiMethodCallExpression) secondArgument;
 
-        boolean callsGetMessage = false;
-
-        if (secondArgument instanceof PsiMethodCallExpression) {
-          PsiMethodCallExpression callExpression = (PsiMethodCallExpression) secondArgument;
-          callsGetMessage = callExpression.getMethodExpression().getCanonicalText().endsWith("getMessage");
-        }
-
-        if (callsGetMessage) {
-          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
+        if (isCallFromMethodInSubclassOf(context, arg2Call, "getMessage", "java.lang.Throwable")) {
+          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument,
+              context.getLocation(secondArgument),
               "Explicitly logging exception message is redundant");
-        } else if (isMessageEmpty) {
-          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
-              "Use single-argument log method instead of null/empty message");
+          return;
         }
       }
+
+      String s = evaluateString(context, secondArgument, true);
+      if (s == null || s.isEmpty()) {
+        context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
+            "Use single-argument log method instead of null/empty message");
+      }
     }
+  }
+
+  private static boolean isCallFromMethodInSubclassOf(JavaContext context,
+      PsiMethodCallExpression call, String methodName, String className) {
+    JavaEvaluator evaluator = context.getEvaluator();
+    PsiMethod method = call.resolveMethod();
+    return method != null //
+        && methodName.equals(call.getMethodExpression().getReferenceName()) //
+        && evaluator.isMemberInSubClassOf(method, className, false);
   }
 
   private static boolean checkElement(JavaContext context, PsiMethodCallExpression call,
