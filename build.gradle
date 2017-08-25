@@ -9,7 +9,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:3.0.0-alpha8'
+    classpath 'com.android.tools.build:gradle:3.0.0-alpha9'
     classpath 'com.github.ben-manes:gradle-versions-plugin:0.15.0'
     classpath 'gradle.plugin.com.kageiit:lintrules:1.1.3'
   }

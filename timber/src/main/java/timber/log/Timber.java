@@ -1,9 +1,6 @@
 package timber.log;
 
 import android.util.Log;
-
-import org.jetbrains.annotations.NonNls;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -11,11 +8,24 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
 
 import static java.util.Collections.unmodifiableList;
 
 /** Logging for lazy people. */
 public final class Timber {
+
+  /** Log a method call source. */
+  public static void enter() {
+    TREE_OF_SOULS.enter();
+  }
+
+  /** Log a method call source with message. */
+  public static void enter(@NonNls String message, Object... args) {
+    TREE_OF_SOULS.enter(message, args);
+  }
+
   /** Log a verbose message with optional format args. */
   public static void v(@NonNls String message, Object... args) {
     TREE_OF_SOULS.v(message, args);
@@ -203,6 +213,24 @@ public final class Timber {
     }
   }
 
+  public static void hire(TreeDecorator treeDecorator) {
+    if (treeDecorator == null) {
+      throw new NullPointerException("decorator == null");
+    }
+    decorator = treeDecorator;
+  }
+
+  public static void fireDecorator() {
+    decorator = decoNOTor;
+  }
+
+  static final TreeDecorator decoNOTor = new TreeDecorator() {
+    @Override public @NotNull String style(String message) {
+      return message;
+    }
+  };
+  static volatile TreeDecorator decorator = decoNOTor;
+
   private static final Tree[] TREE_ARRAY_EMPTY = new Tree[0];
   // Both fields guarded by 'FOREST'.
   private static final List<Tree> FOREST = new ArrayList<>();
@@ -210,6 +238,23 @@ public final class Timber {
 
   /** A {@link Tree} that delegates to all planted trees in the {@linkplain #FOREST forest}. */
   private static final Tree TREE_OF_SOULS = new Tree() {
+
+    @Override public void enter() {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].enter();
+      }
+    }
+
+    @Override public void enter(String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].enter(message, args);
+      }
+    }
+
     @Override public void v(String message, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
@@ -387,6 +432,11 @@ public final class Timber {
     throw new AssertionError("No instances.");
   }
 
+  /** Decorator for log messages **/
+  public interface TreeDecorator {
+    @NotNull String style(final String message);
+  }
+
   /** A facade for handling logging calls. Install instances via {@link #plant Timber.plant()}. */
   public static abstract class Tree {
     final ThreadLocal<String> explicitTag = new ThreadLocal<>();
@@ -397,6 +447,17 @@ public final class Timber {
         explicitTag.remove();
       }
       return tag;
+    }
+
+    /** Log a details about method call. */
+    public void enter() {
+      prepareLog(Log.VERBOSE, null, "Called from " + getCallMethodName(5) + "()");
+    }
+
+    /** Log a message with details about method call. */
+    public void enter(String message, Object... args) {
+      prepareLog(Log.VERBOSE, null, "Called from "
+          + getCallMethodName(5)  + "(): " + message, args);
     }
 
     /** Log a verbose message with optional format args. */
@@ -506,10 +567,10 @@ public final class Timber {
 
     /**
      * Return whether a message at {@code priority} should be logged.
+     *
      * @deprecated use {@link #isLoggable(String, int)} instead.
      */
-    @Deprecated
-    protected boolean isLoggable(int priority) {
+    @Deprecated protected boolean isLoggable(int priority) {
       return true;
     }
 
@@ -517,6 +578,7 @@ public final class Timber {
     protected boolean isLoggable(String tag, int priority) {
       return isLoggable(priority);
     }
+
 
     private void prepareLog(int priority, Throwable t, String message, Object... args) {
       // Consume tag even when message is not loggable so that next message is correctly tagged.
@@ -541,6 +603,7 @@ public final class Timber {
           message += "\n" + getStackTraceString(t);
         }
       }
+      message = decorator.style(message);
 
       log(priority, tag, message, t);
     }
@@ -571,6 +634,31 @@ public final class Timber {
      * @param t Accompanying exceptions. May be {@code null}, but then {@code message} will not be.
      */
     protected abstract void log(int priority, String tag, String message, Throwable t);
+  }
+
+
+  // http://stackoverflow.com/questions/442747/getting-the-name-of-the-current-executing-method
+  private static String getCallMethodName(final int depth) {
+    try {
+      return Thread.currentThread().getStackTrace()[2 + depth].getMethodName();
+    } catch (Throwable t) {
+      return "unknown";
+    }
+  }
+
+  /** A {@link TreeDecorator TreeDecorator with */
+  public static class DebugDecorator implements TreeDecorator {
+
+    private static ThreadLocal<String> threadName = new ThreadLocal<String>() {
+      @Override
+      protected String initialValue() {
+        return "[" + Thread.currentThread().getName() + "] ";
+      }
+    };
+
+    @Override public @NotNull String style(String message) {
+      return threadName.get() + getCallMethodName(6) + "(): " + message;
+    }
   }
 
   /** A {@link Tree Tree} for debug builds. Automatically infers the tag from the calling class. */
