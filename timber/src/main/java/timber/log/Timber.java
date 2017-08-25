@@ -213,6 +213,7 @@ public final class Timber {
     }
   }
 
+  /** Hire new decorator. */
   public static void hire(TreeDecorator treeDecorator) {
     if (treeDecorator == null) {
       throw new NullPointerException("decorator == null");
@@ -220,6 +221,7 @@ public final class Timber {
     decorator = treeDecorator;
   }
 
+  /** Fire decorator. */
   public static void fireDecorator() {
     decorator = decoNOTor;
   }
