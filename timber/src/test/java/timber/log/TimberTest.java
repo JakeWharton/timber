@@ -1,9 +1,8 @@
 package timber.log;
 
 import android.util.Log;
-
-import java.net.UnknownHostException;
 import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +16,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowLog;
 
 import static org.fest.assertions.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.robolectric.shadows.ShadowLog.LogItem;
 
@@ -25,6 +25,7 @@ import static org.robolectric.shadows.ShadowLog.LogItem;
 public class TimberTest {
   @Before @After public void setUpAndTearDown() {
     Timber.uprootAll();
+    Timber.fireDecorator();
   }
 
   // NOTE: This class references the line number. Keep it at the top so it does not change.
@@ -37,9 +38,64 @@ public class TimberTest {
 
     Timber.d("Test");
 
+    assertLog().hasDebugMessage("TimberTest:38", "Test").hasNoMoreMessages();
+  }
+
+  @Test public void callingMethodName() {
+    Timber.plant(new Timber.DebugTree());
+    callEnter();
+
     assertLog()
-        .hasDebugMessage("TimberTest:38", "Test")
+      .hasVerboseMessage("TimberTest", "Called from callingMethodName()")
+      .hasNoMoreMessages();
+  }
+
+  @Test public void callingMethodNameWithMessage() {
+    Timber.plant(new Timber.DebugTree());
+    callEnter("First message %d", 1);
+    callEnter("Second message %d", 2);
+
+    assertLog()
+        .hasVerboseMessage("TimberTest", "Called from callingMethodNameWithMessage(): First message 1")
+        .hasVerboseMessage("TimberTest", "Called from callingMethodNameWithMessage(): Second message 2")
         .hasNoMoreMessages();
+  }
+
+  @Test public void emptyDecoratorByDefault() {
+    Timber.plant(new Timber.DebugTree());
+    Timber.d("Test");
+
+    assertLog()
+        .hasDebugMessage("TimberTest", "Test")
+        .hasNoMoreMessages();
+  }
+
+  @Test public void debugDecorator() {
+    Timber.plant(new Timber.DebugTree());
+    Timber.hire(new Timber.DebugDecorator());
+    Timber.d("Test");
+
+    assertLog()
+        .hasDebugMessage("TimberTest", "[main] debugDecorator(): Test")
+        .hasNoMoreMessages();
+  }
+
+  @Test public void emptyDecoratorAfterFireIxisting() {
+    Timber.DebugDecorator debugDecorator = new Timber.DebugDecorator();
+    Timber.hire(debugDecorator);
+
+    assertEquals(debugDecorator, Timber.decorator);
+
+    Timber.fireDecorator();
+    assertEquals(Timber.decoNOTor, Timber.decorator);
+  }
+
+  private void callEnter(final String message, final Object... args) {
+    Timber.enter(message, args);
+  }
+
+  private void callEnter() {
+    Timber.enter();
   }
 
   @Test public void recursion() {
@@ -51,7 +107,7 @@ public class TimberTest {
       assertThat(e).hasMessage("Cannot plant Timber into itself.");
     }
     try {
-      Timber.plant(new Timber.Tree[]{timber});
+      Timber.plant(new Timber.Tree[] { timber });
       fail();
     } catch (IllegalArgumentException e) {
       assertThat(e).hasMessage("Cannot plant Timber into itself.");
@@ -69,8 +125,7 @@ public class TimberTest {
     assertThat(Timber.treeCount()).isEqualTo(0);
   }
 
-  @SuppressWarnings("ConstantConditions")
-  @Test public void nullTree() {
+  @SuppressWarnings("ConstantConditions") @Test public void nullTree() {
     Timber.Tree nullTree = null;
     try {
       Timber.plant(nullTree);
@@ -80,8 +135,7 @@ public class TimberTest {
     }
   }
 
-  @SuppressWarnings("ConstantConditions")
-  @Test public void nullTreeArray() {
+  @SuppressWarnings("ConstantConditions") @Test public void nullTreeArray() {
     Timber.Tree[] nullTrees = null;
     try {
       Timber.plant(nullTrees);
@@ -89,7 +143,7 @@ public class TimberTest {
     } catch (NullPointerException e) {
       assertThat(e).hasMessage("trees == null");
     }
-    nullTrees = new Timber.Tree[]{null};
+    nullTrees = new Timber.Tree[] { null };
     try {
       Timber.plant(nullTrees);
       fail();
@@ -133,8 +187,7 @@ public class TimberTest {
     Timber.uproot(tree1);
     Timber.d("Second");
 
-    assertLog()
-        .hasDebugMessage("TimberTest", "First")
+    assertLog().hasDebugMessage("TimberTest", "First")
         .hasDebugMessage("TimberTest", "First")
         .hasDebugMessage("TimberTest", "Second")
         .hasNoMoreMessages();
@@ -149,8 +202,7 @@ public class TimberTest {
     Timber.uprootAll();
     Timber.d("Second");
 
-    assertLog()
-        .hasDebugMessage("TimberTest", "First")
+    assertLog().hasDebugMessage("TimberTest", "First")
         .hasDebugMessage("TimberTest", "First")
         .hasNoMoreMessages();
   }
@@ -159,18 +211,14 @@ public class TimberTest {
     Timber.plant(new Timber.DebugTree());
     Timber.d("te%st");
 
-    assertLog()
-        .hasDebugMessage("TimberTest", "te%st")
-        .hasNoMoreMessages();
+    assertLog().hasDebugMessage("TimberTest", "te%st").hasNoMoreMessages();
   }
 
   @Test public void debugTreeTagGeneration() {
     Timber.plant(new Timber.DebugTree());
     Timber.d("Hello, world!");
 
-    assertLog()
-        .hasDebugMessage("TimberTest", "Hello, world!")
-        .hasNoMoreMessages();
+    assertLog().hasDebugMessage("TimberTest", "Hello, world!").hasNoMoreMessages();
   }
 
   @Test public void debugTreeTagGenerationStripsAnonymousClassMarker() {
@@ -187,8 +235,7 @@ public class TimberTest {
       }
     }.run();
 
-    assertLog()
-        .hasDebugMessage("TimberTest", "Hello, world!")
+    assertLog().hasDebugMessage("TimberTest", "Hello, world!")
         .hasDebugMessage("TimberTest", "Hello, world!")
         .hasNoMoreMessages();
   }
@@ -213,18 +260,14 @@ public class TimberTest {
       }
     }
     new ClassNameThatIsReallyReallyReallyLong();
-    assertLog()
-        .hasDebugMessage("TimberTest$1ClassNameTh", "Hello, world!")
-        .hasNoMoreMessages();
+    assertLog().hasDebugMessage("TimberTest$1ClassNameTh", "Hello, world!").hasNoMoreMessages();
   }
 
   @Test public void debugTreeCustomTag() {
     Timber.plant(new Timber.DebugTree());
     Timber.tag("Custom").d("Hello, world!");
 
-    assertLog()
-        .hasDebugMessage("Custom", "Hello, world!")
-        .hasNoMoreMessages();
+    assertLog().hasDebugMessage("Custom", "Hello, world!").hasNoMoreMessages();
   }
 
   @Test public void messageWithException() {
@@ -245,7 +288,8 @@ public class TimberTest {
     assertExceptionLogged(Log.INFO, null, "java.lang.NullPointerException", "TimberTest", 1);
 
     Timber.d(truncatedThrowable(UnsupportedOperationException.class));
-    assertExceptionLogged(Log.DEBUG, null, "java.lang.UnsupportedOperationException", "TimberTest", 2);
+    assertExceptionLogged(Log.DEBUG, null, "java.lang.UnsupportedOperationException", "TimberTest",
+        2);
 
     Timber.w(truncatedThrowable(UnknownHostException.class));
     assertExceptionLogged(Log.WARN, null, "java.net.UnknownHostException", "TimberTest", 3);
@@ -305,8 +349,7 @@ public class TimberTest {
     Timber.plant(new Timber.DebugTree());
     Timber.d(repeat('a', 3000) + '\n' + repeat('b', 6000) + '\n' + repeat('c', 3000));
 
-    assertLog()
-        .hasDebugMessage("TimberTest", repeat('a', 3000))
+    assertLog().hasDebugMessage("TimberTest", repeat('a', 3000))
         .hasDebugMessage("TimberTest", repeat('b', 4000))
         .hasDebugMessage("TimberTest", repeat('b', 2000))
         .hasDebugMessage("TimberTest", repeat('c', 3000))
@@ -367,8 +410,7 @@ public class TimberTest {
     Timber.log(Log.ERROR, "Hello, World!");
     Timber.log(Log.ASSERT, "Hello, World!");
 
-    assertLog()
-        .hasVerboseMessage("TimberTest", "Hello, World!")
+    assertLog().hasVerboseMessage("TimberTest", "Hello, World!")
         .hasDebugMessage("TimberTest", "Hello, World!")
         .hasInfoMessage("TimberTest", "Hello, World!")
         .hasWarnMessage("TimberTest", "Hello, World!")
@@ -386,8 +428,7 @@ public class TimberTest {
     Timber.e("Hello, %s!", "World");
     Timber.wtf("Hello, %s!", "World");
 
-    assertLog()
-        .hasVerboseMessage("TimberTest", "Hello, World!")
+    assertLog().hasVerboseMessage("TimberTest", "Hello, World!")
         .hasDebugMessage("TimberTest", "Hello, World!")
         .hasInfoMessage("TimberTest", "Hello, World!")
         .hasWarnMessage("TimberTest", "Hello, World!")
@@ -409,9 +450,7 @@ public class TimberTest {
     Timber.e("Hello, World!");
     Timber.wtf("Hello, World!");
 
-    assertLog()
-        .hasInfoMessage("TimberTest", "Hello, World!")
-        .hasNoMoreMessages();
+    assertLog().hasInfoMessage("TimberTest", "Hello, World!").hasNoMoreMessages();
   }
 
   @Test public void isLoggableTagControlsLogging() {
@@ -427,9 +466,7 @@ public class TimberTest {
     Timber.e("Hello, World!");
     Timber.wtf("Hello, World!");
 
-    assertLog()
-        .hasVerboseMessage("FILTER", "Hello, World!")
-        .hasNoMoreMessages();
+    assertLog().hasVerboseMessage("FILTER", "Hello, World!").hasNoMoreMessages();
   }
 
   @Test public void logsUnknownHostExceptions() {
@@ -441,30 +478,25 @@ public class TimberTest {
 
   @Test public void tagIsClearedWhenNotLoggable() {
     Timber.plant(new Timber.DebugTree() {
-      @Override
-      protected boolean isLoggable(int priority) {
+      @Override protected boolean isLoggable(int priority) {
         return priority >= Log.WARN;
       }
     });
     Timber.tag("NotLogged").i("Message not logged");
     Timber.w("Message logged");
 
-    assertLog()
-        .hasWarnMessage("TimberTest", "Message logged")
-        .hasNoMoreMessages();
+    assertLog().hasWarnMessage("TimberTest", "Message logged").hasNoMoreMessages();
   }
 
   @Test public void logsWithCustomFormatter() {
     Timber.plant(new Timber.DebugTree() {
-      @Override
-      protected String formatMessage(String message, Object[] args) {
+      @Override protected String formatMessage(String message, Object[] args) {
         return String.format("Test formatting: " + message, args);
       }
     });
     Timber.d("Test message logged. %d", 100);
 
-    assertLog()
-        .hasDebugMessage("TimberTest", "Test formatting: Test message logged. 100");
+    assertLog().hasDebugMessage("TimberTest", "Test formatting: Test message logged. 100");
   }
 
   private static <T extends Throwable> T truncatedThrowable(Class<T> throwableClass) {
@@ -485,12 +517,13 @@ public class TimberTest {
     return new String(data);
   }
 
-  private static void assertExceptionLogged(int logType, String message, String exceptionClassname) {
+  private static void assertExceptionLogged(int logType, String message,
+      String exceptionClassname) {
     assertExceptionLogged(logType, message, exceptionClassname, null, 0);
   }
 
-  private static void assertExceptionLogged(int logType, String message, String exceptionClassname, String tag,
-                                            int index) {
+  private static void assertExceptionLogged(int logType, String message, String exceptionClassname,
+      String tag, int index) {
     List<LogItem> logs = ShadowLog.getLogs();
     assertThat(logs).hasSize(index + 1);
     LogItem log = logs.get(index);
