@@ -1,11 +1,11 @@
-apply plugin: 'java'
+apply plugin: 'java-library'
 
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
-  implementation deps.lintapi
-  implementation deps.lintchecks
+  compileOnly deps.lintapi
+  compileOnly deps.lintchecks
   testImplementation deps.lint
   testImplementation deps.linttests
   testImplementation deps.festassert
