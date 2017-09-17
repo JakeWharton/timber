@@ -13,6 +13,6 @@ dependencies {
 
 jar {
   manifest {
-    attributes('Lint-Registry': 'timber.lint.IssueRegistry')
+    attributes('Lint-Registry-v2': 'timber.lint.IssueRegistry')
   }
 }
