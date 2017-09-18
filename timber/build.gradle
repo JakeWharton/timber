@@ -19,11 +19,11 @@ afterEvaluate {
 }
 
 android {
-  compileSdkVersion rootProject.ext.compileSdkVersion
-  buildToolsVersion rootProject.ext.buildToolsVersion
+  compileSdkVersion versions.compileSdk
+  buildToolsVersion versions.buildTools
 
   defaultConfig {
-    minSdkVersion rootProject.ext.minSdkVersion
+    minSdkVersion versions.minSdk
     consumerProguardFiles 'consumer-proguard-rules.pro'
   }
 
@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-  compileOnly 'org.jetbrains:annotations:15.0'
+  compileOnly deps.annotations
 
   testImplementation deps.festandroid
   testImplementation deps.festassert
