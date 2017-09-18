@@ -34,7 +34,7 @@ public class WrongTimberUsageDetectorTest extends LintDetectorTest {
     assertThat(lintProject(java(source))).isEqualTo("src/foo/Example.java:5: "
         + "Warning: Using 'Log' instead of 'Timber' [LogNotTimber]\n"
         + "    Log.d(\"TAG\", \"msg\");\n"
-        + "    ~~~~~\n"
+        + "    ~~~\n"
         + "0 errors, 1 warnings\n");
   }
 

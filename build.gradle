@@ -7,7 +7,7 @@ buildscript {
       'buildTools': '26.0.1',
 
       'androidPlugin': '3.0.0-beta6',
-      'androidTools': '25.3.0',
+      'androidTools': '26.0.0-beta6',
 
       'butterknife': '8.8.1',
   ]
