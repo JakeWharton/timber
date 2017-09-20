@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.kageiit.lintrules'
 apply plugin: 'checkstyle'
 
 task checkstyle(type: Checkstyle) {
@@ -41,7 +40,7 @@ dependencies {
   testImplementation deps.junit
   testImplementation deps.robolectric
 
-  lintRules project(':timber-lint')
+  lintChecks project(':timber-lint')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
