@@ -7,39 +7,66 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import timber.log.Timber;
 
+import static java.lang.String.format;
+
 @SuppressLint("Registered") //
 public class LintActivity extends Activity {
+  /**
+   * Below are some examples of how NOT to use Timber.
+   *
+   * Currently, locally-packaged lint checks don't work in Studio. Once
+   * https://issuetracker.google.com/issues/65941946 is fixed, you will need to run
+   * "./gradlew :timber-sample:lint" first, before Lint IDE highlighting will work.
+   *
+   * A future release will eliminate the 'command-line first' workaround.
+   */
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    // Below are some examples of how NOT to use Timber
     /*
+    // LogNotTimber
     Log.d("TAG", "msg");
+    Log.d("TAG", "msg", new Exception());
+    android.util.Log.d("TAG", "msg");
+    android.util.Log.d("TAG", "msg", new Exception());
 
-    Timber.w(String.format("%s", "arg0"));
+    // StringFormatInTimber
+    Timber.w(String.format("%s", getString()));
+    Timber.w(format("%s", getString()));
 
-    Exception e = new Exception();
-    Timber.d("%s", e);
+    // ThrowableNotAtBeginning
+    Timber.d("%s", new Exception());
 
-    Timber.d("Hello, " + "world!");
+    // BinaryOperationInTimber
+    String foo = "foo";
+    String bar = "bar";
+    Timber.d("foo" + "bar");
+    Timber.d("foo" + bar);
+    Timber.d(foo + "bar");
+    Timber.d(foo + bar);
 
+    // TimberArgCount
     Timber.d("%s %s", "arg0");
-
     Timber.d("%s", "arg0", "arg1");
-
-    Timber.d("%d", "arg0");
-
-    Timber.tag("abcdefghijklmnopqrstuvwx");
-
     Timber.tag("tag").d("%s %s", "arg0");
-
     Timber.tag("tag").d("%s", "arg0", "arg1");
 
+    // TimberArgTypes
+    Timber.d("%d", "arg0");
     Timber.tag("tag").d("%d", "arg0");
 
+    // TimberTagLength
+    Timber.tag("abcdefghijklmnopqrstuvwx");
     Timber.tag("abcdefghijklmnopqrstuvw" + "x");
 
-    Timber.tag("abcdefghijklmnopqrstuvw" + new String("x"));
+    // TimberExceptionLogging
+    Timber.d(new Exception(), new Exception().getMessage());
+    Timber.d(new Exception(), "");
+    Timber.d(new Exception(), null);
     */
+  }
+
+  private String getString() {
+    return "foo";
   }
 }
