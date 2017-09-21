@@ -9,6 +9,7 @@ import com.android.tools.lint.detector.api.Detector;
 import com.android.tools.lint.detector.api.Implementation;
 import com.android.tools.lint.detector.api.Issue;
 import com.android.tools.lint.detector.api.JavaContext;
+import com.android.tools.lint.detector.api.LintFix;
 import com.android.tools.lint.detector.api.LintUtils;
 import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
@@ -48,6 +49,8 @@ import static com.android.tools.lint.client.api.JavaParser.TYPE_STRING;
 import static com.android.tools.lint.detector.api.ConstantEvaluator.evaluateString;
 import static org.jetbrains.uast.UastBinaryOperator.PLUS;
 import static org.jetbrains.uast.UastBinaryOperator.PLUS_ASSIGN;
+import static org.jetbrains.uast.UastLiteralUtils.isStringLiteral;
+import static org.jetbrains.uast.UastUtils.evaluateString;
 
 public final class WrongTimberUsageDetector extends Detector implements Detector.UastScanner {
   private final static String GET_STRING_METHOD = "getString";
@@ -65,7 +68,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       checkNestedStringFormat(context, call);
       return;
     }
-    // As of API 24, Log tags are no longer limited to 23 chars
+    // As of API 24, Log tags are no longer limited to 23 chars.
     if ("tag".equals(methodName)
         && evaluator.isMemberInClass(method, "timber.log.Timber")
         && context.getMainProject().getMinSdk() <= 23) {
@@ -73,8 +76,9 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       return;
     }
     if (evaluator.isMemberInClass(method, "android.util.Log")) {
-      context.report(ISSUE_LOG, context.getLocation(call.getReceiver()),
-          "Using 'Log' instead of 'Timber'");
+      LintFix fix = quickFixIssueLog(call);
+      context.report(ISSUE_LOG, call, context.getLocation(call), "Using 'Log' instead of 'Timber'",
+          fix);
       return;
     }
     // Handles Timber.X(..) and Timber.tag(..).X(..) where X in (v|d|i|w|e|wtf).
@@ -99,8 +103,9 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         JavaEvaluator evaluator = context.getEvaluator();
         if (Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, maybeTimberLogCall.getMethodName())
             && evaluator.isMemberInClass(maybeTimberLogCall.resolve(), "timber.log.Timber")) {
+          LintFix fix = quickFixIssueFormat(call);
           context.report(ISSUE_FORMAT, call, context.getLocation(call),
-              "Using 'String#format' inside of 'Timber'");
+              "Using 'String#format' inside of 'Timber'", fix);
           return;
         }
       }
@@ -115,7 +120,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       String message =
           String.format("The logging tag can be at most 23 characters, was %1$d (%2$s)",
               tag.length(), tag);
-      context.report(ISSUE_TAG_LENGTH, argument, context.getLocation(argument), message);
+      LintFix fix = quickFixIssueTagLength(argument, tag);
+      context.report(ISSUE_TAG_LENGTH, argument, context.getLocation(argument), message, fix);
     }
   }
 
@@ -484,8 +490,9 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         break;
       }
       if (i > 0 && isSubclassOf(context, argument, Throwable.class)) {
+        LintFix fix = quickFixIssueThrowable(call, arguments, argument);
         context.report(ISSUE_THROWABLE, call, context.getLocation(call),
-            "Throwable should be first argument");
+            "Throwable should be first argument", fix);
       }
     }
   }
@@ -502,16 +509,18 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         // what other UExpressions could be a selector?
         if (isCallFromMethodInSubclassOf(context, (UCallExpression) selector, "getMessage",
             "java.lang.Throwable")) {
-          context.report(ISSUE_EXCEPTION_LOGGING, arg2, context.getLocation(arg2),
-              "Explicitly logging exception message is redundant");
+          LintFix fix = quickFixIssueExceptionLogging(arg2);
+          context.report(ISSUE_EXCEPTION_LOGGING, arg2, context.getLocation(call),
+              "Explicitly logging exception message is redundant", fix);
           return;
         }
       }
 
       String s = evaluateString(context, arg2, true);
       if (s == null || s.isEmpty()) {
-        context.report(ISSUE_EXCEPTION_LOGGING, arg2, context.getLocation(arg2),
-            "Use single-argument log method instead of null/empty message");
+        LintFix fix = quickFixIssueExceptionLogging(arg2);
+        context.report(ISSUE_EXCEPTION_LOGGING, arg2, context.getLocation(call),
+            "Use single-argument log method instead of null/empty message", fix);
       }
     }
   }
@@ -532,8 +541,9 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       if (operator == PLUS || operator == PLUS_ASSIGN) {
         Class argumentType = getType(binaryExpression);
         if (argumentType == String.class) {
+          LintFix fix = quickFixIssueBinary(binaryExpression);
           context.report(ISSUE_BINARY, call, context.getLocation(element),
-              "Replace String concatenation with Timber's string formatting");
+              "Replace String concatenation with Timber's string formatting", fix);
           return true;
         }
       }
@@ -558,6 +568,110 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       return false;
     }
     return checkElement(context, call, elseElement);
+  }
+
+  private static LintFix quickFixIssueLog(UCallExpression logCall) {
+    List<UExpression> arguments = logCall.getValueArguments();
+    String methodName = logCall.getMethodName();
+    UExpression tag = arguments.get(0);
+
+    // 1st suggestion respects author's tag preference.
+    // 2nd suggestion drops it (Timber defaults to calling class name).
+    String fixSource1 = "Timber.tag(" + tag.asSourceString() + ").";
+    String fixSource2 = "Timber.";
+
+    int numArguments = arguments.size();
+    if (numArguments == 2) {
+      UExpression msgOrThrowable = arguments.get(1);
+      fixSource1 += methodName + "(" + msgOrThrowable.asSourceString() + ")";
+      fixSource2 += methodName + "(" + msgOrThrowable.asSourceString() + ")";
+    } else if (numArguments == 3) {
+      UExpression msg = arguments.get(1);
+      UExpression throwable = arguments.get(2);
+      fixSource1 +=
+          methodName + "(" + throwable.asSourceString() + ", " + msg.asSourceString() + ")";
+      fixSource2 +=
+          methodName + "(" + throwable.asSourceString() + ", " + msg.asSourceString() + ")";
+    } else {
+      throw new IllegalStateException("android.util.Log overloads should have 2 or 3 arguments");
+    }
+
+    String logCallSource = logCall.asSourceString();
+    LintFix.GroupBuilder fixGrouper = fix().group();
+    fixGrouper.add(
+        fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource1).build());
+    fixGrouper.add(
+        fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource2).build());
+    return fixGrouper.build();
+  }
+
+  private static LintFix quickFixIssueFormat(UCallExpression stringFormatCall) {
+    // Handles:
+    // 1) String.format(..)
+    // 2) format(...) [static import]
+    UExpression callReceiver = stringFormatCall.getReceiver();
+    String callSourceString = callReceiver == null ? "" : callReceiver.asSourceString() + ".";
+    callSourceString += stringFormatCall.getMethodName();
+
+    return fix().name("Remove String.format(...)").composite() //
+        // Delete closing parenthesis of String.format(...)
+        .add(fix().replace().pattern(callSourceString + "\\(.*(\\))").with("").build())
+        // Delete "String.format("
+        .add(fix().replace().text(callSourceString + "(").with("").build()).build();
+  }
+
+  private static LintFix quickFixIssueThrowable(UCallExpression call, List<UExpression> arguments,
+      UExpression throwable) {
+    String rearrangedArgs = throwable.asSourceString();
+    for (UExpression arg : arguments) {
+      if (arg != throwable) {
+        rearrangedArgs += (", " + arg.asSourceString());
+      }
+    }
+    return fix().replace() //
+        .pattern("\\." + call.getMethodName() + "\\((.*)\\)").with(rearrangedArgs).build();
+  }
+
+  private static LintFix quickFixIssueBinary(UBinaryExpression binaryExpression) {
+    UExpression leftOperand = binaryExpression.getLeftOperand();
+    UExpression rightOperand = binaryExpression.getRightOperand();
+    boolean isLeftLiteral = isStringLiteral(leftOperand);
+    boolean isRightLiteral = isStringLiteral(rightOperand);
+
+    // "a" + "b" => "ab"
+    if (isLeftLiteral && isRightLiteral) {
+      return fix().replace() //
+          .text(binaryExpression.asSourceString())
+          .with("\"" + evaluateString(binaryExpression) + "\"")
+          .build();
+    }
+
+    String args;
+    if (isLeftLiteral) {
+      args = "\"" + evaluateString(leftOperand) + "%s\", " + rightOperand.asSourceString();
+    } else if (isRightLiteral) {
+      args = "\"%s" + evaluateString(rightOperand) + "\", " + leftOperand.asSourceString();
+    } else {
+      args = "\"%s%s\", " + leftOperand.asSourceString() + ", " + rightOperand.asSourceString();
+    }
+    return fix().replace().text(binaryExpression.asSourceString()).with(args).build();
+  }
+
+  private static LintFix quickFixIssueTagLength(UExpression argument, String tag) {
+    int numCharsToTrim = tag.length() - 23;
+    return fix().replace()
+        .name("Strip last " + (numCharsToTrim == 1 ? "char" : numCharsToTrim + " chars"))
+        .text(argument.asSourceString())
+        .with("\"" + tag.substring(0, 23) + "\"")
+        .build();
+  }
+
+  private static LintFix quickFixIssueExceptionLogging(UExpression arg2) {
+    return fix().replace()
+        .name("Remove redundant argument")
+        .text(", " + arg2.asSourceString())
+        .with("")
+        .build();
   }
 
   static Issue[] getIssues() {
