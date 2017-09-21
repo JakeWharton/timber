@@ -65,7 +65,10 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       checkNestedStringFormat(context, call);
       return;
     }
-    if ("tag".equals(methodName) && evaluator.isMemberInClass(method, "timber.log.Timber")) {
+    // As of API 24, Log tags are no longer limited to 23 chars
+    if ("tag".equals(methodName)
+        && evaluator.isMemberInClass(method, "timber.log.Timber")
+        && context.getMainProject().getMinSdk() <= 23) {
       checkTagLength(context, call);
       return;
     }
