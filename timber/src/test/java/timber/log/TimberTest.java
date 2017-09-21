@@ -173,6 +173,34 @@ public class TimberTest {
         .hasNoMoreMessages();
   }
 
+  class ThisIsAReallyLongClassName {
+    public void run() {
+      Timber.d("Hello, world!");
+    }
+  }
+
+  @Config(sdk = 23)
+  @Test public void debugTreeTagTruncation() {
+    Timber.plant(new Timber.DebugTree());
+
+    new ThisIsAReallyLongClassName().run();
+
+    assertLog()
+        .hasDebugMessage("TimberTest$ThisIsAReall", "Hello, world!")
+        .hasNoMoreMessages();
+  }
+
+  @Config(sdk = 24)
+  @Test public void debugTreeTagNoTruncation() {
+    Timber.plant(new Timber.DebugTree());
+
+    new ThisIsAReallyLongClassName().run();
+
+    assertLog()
+        .hasDebugMessage("TimberTest$ThisIsAReallyLongClassName", "Hello, world!")
+        .hasNoMoreMessages();
+  }
+
   @Test public void debugTreeTagGenerationStripsAnonymousClassMarker() {
     Timber.plant(new Timber.DebugTree());
     new Runnable() {

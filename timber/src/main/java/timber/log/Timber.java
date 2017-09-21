@@ -1,5 +1,6 @@
 package timber.log;
 
+import android.os.Build;
 import android.util.Log;
 
 import org.jetbrains.annotations.NonNls;
@@ -594,7 +595,11 @@ public final class Timber {
         tag = m.replaceAll("");
       }
       tag = tag.substring(tag.lastIndexOf('.') + 1);
-      return tag.length() > MAX_TAG_LENGTH ? tag.substring(0, MAX_TAG_LENGTH) : tag;
+      // Tag length limit was removed in API 24.
+      if (tag.length() <= MAX_TAG_LENGTH || Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        return tag;
+      }
+      return tag.substring(0, MAX_TAG_LENGTH);
     }
 
     @Override final String getTag() {
