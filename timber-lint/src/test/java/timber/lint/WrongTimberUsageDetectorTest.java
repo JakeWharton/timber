@@ -4,6 +4,7 @@ import com.android.tools.lint.checks.infrastructure.TestFile;
 import org.junit.Test;
 
 import static com.android.tools.lint.checks.infrastructure.TestFiles.java;
+import static com.android.tools.lint.checks.infrastructure.TestFiles.manifest;
 import static com.android.tools.lint.checks.infrastructure.TestLintTask.lint;
 
 public final class WrongTimberUsageDetectorTest {
@@ -273,6 +274,24 @@ public final class WrongTimberUsageDetectorTest {
             + "     Timber.tag(\"abcdefghijklmnopqrstuvw\" + field);\n"
             + "                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
             + "1 errors, 0 warnings\n");
+  }
+
+  @Test public void tagTooLongLiteralOnlyAfterApi23() {
+    lint() //
+        .files(TIMBER_STUB, //
+            java(""
+                + "package foo;\n"
+                + "import timber.log.Timber;\n"
+                + "public class Example {\n"
+                + "  public void log() {\n"
+                + "     Timber.tag(\"abcdefghijklmnopqrstuvwx\");\n"
+                + "  }\n"
+                + "}"), //
+            manifest().minSdk(24) //
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
+        .run()
+        .expectClean();
   }
 
   @Test public void tooManyFormatArgsInTag() {
