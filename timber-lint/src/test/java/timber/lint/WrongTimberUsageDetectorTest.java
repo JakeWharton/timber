@@ -649,6 +649,29 @@ public final class WrongTimberUsageDetectorTest {
         .expectClean();
   }
 
+  @Test
+  public void exceptionLoggingUsingField() {
+    lint() //
+        .files(TIMBER_STUB, //
+            java(""
+                + "package foo;\n"
+                + "import timber.log.Timber;\n"
+                + "public class Example {\n"
+                + "  private final String message;\n"
+                + "  public Example(String message) {\n"
+                + "    this.message = message;\n"
+                + "  }\n"
+                + "  public void log() {\n"
+                + "     Exception e = new Exception();\n"
+                + "     Logger.e(e, message);\n"
+                + "  }\n"
+                + "}") //
+        ) //
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING) //
+        .run() //
+        .expectClean();
+  }
+
   @Test public void exceptionLoggingUsingEmptyStringMessage() {
     lint() //
         .files(TIMBER_STUB, //
