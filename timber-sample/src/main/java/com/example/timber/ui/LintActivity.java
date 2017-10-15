@@ -14,9 +14,9 @@ public class LintActivity extends Activity {
   /**
    * Below are some examples of how NOT to use Timber.
    *
-   * Currently, locally-packaged lint checks don't work in Studio. Once
-   * https://issuetracker.google.com/issues/65941946 is fixed, you will need to run
-   * "./gradlew :timber-sample:lint" first, before Lint IDE highlighting will work.
+   * Currently, locally-packaged lint checks don't work in Studio. As a workaround,
+   * you will need to run "./gradlew :timber-sample:lint" first, before Lint IDE
+   * highlighting will work.
    *
    * A future release will eliminate the 'command-line first' workaround.
    */

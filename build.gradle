@@ -5,8 +5,8 @@ buildscript {
       'minSdk': 9,
       'compileSdk': 26,
 
-      'androidPlugin': '3.0.0-beta7',
-      'androidTools': '26.0.0-beta7',
+      'androidPlugin': '3.0.0-rc1',
+      'androidTools': '26.0.0-rc1',
 
       'butterknife': '8.8.1',
   ]
