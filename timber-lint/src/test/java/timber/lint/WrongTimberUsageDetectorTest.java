@@ -253,6 +253,22 @@ public final class WrongTimberUsageDetectorTest {
         .expectClean();
   }
 
+  @Test public void validStringFormatInConstructorCall() {
+    lint() //
+        .files(TIMBER_STUB, //
+            java(""
+                + "package foo;\n"
+                + "public class Example {\n"
+                + "  public void log() {\n"
+                + "    new Exception(String.format(\"msg\"));\n"
+                + "  }\n"
+                + "}") //
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
+        .run()
+        .expectClean();
+  }
+
   @Test public void throwableNotAtBeginning() {
     lint() //
         .files(TIMBER_STUB, //

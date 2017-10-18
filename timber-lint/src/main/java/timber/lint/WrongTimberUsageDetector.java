@@ -101,8 +101,9 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       if (current instanceof UCallExpression) {
         UCallExpression maybeTimberLogCall = (UCallExpression) current;
         JavaEvaluator evaluator = context.getEvaluator();
-        if (Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, maybeTimberLogCall.getMethodName())
-            && evaluator.isMemberInClass(maybeTimberLogCall.resolve(), "timber.log.Timber")) {
+        PsiMethod psiMethod = maybeTimberLogCall.resolve();
+        if (Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.getName())
+            && evaluator.isMemberInClass(psiMethod, "timber.log.Timber")) {
           LintFix fix = quickFixIssueFormat(call);
           context.report(ISSUE_FORMAT, call, context.getLocation(call),
               "Using 'String#format' inside of 'Timber'", fix);
