@@ -4,6 +4,7 @@ import android.os.Build;
 import android.util.Log;
 
 import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -571,7 +572,7 @@ public final class Timber {
      * @param message Formatted log message. May be {@code null}, but then {@code t} will not be.
      * @param t Accompanying exceptions. May be {@code null}, but then {@code message} will not be.
      */
-    protected abstract void log(int priority, String tag, String message, Throwable t);
+    protected abstract void log(int priority, @Nullable String tag, String message, Throwable t);
   }
 
   /** A {@link Tree Tree} for debug builds. Automatically infers the tag from the calling class. */
