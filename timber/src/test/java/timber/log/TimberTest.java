@@ -2,13 +2,13 @@ package timber.log;
 
 import android.os.Build;
 import android.util.Log;
-
-import java.net.UnknownHostException;
 import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -33,7 +33,7 @@ public class TimberTest {
   // NOTE: This class references the line number. Keep it at the top so it does not change.
   @Test public void debugTreeCanAlterCreatedTag() {
     Timber.plant(new Timber.DebugTree() {
-      @Override protected String createStackElementTag(StackTraceElement element) {
+      @Override protected String createStackElementTag(@NotNull StackTraceElement element) {
         return super.createStackElementTag(element) + ':' + element.getLineNumber();
       }
     });
@@ -229,7 +229,7 @@ public class TimberTest {
     Timber.plant(new Timber.DebugTree() {
       private static final int MAX_TAG_LENGTH = 23;
 
-      @Override protected void log(int priority, String tag, String message, Throwable t) {
+      @Override protected void log(int priority, String tag, @NotNull String message, Throwable t) {
         try {
           assertTrue(Log.isLoggable(tag, priority));
           if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
@@ -357,7 +357,7 @@ public class TimberTest {
   @Test public void logMessageCallback() {
     final List<String> logs = new ArrayList<>();
     Timber.plant(new Timber.DebugTree() {
-      @Override protected void log(int priority, String tag, String message, Throwable t) {
+      @Override protected void log(int priority, String tag, @NotNull String message, Throwable t) {
         logs.add(priority + " " + tag + " " + message);
       }
     });
@@ -492,7 +492,7 @@ public class TimberTest {
   @Test public void logsWithCustomFormatter() {
     Timber.plant(new Timber.DebugTree() {
       @Override
-      protected String formatMessage(String message, Object[] args) {
+      protected String formatMessage(@NotNull String message, @NotNull Object[] args) {
         return String.format("Test formatting: " + message, args);
       }
     });

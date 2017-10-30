@@ -2,9 +2,6 @@ package timber.log;
 
 import android.os.Build;
 import android.util.Log;
-
-import org.jetbrains.annotations.NonNls;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -12,10 +9,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static java.util.Collections.unmodifiableList;
 
 /** Logging for lazy people. */
+@SuppressWarnings({ "WeakerAccess", "unused" }) // Public API.
 public final class Timber {
   /** Log a verbose message with optional format args. */
   public static void v(@NonNls String message, Object... args) {
@@ -126,11 +127,13 @@ public final class Timber {
    * A view into Timber's planted trees as a tree itself. This can be used for injecting a logger
    * instance rather than using static methods or to facilitate testing.
    */
+  @NotNull
   public static Tree asTree() {
     return TREE_OF_SOULS;
   }
 
   /** Set a one-time tag for use on the next logging call. */
+  @NotNull
   public static Tree tag(String tag) {
     Tree[] forest = forestAsArray;
     //noinspection ForLoopReplaceableByForEach
@@ -141,7 +144,8 @@ public final class Timber {
   }
 
   /** Add a new logging tree. */
-  public static void plant(Tree tree) {
+  @SuppressWarnings("ConstantConditions") // Validating public API contract.
+  public static void plant(@NotNull Tree tree) {
     if (tree == null) {
       throw new NullPointerException("tree == null");
     }
@@ -155,7 +159,8 @@ public final class Timber {
   }
 
   /** Adds new logging trees. */
-  public static void plant(Tree... trees) {
+  @SuppressWarnings("ConstantConditions") // Validating public API contract.
+  public static void plant(@NotNull Tree... trees) {
     if (trees == null) {
       throw new NullPointerException("trees == null");
     }
@@ -174,7 +179,7 @@ public final class Timber {
   }
 
   /** Remove a planted tree. */
-  public static void uproot(Tree tree) {
+  public static void uproot(@NotNull Tree tree) {
     synchronized (FOREST) {
       if (!FOREST.remove(tree)) {
         throw new IllegalArgumentException("Cannot uproot tree which is not planted: " + tree);
@@ -192,6 +197,7 @@ public final class Timber {
   }
 
   /** Return a copy of all planted {@linkplain Tree trees}. */
+  @NotNull
   public static List<Tree> forest() {
     synchronized (FOREST) {
       return unmodifiableList(new ArrayList<>(FOREST));
@@ -379,7 +385,7 @@ public final class Timber {
       }
     }
 
-    @Override protected void log(int priority, String tag, String message, Throwable t) {
+    @Override protected void log(int priority, String tag, @NotNull String message, Throwable t) {
       throw new AssertionError("Missing override for log method.");
     }
   };
@@ -392,6 +398,7 @@ public final class Timber {
   public static abstract class Tree {
     final ThreadLocal<String> explicitTag = new ThreadLocal<>();
 
+    @Nullable
     String getTag() {
       String tag = explicitTag.get();
       if (tag != null) {
@@ -515,7 +522,8 @@ public final class Timber {
     }
 
     /** Return whether a message at {@code priority} or {@code tag} should be logged. */
-    protected boolean isLoggable(String tag, int priority) {
+    protected boolean isLoggable(@Nullable String tag, int priority) {
+      //noinspection deprecation
       return isLoggable(priority);
     }
 
@@ -549,7 +557,7 @@ public final class Timber {
     /**
      * Formats a log message with optional arguments.
      */
-    protected String formatMessage(String message, Object[] args) {
+    protected String formatMessage(@NotNull String message, @NotNull Object[] args) {
       return String.format(message, args);
     }
 
@@ -571,7 +579,8 @@ public final class Timber {
      * @param message Formatted log message. May be {@code null}, but then {@code t} will not be.
      * @param t Accompanying exceptions. May be {@code null}, but then {@code message} will not be.
      */
-    protected abstract void log(int priority, String tag, String message, Throwable t);
+    protected abstract void log(int priority, @Nullable String tag, @NotNull String message,
+        @Nullable Throwable t);
   }
 
   /** A {@link Tree Tree} for debug builds. Automatically infers the tag from the calling class. */
@@ -588,7 +597,8 @@ public final class Timber {
      * <p>
      * Note: This will not be called if a {@linkplain #tag(String) manual tag} was specified.
      */
-    protected String createStackElementTag(StackTraceElement element) {
+    @Nullable
+    protected String createStackElementTag(@NotNull StackTraceElement element) {
       String tag = element.getClassName();
       Matcher m = ANONYMOUS_CLASS.matcher(tag);
       if (m.find()) {
@@ -625,7 +635,7 @@ public final class Timber {
      *
      * {@inheritDoc}
      */
-    @Override protected void log(int priority, String tag, String message, Throwable t) {
+    @Override protected void log(int priority, String tag, @NotNull String message, Throwable t) {
       if (message.length() < MAX_LOG_LENGTH) {
         if (priority == Log.ASSERT) {
           Log.wtf(tag, message);
