@@ -25,9 +25,8 @@ buildscript {
       ],
       annotations: 'org.jetbrains:annotations:15.0',
 
-      junit      : 'junit:junit:4.12',
-      festassert : 'org.easytesting:fest-assert-core:2.0M10',
-      festandroid: 'com.squareup:fest-android:1.0.8',
+      junit: 'junit:junit:4.12',
+      truth: 'com.google.truth:truth:0.36',
       mockitocore: 'org.mockito:mockito-core:1.9.5',
       robolectric: 'org.robolectric:robolectric:3.5',
   ]

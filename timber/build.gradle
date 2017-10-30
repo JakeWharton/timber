@@ -34,9 +34,8 @@ android {
 dependencies {
   compileOnly deps.annotations
 
-  testImplementation deps.festandroid
-  testImplementation deps.festassert
   testImplementation deps.junit
+  testImplementation deps.truth
   testImplementation deps.robolectric
 
   lintChecks project(':timber-lint')
