@@ -502,6 +502,14 @@ public class TimberTest {
         .hasDebugMessage("TimberTest", "Test formatting: Test message logged. 100");
   }
 
+  @Test public void nullArgumentObjectArray() {
+    Timber.plant(new Timber.DebugTree());
+    Timber.v("Test", (Object[]) null);
+    assertLog()
+        .hasVerboseMessage("TimberTest", "Test")
+        .hasNoMoreMessages();
+  }
+
   private static <T extends Throwable> T truncatedThrowable(Class<T> throwableClass) {
     try {
       T throwable = throwableClass.newInstance();
