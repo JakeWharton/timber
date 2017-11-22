@@ -657,13 +657,13 @@ public final class WrongTimberUsageDetectorTest {
                 + "package foo;\n"
                 + "import timber.log.Timber;\n"
                 + "public class Example {\n"
-                + "  private final String message;\n"
-                + "  public Example(String message) {\n"
-                + "    this.message = message;\n"
+                + "  private final String logMessage;\n"
+                + "  public Example(String logMessage) {\n"
+                + "    this.logMessage = logMessage;\n"
                 + "  }\n"
                 + "  public void log() {\n"
                 + "     Exception e = new Exception();\n"
-                + "     Logger.e(e, message);\n"
+                + "     Timber.d(e, logMessage);\n"
                 + "  }\n"
                 + "}") //
         ) //
