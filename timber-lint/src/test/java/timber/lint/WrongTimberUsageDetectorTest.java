@@ -269,6 +269,21 @@ public final class WrongTimberUsageDetectorTest {
         .expectClean();
   }
 
+  @Test public void validStringFormatFromStaticArray() {
+    lint() //
+        .files(TIMBER_STUB, //
+            java(""
+                + "package foo;\n"
+                + "public class Example {\n"
+                + "  static String[] X = { String.format(\"%s\", 100) };"
+                + "}") //
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
+        .run()
+        .expectClean();
+  }
+
+
   @Test public void throwableNotAtBeginning() {
     lint() //
         .files(TIMBER_STUB, //

@@ -102,7 +102,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         UCallExpression maybeTimberLogCall = (UCallExpression) current;
         JavaEvaluator evaluator = context.getEvaluator();
         PsiMethod psiMethod = maybeTimberLogCall.resolve();
-        if (Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.getName())
+        if (psiMethod != null
+            && Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.getName())
             && evaluator.isMemberInClass(psiMethod, "timber.log.Timber")) {
           LintFix fix = quickFixIssueFormat(call);
           context.report(ISSUE_FORMAT, call, context.getLocation(call),
