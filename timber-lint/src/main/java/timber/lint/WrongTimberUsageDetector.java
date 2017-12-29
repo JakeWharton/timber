@@ -33,6 +33,7 @@ import org.jetbrains.uast.UExpression;
 import org.jetbrains.uast.UIfExpression;
 import org.jetbrains.uast.UMethod;
 import org.jetbrains.uast.UQualifiedReferenceExpression;
+import org.jetbrains.uast.UReferenceExpression;
 import org.jetbrains.uast.UastBinaryOperator;
 import org.jetbrains.uast.util.UastExpressionUtils;
 
@@ -507,9 +508,9 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
 
       if (arg2 instanceof UQualifiedReferenceExpression) {
         UQualifiedReferenceExpression arg2Expression = (UQualifiedReferenceExpression) arg2;
-        UExpression selector = arg2Expression.getSelector();
+        UCallExpression selector = (UCallExpression) arg2Expression.getSelector();
         // what other UExpressions could be a selector?
-        if (isCallFromMethodInSubclassOf(context, (UCallExpression) selector, "getMessage",
+        if (isCallFromMethodInSubclassOf(context, selector, "getMessage",
             "java.lang.Throwable")) {
           LintFix fix = quickFixIssueExceptionLogging(arg2);
           context.report(ISSUE_EXCEPTION_LOGGING, arg2, context.getLocation(call),
@@ -518,11 +519,13 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         }
       }
 
-      String s = evaluateString(context, arg2, true);
-      if (s == null || s.isEmpty()) {
-        LintFix fix = quickFixIssueExceptionLogging(arg2);
-        context.report(ISSUE_EXCEPTION_LOGGING, arg2, context.getLocation(call),
-            "Use single-argument log method instead of null/empty message", fix);
+      if (!(arg2 instanceof UReferenceExpression)) {
+        String s = evaluateString(context, arg2, true);
+        if (s == null || s.isEmpty()) {
+          LintFix fix = quickFixIssueExceptionLogging(arg2);
+          context.report(ISSUE_EXCEPTION_LOGGING, arg2, context.getLocation(call),
+              "Use single-argument log method instead of null/empty message", fix);
+        }
       }
     }
   }
