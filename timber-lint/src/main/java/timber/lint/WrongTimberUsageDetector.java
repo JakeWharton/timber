@@ -34,6 +34,7 @@ import org.jetbrains.uast.UIfExpression;
 import org.jetbrains.uast.UMethod;
 import org.jetbrains.uast.UQualifiedReferenceExpression;
 import org.jetbrains.uast.UastBinaryOperator;
+import org.jetbrains.uast.util.UastExpressionUtils;
 
 import static com.android.tools.lint.client.api.JavaParser.TYPE_BOOLEAN;
 import static com.android.tools.lint.client.api.JavaParser.TYPE_BYTE;
@@ -98,12 +99,11 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         // Reached AST root or code block node; String.format not inside Timber.X(..).
         return;
       }
-      if (current instanceof UCallExpression) {
+      if (UastExpressionUtils.isMethodCall(current)) {
         UCallExpression maybeTimberLogCall = (UCallExpression) current;
         JavaEvaluator evaluator = context.getEvaluator();
         PsiMethod psiMethod = maybeTimberLogCall.resolve();
-        if (psiMethod != null
-            && Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.getName())
+        if (Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.getName())
             && evaluator.isMemberInClass(psiMethod, "timber.log.Timber")) {
           LintFix fix = quickFixIssueFormat(call);
           context.report(ISSUE_FORMAT, call, context.getLocation(call),

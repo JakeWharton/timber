@@ -269,7 +269,7 @@ public final class WrongTimberUsageDetectorTest {
         .expectClean();
   }
 
-  @Test public void validStringFormatFromStaticArray() {
+  @Test public void validStringFormatInStaticArray() {
     lint() //
         .files(TIMBER_STUB, //
             java(""
