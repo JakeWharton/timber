@@ -15,6 +15,7 @@ import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
@@ -33,6 +34,7 @@ import org.jetbrains.uast.UExpression;
 import org.jetbrains.uast.UIfExpression;
 import org.jetbrains.uast.UMethod;
 import org.jetbrains.uast.UQualifiedReferenceExpression;
+import org.jetbrains.uast.USimpleNameReferenceExpression;
 import org.jetbrains.uast.UastBinaryOperator;
 import org.jetbrains.uast.util.UastExpressionUtils;
 
@@ -519,12 +521,22 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       }
 
       String s = evaluateString(context, arg2, true);
+      if (s == null && isField(arg2)) {
+        // Non-final fields can't be evaluated.
+        return;
+      }
+
       if (s == null || s.isEmpty()) {
         LintFix fix = quickFixIssueExceptionLogging(arg2);
         context.report(ISSUE_EXCEPTION_LOGGING, arg2, context.getLocation(call),
             "Use single-argument log method instead of null/empty message", fix);
       }
     }
+  }
+
+  private static boolean isField(UExpression expression) {
+    return expression instanceof USimpleNameReferenceExpression
+        && (((USimpleNameReferenceExpression) expression).resolve() instanceof PsiField);
   }
 
   private static boolean isCallFromMethodInSubclassOf(JavaContext context, UCallExpression call,
