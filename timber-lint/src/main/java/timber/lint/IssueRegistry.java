@@ -9,4 +9,7 @@ public final class IssueRegistry extends com.android.tools.lint.client.api.Issue
   @Override public List<Issue> getIssues() {
     return Arrays.asList(WrongTimberUsageDetector.getIssues());
   }
+  @Override public int getApi() { 
+    return com.android.tools.lint.detector.api.ApiKt.CURRENT_API; 
+  }
 }
