@@ -12,6 +12,6 @@ dependencies {
 
 jar {
   manifest {
-    attributes('Lint-Registry-v2': 'timber.lint.IssueRegistry')
+    attributes('Lint-Registry-v2': 'timber.lint.TimberIssueRegistry')
   }
 }
