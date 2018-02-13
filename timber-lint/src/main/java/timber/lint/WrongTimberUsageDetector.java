@@ -38,17 +38,17 @@ import org.jetbrains.uast.USimpleNameReferenceExpression;
 import org.jetbrains.uast.UastBinaryOperator;
 import org.jetbrains.uast.util.UastExpressionUtils;
 
-import static com.android.tools.lint.client.api.JavaParser.TYPE_BOOLEAN;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_BYTE;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_CHAR;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_DOUBLE;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_FLOAT;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_INT;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_LONG;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_NULL;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_OBJECT;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_SHORT;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_STRING;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_BOOLEAN;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_BYTE;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_CHAR;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_DOUBLE;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_FLOAT;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_INT;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_LONG;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_NULL;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_OBJECT;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_SHORT;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_STRING;
 import static com.android.tools.lint.detector.api.ConstantEvaluator.evaluateString;
 import static org.jetbrains.uast.UastBinaryOperator.PLUS;
 import static org.jetbrains.uast.UastBinaryOperator.PLUS_ASSIGN;
@@ -93,7 +93,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     }
   }
 
-  private static void checkNestedStringFormat(JavaContext context, UCallExpression call) {
+  private void checkNestedStringFormat(JavaContext context, UCallExpression call) {
     UElement current = call;
     while (true) {
       current = LintUtils.skipParentheses(current.getUastParent());
@@ -116,7 +116,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     }
   }
 
-  private static void checkTagLength(JavaContext context, UCallExpression call) {
+  private void checkTagLength(JavaContext context, UCallExpression call) {
     List<UExpression> arguments = call.getValueArguments();
     UExpression argument = arguments.get(0);
     String tag = evaluateString(context, argument, true);
@@ -485,7 +485,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return max;
   }
 
-  private static void checkMethodArguments(JavaContext context, UCallExpression call) {
+  private void checkMethodArguments(JavaContext context, UCallExpression call) {
     List<UExpression> arguments = call.getValueArguments();
     int numArguments = arguments.size();
     for (int i = 0; i < numArguments; i++) {
@@ -501,7 +501,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     }
   }
 
-  private static void checkExceptionLogging(JavaContext context, UCallExpression call) {
+  private void checkExceptionLogging(JavaContext context, UCallExpression call) {
     List<UExpression> arguments = call.getValueArguments();
 
     if (arguments.size() > 1 && isSubclassOf(context, arguments.get(0), Throwable.class)) {
@@ -548,7 +548,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         && evaluator.isMemberInSubClassOf(method, className, false);
   }
 
-  private static boolean checkElement(JavaContext context, UCallExpression call, UElement element) {
+  private boolean checkElement(JavaContext context, UCallExpression call, UElement element) {
     if (element instanceof UBinaryExpression) {
       UBinaryExpression binaryExpression = (UBinaryExpression) element;
       UastBinaryOperator operator = binaryExpression.getOperator();
@@ -567,7 +567,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return false;
   }
 
-  private static boolean checkConditionalUsage(JavaContext context, UCallExpression call,
+  private boolean checkConditionalUsage(JavaContext context, UCallExpression call,
       UElement element) {
     UElement thenElement;
     UElement elseElement;
@@ -584,7 +584,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return checkElement(context, call, elseElement);
   }
 
-  private static LintFix quickFixIssueLog(UCallExpression logCall) {
+  private LintFix quickFixIssueLog(UCallExpression logCall) {
     List<UExpression> arguments = logCall.getValueArguments();
     String methodName = logCall.getMethodName();
     UExpression tag = arguments.get(0);
@@ -619,7 +619,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return fixGrouper.build();
   }
 
-  private static LintFix quickFixIssueFormat(UCallExpression stringFormatCall) {
+  private LintFix quickFixIssueFormat(UCallExpression stringFormatCall) {
     // Handles:
     // 1) String.format(..)
     // 2) format(...) [static import]
@@ -634,7 +634,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         .add(fix().replace().text(callSourceString + "(").with("").build()).build();
   }
 
-  private static LintFix quickFixIssueThrowable(UCallExpression call, List<UExpression> arguments,
+  private LintFix quickFixIssueThrowable(UCallExpression call, List<UExpression> arguments,
       UExpression throwable) {
     String rearrangedArgs = throwable.asSourceString();
     for (UExpression arg : arguments) {
@@ -646,7 +646,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         .pattern("\\." + call.getMethodName() + "\\((.*)\\)").with(rearrangedArgs).build();
   }
 
-  private static LintFix quickFixIssueBinary(UBinaryExpression binaryExpression) {
+  private LintFix quickFixIssueBinary(UBinaryExpression binaryExpression) {
     UExpression leftOperand = binaryExpression.getLeftOperand();
     UExpression rightOperand = binaryExpression.getRightOperand();
     boolean isLeftLiteral = isStringLiteral(leftOperand);
@@ -671,7 +671,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return fix().replace().text(binaryExpression.asSourceString()).with(args).build();
   }
 
-  private static LintFix quickFixIssueTagLength(UExpression argument, String tag) {
+  private LintFix quickFixIssueTagLength(UExpression argument, String tag) {
     int numCharsToTrim = tag.length() - 23;
     return fix().replace()
         .name("Strip last " + (numCharsToTrim == 1 ? "char" : numCharsToTrim + " chars"))
@@ -680,7 +680,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         .build();
   }
 
-  private static LintFix quickFixIssueExceptionLogging(UExpression arg2) {
+  private LintFix quickFixIssueExceptionLogging(UExpression arg2) {
     return fix().replace()
         .name("Remove redundant argument")
         .text(", " + arg2.asSourceString())
