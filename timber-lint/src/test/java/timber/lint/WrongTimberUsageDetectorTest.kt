@@ -20,8 +20,8 @@ class WrongTimberUsageDetectorTest {
       |}""".trimMargin())
 
   @Test fun usingAndroidLogWithTwoArguments() {
-    lint() //
-        .files( //
+    lint()
+        .files(
             java("""
                 |package foo;
                 |import android.util.Log;
@@ -29,9 +29,9 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |    Log.d("TAG", "msg");
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_LOG) //
+        .issues(WrongTimberUsageDetector.ISSUE_LOG)
         .run()
         .expect("""
             |src/foo/Example.java:5: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
@@ -51,8 +51,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun usingAndroidLogWithThreeArguments() {
-    lint() //
-        .files( //
+    lint()
+        .files(
             java("""
                 |package foo;
                 |import android.util.Log;
@@ -60,9 +60,9 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |    Log.d("TAG", "msg", new Exception());
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_LOG) //
+        .issues(WrongTimberUsageDetector.ISSUE_LOG)
         .run()
         .expect("""
             |src/foo/Example.java:5: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
@@ -82,17 +82,17 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun usingFullyQualifiedAndroidLogWithTwoArguments() {
-    lint() //
-        .files( //
+    lint()
+        .files(
             java("""
                 |package foo;
                 |public class Example {
                 |  public void log() {
                 |    android.util.Log.d("TAG", "msg");
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_LOG) //
+        .issues(WrongTimberUsageDetector.ISSUE_LOG)
         .run()
         .expect("""
             |src/foo/Example.java:4: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
@@ -112,17 +112,17 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun usingFullyQualifiedAndroidLogWithThreeArguments() {
-    lint() //
-        .files( //
+    lint()
+        .files(
             java("""
                 |package foo;
                 |public class Example {
                 |  public void log() {
                 |    android.util.Log.d("TAG", "msg", new Exception());
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_LOG) //
+        .issues(WrongTimberUsageDetector.ISSUE_LOG)
         .run()
         .expect("""
             |src/foo/Example.java:4: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
@@ -142,8 +142,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun innerStringFormat() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -151,7 +151,7 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.d(String.format("%s", "arg1"));
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
@@ -169,8 +169,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun innerStringFormatWithStaticImport() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -179,7 +179,7 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.d(format("%s", "arg1"));
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
@@ -197,8 +197,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun innerStringFormatInNestedMethods() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -207,7 +207,7 @@ class WrongTimberUsageDetectorTest {
                 |     Timber.d(id(String.format("%s", "arg1")));
                 |  }
                 |  private String id(String s) { return s; }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
@@ -219,8 +219,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun innerStringFormatInNestedAssignment() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -229,7 +229,7 @@ class WrongTimberUsageDetectorTest {
                 |    String msg = null;
                 |    Timber.d(msg = String.format("msg"));
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
@@ -241,8 +241,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun validStringFormatInCodeBlock() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -252,23 +252,23 @@ class WrongTimberUsageDetectorTest {
                 |      String name = String.format("msg");
                 |    }
                 |  }
-                |}""".trimMargin()) //
-        ) //
-        .issues(WrongTimberUsageDetector.ISSUE_FORMAT) //
-        .run() //
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
+        .run()
         .expectClean()
   }
 
   @Test fun validStringFormatInConstructorCall() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |public class Example {
                 |  public void log() {
                 |    new Exception(String.format("msg"));
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
@@ -276,13 +276,13 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun validStringFormatInStaticArray() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |public class Example {
                 |  static String[] X = { String.format("%s", 100) };
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
@@ -291,8 +291,8 @@ class WrongTimberUsageDetectorTest {
 
 
   @Test fun throwableNotAtBeginning() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -301,8 +301,8 @@ class WrongTimberUsageDetectorTest {
                 |     Exception e = new Exception();
                 |     Timber.d("%s", e);
                 |  }
-                |}""".trimMargin()) //
-        ) //
+                |}""".trimMargin())
+        )
         .issues(WrongTimberUsageDetector.ISSUE_THROWABLE)
         .run()
         .expect("""
@@ -319,8 +319,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun stringConcatenationBothLiterals() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -345,8 +345,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun stringConcatenationLeftLiteral() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -372,8 +372,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun stringConcatenationRightLiteral() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -399,8 +399,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun stringConcatenationBothVariables() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -427,8 +427,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun stringConcatenationInsideTernary() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -437,8 +437,8 @@ class WrongTimberUsageDetectorTest {
                 |     String s = "world!";
                 |     Timber.d(true ? "Hello, " + s : "Bye");
                 |  }
-                |}""".trimMargin()) //
-        ) //
+                |}""".trimMargin())
+        )
         .issues(WrongTimberUsageDetector.ISSUE_BINARY)
         .run()
         .expect("""
@@ -449,8 +449,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun tooManyFormatArgs() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -458,8 +458,8 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.d("%s %s", "arg1");
                 |  }
-                |}""".trimMargin()) //
-        ) //
+                |}""".trimMargin())
+        )
         .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
         .run()
         .expect("""
@@ -470,8 +470,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun tooManyArgs() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -479,7 +479,7 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.d("%s", "arg1", "arg2");
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
         .run()
@@ -491,8 +491,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun wrongArgTypes() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -500,7 +500,7 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.d("%d", "arg1");
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
         .run()
@@ -512,8 +512,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun tagTooLongLiteralOnly() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -521,7 +521,7 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.tag("abcdefghijklmnopqrstuvwx");
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
         .run()
@@ -533,8 +533,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun tagTooLongLiteralPlusField() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -543,7 +543,7 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.tag("abcdefghijklmnopqrstuvw" + field);
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
         .run()
@@ -555,8 +555,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun tagTooLongLiteralOnlyAfterApi23() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -564,8 +564,8 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.tag("abcdefghijklmnopqrstuvwx");
                 |  }
-                |}""".trimMargin()), //
-            manifest().minSdk(24) //
+                |}""".trimMargin()),
+            manifest().minSdk(24)
         )
         .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
         .run()
@@ -573,8 +573,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun tooManyFormatArgsInTag() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -582,7 +582,7 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.tag("tag").d("%s %s", "arg1");
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
         .run()
@@ -594,8 +594,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun tooManyArgsInTag() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -603,7 +603,7 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.tag("tag").d("%s", "arg1", "arg2");
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
         .run()
@@ -615,8 +615,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun wrongArgTypesInTag() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -624,7 +624,7 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.tag("tag").d("%d", "arg1");
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
         .run()
@@ -636,8 +636,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun exceptionLoggingUsingExceptionMessage() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -646,7 +646,7 @@ class WrongTimberUsageDetectorTest {
                 |     Exception e = new Exception();
                 |     Timber.d(e, e.getMessage());
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
@@ -664,8 +664,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun exceptionLoggingUsingVariable() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -675,16 +675,16 @@ class WrongTimberUsageDetectorTest {
                 |     Exception e = new Exception();
                 |     Timber.d(e, msg);
                 |  }
-                |}""".trimMargin()) //
-        ) //
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING) //
-        .run() //
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .run()
         .expectClean()
   }
 
   @Test fun exceptionLoggingUsingNonFinalField() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -694,16 +694,16 @@ class WrongTimberUsageDetectorTest {
                 |     Exception e = new Exception();
                 |     Timber.d(e, message);
                 |  }
-                |}""".trimMargin()) //
-        ) //
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING) //
-        .run() //
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .run()
         .expectClean()
   }
 
   @Test fun exceptionLoggingUsingFinalField() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -713,16 +713,16 @@ class WrongTimberUsageDetectorTest {
                 |     Exception e = new Exception();
                 |     Timber.d(e, message);
                 |  }
-                |}""".trimMargin()) //
-        ) //
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING) //
-        .run() //
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .run()
         .expectClean()
   }
 
   @Test fun exceptionLoggingUsingEmptyStringMessage() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -731,8 +731,8 @@ class WrongTimberUsageDetectorTest {
                 |     Exception e = new Exception();
                 |     Timber.d(e, "");
                 |  }
-                |}""".trimMargin()) //
-        ) //
+                |}""".trimMargin())
+        )
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expect("""
@@ -749,8 +749,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun exceptionLoggingUsingNullMessage() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -759,7 +759,7 @@ class WrongTimberUsageDetectorTest {
                 |     Exception e = new Exception();
                 |     Timber.d(e, null);
                 |  }
-                |}""".trimMargin()) //
+                |}""".trimMargin())
         )
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
@@ -777,8 +777,8 @@ class WrongTimberUsageDetectorTest {
   }
 
   @Test fun exceptionLoggingUsingValidMessage() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -787,16 +787,16 @@ class WrongTimberUsageDetectorTest {
                 |     Exception e = new Exception();
                 |     Timber.d(e, "Valid message");
                 |  }
-                |}""".trimMargin()) //
-        ) //
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING) //
-        .run() //
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .run()
         .expectClean()
   }
 
   @Test fun dateFormatNotDisplayingWarning() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -804,16 +804,16 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |    Timber.d("%tc", new java.util.Date());
                 |  }
-                |}""".trimMargin()) //
-        ) //
-        .issues(*WrongTimberUsageDetector.getIssues()) //
-        .run() //
+                |}""".trimMargin())
+        )
+        .issues(*WrongTimberUsageDetector.getIssues())
+        .run()
         .expectClean()
   }
 
   @Test fun wrappedBooleanType() {
-    lint() //
-        .files(TIMBER_STUB, //
+    lint()
+        .files(TIMBER_STUB,
             java("""
                 |package foo;
                 |import timber.log.Timber;
@@ -821,9 +821,9 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.d("%b", Boolean.valueOf(true));
                 |  }
-                |}""".trimMargin())) //
-        .issues(*WrongTimberUsageDetector.getIssues()) //
-        .run() //
+                |}""".trimMargin()))
+        .issues(*WrongTimberUsageDetector.getIssues())
+        .run()
         .expectClean()
   }
 }
