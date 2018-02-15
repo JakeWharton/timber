@@ -7,8 +7,8 @@ buildscript {
 
       'kotlin': '1.2.21',
 
-      'androidPlugin': '3.0.0',
-      'androidTools': '26.0.0',
+      'androidPlugin': '3.1.0-beta2',
+      'androidTools': '26.1.0-beta2',
 
       'butterknife': '8.8.1',
   ]
@@ -29,8 +29,8 @@ buildscript {
       annotations: 'org.jetbrains:annotations:15.0',
 
       junit: 'junit:junit:4.12',
-      truth: 'com.google.truth:truth:0.36',
-      robolectric: 'org.robolectric:robolectric:3.5',
+      truth: 'com.google.truth:truth:0.39',
+      robolectric: 'org.robolectric:robolectric:3.7',
   ]
 
   repositories {
