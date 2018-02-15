@@ -136,9 +136,8 @@ public final class Timber {
   @NotNull
   public static Tree tag(String tag) {
     Tree[] forest = forestAsArray;
-    //noinspection ForLoopReplaceableByForEach
-    for (int i = 0, count = forest.length; i < count; i++) {
-      forest[i].explicitTag.set(tag);
+    for (Tree tree : forest){
+    	tree.explicitTag.set(tag);
     }
     return TREE_OF_SOULS;
   }
@@ -219,169 +218,148 @@ public final class Timber {
   private static final Tree TREE_OF_SOULS = new Tree() {
     @Override public void v(String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].v(message, args);
+      for (Tree tree : forest){
+    	  tree.v(message, args);
       }
     }
 
     @Override public void v(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].v(t, message, args);
+      for (Tree tree : forest){
+    	  tree.v(t, message, args);
       }
     }
 
     @Override public void v(Throwable t) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].v(t);
+      for (Tree tree : forest){
+    	  tree.v(t);
       }
     }
 
     @Override public void d(String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].d(message, args);
+      for (Tree tree : forest){
+    	  tree.d(message, args);
       }
     }
 
     @Override public void d(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].d(t, message, args);
+      for (Tree tree : forest){
+    	  tree.d(t, message, args);
       }
     }
 
     @Override public void d(Throwable t) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].d(t);
+      for (Tree tree : forest){
+    	  tree.d(t);
       }
     }
 
     @Override public void i(String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].i(message, args);
+      for (Tree tree : forest){
+    	  tree.i(message, args);
       }
     }
 
     @Override public void i(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].i(t, message, args);
+      for (Tree tree : forest){
+    	  tree.i(t, message, args);
       }
     }
 
     @Override public void i(Throwable t) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].i(t);
+      for (Tree tree : forest){
+    	  tree.i(t);
       }
     }
 
     @Override public void w(String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].w(message, args);
+      for (Tree tree : forest){
+    	  tree.w(message, args);
       }
     }
 
     @Override public void w(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].w(t, message, args);
+      for (Tree tree : forest){
+    	  tree.w(t, message, args);
       }
     }
 
     @Override public void w(Throwable t) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].w(t);
+      for (Tree tree : forest){
+    	  tree.w(t);
       }
     }
 
     @Override public void e(String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].e(message, args);
+      for (Tree tree : forest){
+    	  tree.e(message, args);
       }
     }
 
     @Override public void e(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].e(t, message, args);
+      for (Tree tree : forest){
+    	  tree.e(t, message, args);
       }
     }
 
     @Override public void e(Throwable t) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].e(t);
+      for (Tree tree : forest){
+    	  tree.e(t);
       }
     }
 
     @Override public void wtf(String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].wtf(message, args);
+      for (Tree tree : forest){
+    	  tree.wtf(message, args);
       }
     }
 
     @Override public void wtf(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].wtf(t, message, args);
+      for (Tree tree : forest){
+    	  tree.wtf(t, message, args);
       }
     }
 
     @Override public void wtf(Throwable t) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].wtf(t);
+      for (Tree tree : forest){
+    	  tree.wtf(t);
       }
     }
 
     @Override public void log(int priority, String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].log(priority, message, args);
+      for (Tree tree : forest){
+    	  tree.log(priority, message, args);
       }
     }
 
     @Override public void log(int priority, Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].log(priority, t, message, args);
+      for (Tree tree : forest){
+    	  tree.log(priority, t, message, args);
       }
     }
 
     @Override public void log(int priority, Throwable t) {
       Tree[] forest = forestAsArray;
-      //noinspection ForLoopReplaceableByForEach
-      for (int i = 0, count = forest.length; i < count; i++) {
-        forest[i].log(priority, t);
+      for (Tree tree : forest){
+    	  tree.log(priority, t);
       }
     }
 
