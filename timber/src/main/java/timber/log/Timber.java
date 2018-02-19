@@ -143,21 +143,6 @@ public final class Timber {
     return TREE_OF_SOULS;
   }
 
-  /** Add a new logging tree. */
-  @SuppressWarnings("ConstantConditions") // Validating public API contract.
-  public static void plant(@NotNull Tree tree) {
-    if (tree == null) {
-      throw new NullPointerException("tree == null");
-    }
-    if (tree == TREE_OF_SOULS) {
-      throw new IllegalArgumentException("Cannot plant Timber into itself.");
-    }
-    synchronized (FOREST) {
-      FOREST.add(tree);
-      forestAsArray = FOREST.toArray(new Tree[FOREST.size()]);
-    }
-  }
-
   /** Adds new logging trees. */
   @SuppressWarnings("ConstantConditions") // Validating public API contract.
   public static void plant(@NotNull Tree... trees) {
