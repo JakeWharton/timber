@@ -14,16 +14,22 @@ public class LintActivity extends Activity {
   /**
    * Below are some examples of how NOT to use Timber.
    *
-   * Currently, locally-packaged lint checks don't work in Studio. As a workaround,
-   * you will need to run "./gradlew :timber-sample:lint" first, before Lint IDE
-   * highlighting will work.
-   *
-   * A future release will eliminate the 'command-line first' workaround.
+   * To see how a particular lint issue behaves, comment/remove its corresponding id from the set
+   * of SuppressLint ids below.
    */
+  @SuppressLint({
+      "LogNotTimber", //
+      "StringFormatInTimber", //
+      "ThrowableNotAtBeginning", //
+      "BinaryOperationInTimber", //
+      "TimberArgCount", //
+      "TimberArgTypes", //
+      "TimberTagLength", //
+      "TimberExceptionLogging" //
+  }) //
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    /*
     // LogNotTimber
     Log.d("TAG", "msg");
     Log.d("TAG", "msg", new Exception());
@@ -63,7 +69,6 @@ public class LintActivity extends Activity {
     Timber.d(new Exception(), new Exception().getMessage());
     Timber.d(new Exception(), "");
     Timber.d(new Exception(), null);
-    */
   }
 
   private String getString() {
