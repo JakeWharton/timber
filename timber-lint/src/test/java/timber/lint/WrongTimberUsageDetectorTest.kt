@@ -644,6 +644,34 @@ class WrongTimberUsageDetectorTest {
                 |public class Example {
                 |  public void log() {
                 |     Exception e = new Exception();
+                |     Timber.d(e.getMessage());
+                |  }
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .run()
+        .expect("""
+            |src/foo/Example.java:6: Warning: Explicitly logging exception message is redundant [TimberExceptionLogging]
+            |     Timber.d(e.getMessage());
+            |     ~~~~~~~~~~~~~~~~~~~~~~~~
+            |0 errors, 1 warnings""".trimMargin())
+        .expectFixDiffs("""
+            |Fix for src/foo/Example.java line 5: Replace message with throwable:
+            |@@ -6 +6
+            |-      Timber.d(e.getMessage());
+            |+      Timber.d(e);
+            |""".trimMargin())
+  }
+
+  @Test fun exceptionLoggingUsingExceptionMessageArgument() {
+    lint()
+        .files(TIMBER_STUB,
+            java("""
+                |package foo;
+                |import timber.log.Timber;
+                |public class Example {
+                |  public void log() {
+                |     Exception e = new Exception();
                 |     Timber.d(e, e.getMessage());
                 |  }
                 |}""".trimMargin())
