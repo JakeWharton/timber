@@ -69,6 +69,7 @@ public class LintActivity extends Activity {
     Timber.d(new Exception(), new Exception().getMessage());
     Timber.d(new Exception(), "");
     Timber.d(new Exception(), null);
+    Timber.d(new Exception().getMessage());
   }
 
   private String getString() {
