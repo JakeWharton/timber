@@ -663,6 +663,82 @@ class WrongTimberUsageDetectorTest {
             |""".trimMargin())
   }
 
+  @Test fun exceptionLoggingUsingExceptionMessageInLambdaWithExpressionBody() {
+    lint()
+        .files(TIMBER_STUB,
+            java("""
+                |package foo;
+                |import timber.log.Timber;
+                |private interface Callback {
+                |  void call(Exception e);
+                |}
+                |public class Example {
+                |  public void log() {
+                |     Callback cb = t -> {
+                |       Timber.d(t.getMessage());
+                |     };
+                |  }
+                |}
+                |""".trimMargin()
+            )
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .run()
+        .expect("""
+                |src/foo/Callback.java:9: Warning: Explicitly logging exception message is redundant [TimberExceptionLogging]
+                |       Timber.d(t.getMessage());
+                |       ~~~~~~~~~~~~~~~~~~~~~~~~
+                |0 errors, 1 warnings""".trimMargin())
+        .expectFixDiffs("""
+                |Fix for src/foo/Callback.java line 8: Replace message with throwable:
+                |@@ -9 +9
+                |-        Timber.d(t.getMessage());
+                |+        Timber.d(t);
+                |Fix for src/foo/Callback.java line 8: Replace message with throwable + replace lambda with method reference:
+                |@@ -8 +8
+                |-      Callback cb = t -> {
+                |-        Timber.d(t.getMessage());
+                |-      };
+                |+      Callback cb = Timber::d;
+                |""".trimMargin())
+  }
+
+  @Test fun exceptionLoggingUsingExceptionMessageInLambdaWithBlockBody() {
+    lint()
+        .files(TIMBER_STUB,
+            java("""
+                |package foo;
+                |import timber.log.Timber;
+                |private interface Callback {
+                |  void call(Exception e);
+                |}
+                |public class Example {
+                |  public void log() {
+                |     Callback cb = t -> Timber.d(t.getMessage());
+                |  }
+                |}
+                |""".trimMargin()
+            )
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .run()
+        .expect("""
+                |src/foo/Callback.java:8: Warning: Explicitly logging exception message is redundant [TimberExceptionLogging]
+                |     Callback cb = t -> Timber.d(t.getMessage());
+                |                        ~~~~~~~~~~~~~~~~~~~~~~~~
+                |0 errors, 1 warnings""".trimMargin())
+        .expectFixDiffs("""
+                |Fix for src/foo/Callback.java line 7: Replace message with throwable:
+                |@@ -8 +8
+                |-      Callback cb = t -> Timber.d(t.getMessage());
+                |+      Callback cb = t -> Timber.d(t);
+                |Fix for src/foo/Callback.java line 7: Replace message with throwable + replace lambda with method reference:
+                |@@ -8 +8
+                |-      Callback cb = t -> Timber.d(t.getMessage());
+                |+      Callback cb = Timber::d;
+                |""".trimMargin())
+  }
+
   @Test fun exceptionLoggingUsingExceptionMessageArgument() {
     lint()
         .files(TIMBER_STUB,

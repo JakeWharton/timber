@@ -70,9 +70,21 @@ public class LintActivity extends Activity {
     Timber.d(new Exception(), "");
     Timber.d(new Exception(), null);
     Timber.d(new Exception().getMessage());
+    errorCallback = new ErrorCallback() {
+      @Override public void run(Throwable t) {
+        Timber.d(t.getMessage());
+      }
+    };
+    errorCallback = t -> Timber.d(t.getMessage());
   }
+
+  ErrorCallback errorCallback;
 
   private String getString() {
     return "foo";
+  }
+
+  interface ErrorCallback {
+    void run(Throwable e);
   }
 }

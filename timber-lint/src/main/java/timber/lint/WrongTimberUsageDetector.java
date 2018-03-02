@@ -28,14 +28,18 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.uast.UBinaryExpression;
+import org.jetbrains.uast.UBlockExpression;
 import org.jetbrains.uast.UCallExpression;
 import org.jetbrains.uast.UElement;
 import org.jetbrains.uast.UExpression;
 import org.jetbrains.uast.UIfExpression;
+import org.jetbrains.uast.ULambdaExpression;
 import org.jetbrains.uast.UMethod;
+import org.jetbrains.uast.UParameter;
 import org.jetbrains.uast.UQualifiedReferenceExpression;
 import org.jetbrains.uast.USimpleNameReferenceExpression;
 import org.jetbrains.uast.UastBinaryOperator;
+import org.jetbrains.uast.UastUtils;
 import org.jetbrains.uast.util.UastExpressionUtils;
 
 import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_BOOLEAN;
@@ -532,7 +536,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       if (isLoggingExceptionMessage(context, messageArg)) {
         context.report(ISSUE_EXCEPTION_LOGGING, messageArg, context.getLocation(call),
             "Explicitly logging exception message is redundant",
-            quickFixReplaceMessageWithThrowable(messageArg));
+            quickFixReplaceMessageWithThrowable(context, call, messageArg));
       }
     }
   }
@@ -704,16 +708,54 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         .build();
   }
 
-  private LintFix quickFixReplaceMessageWithThrowable(UExpression arg) {
+  private LintFix quickFixReplaceMessageWithThrowable(JavaContext context,
+      UCallExpression timberMethodCall, UExpression arg) {
     // guaranteed based on callers of this method
     UQualifiedReferenceExpression argExpression = (UQualifiedReferenceExpression) arg;
     UExpression receiver = argExpression.getReceiver();
 
-    return fix().replace()
+    LintFix.GroupBuilder fixGrouper = fix().group();
+    fixGrouper.add(fix().replace()
         .name("Replace message with throwable")
         .text(arg.asSourceString())
         .with(receiver.asSourceString())
-        .build();
+        .build());
+
+    ULambdaExpression lambda =
+        UastUtils.getParentOfType(timberMethodCall, ULambdaExpression.class, false);
+    if (lambda != null && canBeStaticMethodReference(lambda, argExpression)) {
+      fixGrouper.add(fix().replace()
+          .range(context.getLocation(lambda))
+          .name("Replace message with throwable + replace lambda with method reference")
+          .text(lambda.asSourceString())
+          .with("Timber::" + timberMethodCall.getMethodName())
+          .build());
+    }
+
+    return fixGrouper.build();
+  }
+
+  private boolean canBeStaticMethodReference(ULambdaExpression lambda,
+      UQualifiedReferenceExpression arg) {
+    // if the lambda has a block body, does it only contain a single expression?
+    UExpression lambdaBody = lambda.getBody();
+    if (lambdaBody instanceof UBlockExpression
+        && ((UBlockExpression) lambdaBody).getExpressions().size() != 1) {
+      return false;
+    }
+
+    // does the lambda have a single parameter?
+    List<UParameter> valueParameters = lambda.getValueParameters();
+    if (valueParameters.size() != 1) return false;
+
+    // is the method call receiver a simple object reference?
+    UExpression receiver = arg.getReceiver();
+    if (!(receiver instanceof USimpleNameReferenceExpression)) return false;
+    USimpleNameReferenceExpression simpleNameReceiver = (USimpleNameReferenceExpression) receiver;
+
+    // is that object reference the same as the lambda parameter?
+    UParameter lambdaParameter = valueParameters.get(0);
+    return simpleNameReceiver.resolve() == lambdaParameter.getPsi();
   }
 
   static Issue[] getIssues() {
