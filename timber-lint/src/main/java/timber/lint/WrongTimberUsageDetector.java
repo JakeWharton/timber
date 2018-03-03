@@ -15,10 +15,12 @@ import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +34,7 @@ import org.jetbrains.uast.UCallExpression;
 import org.jetbrains.uast.UElement;
 import org.jetbrains.uast.UExpression;
 import org.jetbrains.uast.UIfExpression;
+import org.jetbrains.uast.ULiteralExpression;
 import org.jetbrains.uast.UMethod;
 import org.jetbrains.uast.UQualifiedReferenceExpression;
 import org.jetbrains.uast.USimpleNameReferenceExpression;
@@ -516,8 +519,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       }
 
       String s = evaluateString(context, messageArg, true);
-      if (s == null && isField(messageArg)) {
-        // Non-final fields can't be evaluated.
+      if (s == null && !canEvaluateExpression(messageArg)) {
+        // Parameters and non-final fields can't be evaluated.
         return;
       }
 
@@ -550,9 +553,16 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
         "java.lang.Throwable");
   }
 
-  private static boolean isField(UExpression expression) {
-    return expression instanceof USimpleNameReferenceExpression
-        && (((USimpleNameReferenceExpression) expression).resolve() instanceof PsiField);
+  private static boolean canEvaluateExpression(UExpression expression) {
+    // TODO - try using CallGraph?
+    if (expression instanceof ULiteralExpression) {
+      return true;
+    }
+    if (!(expression instanceof USimpleNameReferenceExpression)) {
+      return false;
+    }
+    PsiElement resolvedElement = ((USimpleNameReferenceExpression) expression).resolve();
+    return !(resolvedElement instanceof PsiField || resolvedElement instanceof PsiParameter);
   }
 
   private static boolean isCallFromMethodInSubclassOf(JavaContext context, UCallExpression call,

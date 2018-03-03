@@ -710,6 +710,43 @@ class WrongTimberUsageDetectorTest {
         .expectClean()
   }
 
+  @Test fun exceptionLoggingUsingParameter() {
+    lint()
+        .files(TIMBER_STUB,
+            java("""
+                |package foo;
+                |import timber.log.Timber;
+                |public class Example {
+                |  public void log(Exception e, String message) {
+                |     Timber.d(e, message);
+                |  }
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .run()
+        .expectClean()
+  }
+
+  @Test fun exceptionLoggingUsingMethod() {
+    lint()
+        .files(TIMBER_STUB,
+            java("""
+                |package foo;
+                |import timber.log.Timber;
+                |public class Example {
+                |  public void log(Exception e) {
+                |    Timber.d(e, method());
+                |  }
+                |  private String method() {
+                |    return "foo";
+                |  }
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .run()
+        .expectClean()
+  }
+
   @Test fun exceptionLoggingUsingNonFinalField() {
     lint()
         .files(TIMBER_STUB,
