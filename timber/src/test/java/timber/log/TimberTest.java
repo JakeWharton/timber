@@ -6,7 +6,9 @@ import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
@@ -41,7 +43,7 @@ public class TimberTest {
     Timber.d("Test");
 
     assertLog()
-        .hasDebugMessage("TimberTest:41", "Test")
+        .hasDebugMessage("TimberTest:43", "Test")
         .hasNoMoreMessages();
   }
 
@@ -508,6 +510,31 @@ public class TimberTest {
     assertLog()
         .hasVerboseMessage("TimberTest", "Test")
         .hasNoMoreMessages();
+  }
+
+  @Test public void loggingMetadataFailsWhenNotImplemented() {
+    Timber.plant(new Timber.DebugTree());
+    try {
+      Timber.d(new HashMap<String, Object>(), "TimberTest");
+    } catch (IllegalArgumentException e) {
+      assertThat(e).hasMessageThat().startsWith("You must override this method to log with metadata");
+    }
+  }
+
+  @Test public void loggingMetadataWorksWhenImplemented() {
+    final String key = "test-key";
+    final String value = "test-content";
+    Timber.Tree testTree = new Timber.DebugTree() {
+      @Override protected void log(int priority, String tag, @NotNull String message, Throwable t,
+                                   Map<String, Object> metadata) {
+        Object result = metadata.get(key);
+        assertThat(result).isEqualTo(value);
+      }
+    };
+    Timber.plant(testTree);
+    Map<String, Object> metadata = new HashMap<>();
+    metadata.put(key, value);
+    Timber.d(metadata, "TimberTest");
   }
 
   private static <T extends Throwable> T truncatedThrowable(Class<T> throwableClass) {
