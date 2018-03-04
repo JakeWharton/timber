@@ -321,11 +321,28 @@ public final class Timber {
       }
     }
 
+    @Override public void v(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].v(metadata, message, args);
+      }
+    }
+
     @Override public void v(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
         forest[i].v(t, message, args);
+      }
+    }
+
+    @Override public void v(Throwable t, Map<String, Object> metadata,
+                            String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].v(t, metadata, message, args);
       }
     }
 
@@ -337,11 +354,27 @@ public final class Timber {
       }
     }
 
+    @Override public void v(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].v(metadata, t);
+      }
+    }
+
     @Override public void d(String message, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
         forest[i].d(message, args);
+      }
+    }
+
+    @Override public void d(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].d(metadata, message, args);
       }
     }
 
@@ -353,11 +386,28 @@ public final class Timber {
       }
     }
 
+    @Override public void d(Throwable t, Map<String, Object> metadata,
+                            String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].d(t, metadata, message, args);
+      }
+    }
+
     @Override public void d(Throwable t) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
         forest[i].d(t);
+      }
+    }
+
+    @Override public void d(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].d(metadata, t);
       }
     }
 
@@ -369,11 +419,28 @@ public final class Timber {
       }
     }
 
+    @Override public void i(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].i(metadata, message, args);
+      }
+    }
+
     @Override public void i(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
         forest[i].i(t, message, args);
+      }
+    }
+
+    @Override public void i(Throwable t, Map<String, Object> metadata,
+                            String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].i(t, metadata, message, args);
       }
     }
 
@@ -385,11 +452,27 @@ public final class Timber {
       }
     }
 
+    @Override public void i(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].i(metadata, t);
+      }
+    }
+
     @Override public void w(String message, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
         forest[i].w(message, args);
+      }
+    }
+
+    @Override public void w(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].w(metadata, message, args);
       }
     }
 
@@ -401,11 +484,28 @@ public final class Timber {
       }
     }
 
+    @Override public void w(Throwable t, Map<String, Object> metadata, String message,
+                            Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].w(t, metadata, message, args);
+      }
+    }
+
     @Override public void w(Throwable t) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
         forest[i].w(t);
+      }
+    }
+
+    @Override public void w(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].w(metadata, t);
       }
     }
 
@@ -417,11 +517,28 @@ public final class Timber {
       }
     }
 
+    @Override public void e(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].e(metadata, message, args);
+      }
+    }
+
     @Override public void e(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
         forest[i].e(t, message, args);
+      }
+    }
+
+    @Override public void e(Throwable t, Map<String, Object> metadata, String message,
+                            Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].e(t, metadata, message, args);
       }
     }
 
@@ -433,11 +550,27 @@ public final class Timber {
       }
     }
 
+    @Override public void e(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].e(metadata, t);
+      }
+    }
+
     @Override public void wtf(String message, Object... args) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
         forest[i].wtf(message, args);
+      }
+    }
+
+    @Override public void wtf(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].wtf(metadata, message, args);
       }
     }
 
@@ -449,11 +582,28 @@ public final class Timber {
       }
     }
 
+    @Override public void wtf(Throwable t, Map<String, Object> metadata, String message,
+                              Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].wtf(t, metadata, message, args);
+      }
+    }
+
     @Override public void wtf(Throwable t) {
       Tree[] forest = forestAsArray;
       //noinspection ForLoopReplaceableByForEach
       for (int i = 0, count = forest.length; i < count; i++) {
         forest[i].wtf(t);
+      }
+    }
+
+    @Override public void wtf(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].wtf(metadata, t);
       }
     }
 
@@ -509,7 +659,7 @@ public final class Timber {
 
     @Override protected void log(int priority, String tag, @NotNull String message, Throwable t,
                                  Map<String, Object> metadata) {
-      throw new AssertionError("Missing override for log method.");
+      throw new AssertionError("Missing override for log method. test test");
     }
 
     @Override protected void log(int priority, String tag, @NotNull String message, Throwable t) {
