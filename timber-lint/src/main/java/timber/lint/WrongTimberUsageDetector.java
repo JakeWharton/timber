@@ -3,29 +3,24 @@ package timber.lint;
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.tools.lint.checks.StringFormatDetector;
+import com.android.tools.lint.client.api.JavaEvaluator;
 import com.android.tools.lint.detector.api.Category;
 import com.android.tools.lint.detector.api.Detector;
 import com.android.tools.lint.detector.api.Implementation;
 import com.android.tools.lint.detector.api.Issue;
 import com.android.tools.lint.detector.api.JavaContext;
+import com.android.tools.lint.detector.api.LintFix;
 import com.android.tools.lint.detector.api.LintUtils;
 import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
-import com.intellij.psi.JavaElementVisitor;
-import com.intellij.psi.JavaTokenType;
-import com.intellij.psi.PsiBinaryExpression;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
-import com.intellij.psi.PsiCodeBlock;
-import com.intellij.psi.PsiConditionalExpression;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiExpression;
 import com.intellij.psi.PsiField;
-import com.intellij.psi.PsiIfStatement;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
-import com.intellij.psi.PsiReferenceExpression;
+import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,20 +29,36 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jetbrains.uast.UBinaryExpression;
+import org.jetbrains.uast.UCallExpression;
+import org.jetbrains.uast.UElement;
+import org.jetbrains.uast.UExpression;
+import org.jetbrains.uast.UIfExpression;
+import org.jetbrains.uast.ULiteralExpression;
+import org.jetbrains.uast.UMethod;
+import org.jetbrains.uast.UQualifiedReferenceExpression;
+import org.jetbrains.uast.USimpleNameReferenceExpression;
+import org.jetbrains.uast.UastBinaryOperator;
+import org.jetbrains.uast.util.UastExpressionUtils;
 
-import static com.android.tools.lint.client.api.JavaParser.TYPE_BOOLEAN;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_BYTE;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_CHAR;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_DOUBLE;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_FLOAT;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_INT;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_LONG;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_NULL;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_OBJECT;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_SHORT;
-import static com.android.tools.lint.client.api.JavaParser.TYPE_STRING;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_BOOLEAN;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_BYTE;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_CHAR;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_DOUBLE;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_FLOAT;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_INT;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_LONG;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_NULL;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_OBJECT;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_SHORT;
+import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_STRING;
+import static com.android.tools.lint.detector.api.ConstantEvaluator.evaluateString;
+import static org.jetbrains.uast.UastBinaryOperator.PLUS;
+import static org.jetbrains.uast.UastBinaryOperator.PLUS_ASSIGN;
+import static org.jetbrains.uast.UastLiteralUtils.isStringLiteral;
+import static org.jetbrains.uast.UastUtils.evaluateString;
 
-public final class WrongTimberUsageDetector extends Detector implements Detector.JavaPsiScanner {
+public final class WrongTimberUsageDetector extends Detector implements Detector.UastScanner {
   private final static String GET_STRING_METHOD = "getString";
   private final static String TIMBER_TREE_LOG_METHOD_REGEXP = "(v|d|i|w|e|wtf)";
 
@@ -55,111 +66,121 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return Arrays.asList("tag", "format", "v", "d", "i", "w", "e", "wtf");
   }
 
-  @Override public void visitMethod(JavaContext context, JavaElementVisitor visitor,
-      PsiMethodCallExpression call, PsiMethod method) {
-    PsiReferenceExpression methodExpression = call.getMethodExpression();
-    String fullyQualifiedMethodName = methodExpression.getQualifiedName();
-    if ("java.lang.String.format".equals(fullyQualifiedMethodName)) {
+  @Override public void visitMethod(JavaContext context, UCallExpression call, PsiMethod method) {
+    String methodName = call.getMethodName();
+    JavaEvaluator evaluator = context.getEvaluator();
+
+    if ("format".equals(methodName) && evaluator.isMemberInClass(method, "java.lang.String")) {
       checkNestedStringFormat(context, call);
       return;
     }
-    if (fullyQualifiedMethodName.startsWith("timber.log.Timber.tag")) {
+    // As of API 24, Log tags are no longer limited to 23 chars.
+    if ("tag".equals(methodName)
+        && evaluator.isMemberInClass(method, "timber.log.Timber")
+        && context.getMainProject().getMinSdk() <= 23) {
       checkTagLength(context, call);
       return;
     }
-    if (fullyQualifiedMethodName.startsWith("android.util.Log.")) {
-      context.report(ISSUE_LOG, methodExpression, context.getLocation(methodExpression),
-          "Using 'Log' instead of 'Timber'");
+    if (evaluator.isMemberInClass(method, "android.util.Log")) {
+      LintFix fix = quickFixIssueLog(call);
+      context.report(ISSUE_LOG, call, context.getLocation(call), "Using 'Log' instead of 'Timber'",
+          fix);
       return;
     }
     // Handles Timber.X(..) and Timber.tag(..).X(..) where X in (v|d|i|w|e|wtf).
-    if (fullyQualifiedMethodName.startsWith("timber.log.Timber.")) {
+    if (evaluator.isMemberInClass(method, "timber.log.Timber") //
+        || evaluator.isMemberInClass(method, "timber.log.Timber.Tree")) {
       checkMethodArguments(context, call);
       checkFormatArguments(context, call);
       checkExceptionLogging(context, call);
-      return;
     }
   }
 
-  private static void checkNestedStringFormat(JavaContext context, PsiMethodCallExpression call) {
-    PsiElement current = call;
+  private void checkNestedStringFormat(JavaContext context, UCallExpression call) {
+    UElement current = call;
     while (true) {
-      current = LintUtils.skipParentheses(current.getParent());
-      if (current == null || current instanceof PsiCodeBlock) {
+      current = LintUtils.skipParentheses(current.getUastParent());
+      if (current == null || current instanceof UMethod) {
         // Reached AST root or code block node; String.format not inside Timber.X(..).
         return;
       }
-      if (current instanceof PsiMethodCallExpression) {
-        PsiMethodCallExpression maybeTimberLog = (PsiMethodCallExpression) current;
-        if (Pattern.matches("timber\\.log\\.Timber\\." + TIMBER_TREE_LOG_METHOD_REGEXP,
-            maybeTimberLog.getMethodExpression().getQualifiedName())) {
+      if (UastExpressionUtils.isMethodCall(current)) {
+        UCallExpression maybeTimberLogCall = (UCallExpression) current;
+        JavaEvaluator evaluator = context.getEvaluator();
+        PsiMethod psiMethod = maybeTimberLogCall.resolve();
+        if (Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.getName())
+            && evaluator.isMemberInClass(psiMethod, "timber.log.Timber")) {
+          LintFix fix = quickFixIssueFormat(call);
           context.report(ISSUE_FORMAT, call, context.getLocation(call),
-              "Using 'String#format' inside of 'Timber'");
+              "Using 'String#format' inside of 'Timber'", fix);
           return;
         }
       }
     }
   }
 
-  private static void checkTagLength(JavaContext context, PsiMethodCallExpression call) {
-    PsiExpression argument = call.getArgumentList().getExpressions()[0];
-    String tag = findLiteralValue(argument);
+  private void checkTagLength(JavaContext context, UCallExpression call) {
+    List<UExpression> arguments = call.getValueArguments();
+    UExpression argument = arguments.get(0);
+    String tag = evaluateString(context, argument, true);
     if (tag != null && tag.length() > 23) {
       String message =
           String.format("The logging tag can be at most 23 characters, was %1$d (%2$s)",
               tag.length(), tag);
-      context.report(ISSUE_TAG_LENGTH, argument, context.getLocation(argument), message);
+      LintFix fix = quickFixIssueTagLength(argument, tag);
+      context.report(ISSUE_TAG_LENGTH, argument, context.getLocation(argument), message, fix);
     }
   }
 
-  private static void checkFormatArguments(JavaContext context, PsiMethodCallExpression call) {
-    PsiExpression[] arguments = call.getArgumentList().getExpressions();
-    if (arguments.length == 0) {
+  private static void checkFormatArguments(JavaContext context, UCallExpression call) {
+    List<UExpression> arguments = call.getValueArguments();
+    int numArguments = arguments.size();
+    if (numArguments == 0) {
       return;
     }
 
     int startIndexOfArguments = 1;
-    PsiExpression formatStringArg = arguments[0];
+    UExpression formatStringArg = arguments.get(0);
     if (isSubclassOf(context, formatStringArg, Throwable.class)) {
-      if (arguments.length == 1) {
+      if (numArguments == 1) {
         return;
       }
-      formatStringArg = arguments[1];
+      formatStringArg = arguments.get(1);
       startIndexOfArguments++;
     }
 
-    String formatString = findLiteralValue(formatStringArg);
+    String formatString = evaluateString(context, formatStringArg, true);
     // We passed for example a method call
     if (formatString == null) {
       return;
     }
 
-    int argumentCount = getFormatArgumentCount(formatString);
-    int passedArgCount = arguments.length - startIndexOfArguments;
-    if (argumentCount < passedArgCount) {
+    int formatArgumentCount = getFormatArgumentCount(formatString);
+    int passedArgCount = numArguments - startIndexOfArguments;
+    if (formatArgumentCount < passedArgCount) {
       context.report(ISSUE_ARG_COUNT, call, context.getLocation(call), String.format(
           "Wrong argument count, format string `%1$s` requires "
-              + "`%2$d` but format call supplies `%3$d`", formatString, argumentCount,
+              + "`%2$d` but format call supplies `%3$d`", formatString, formatArgumentCount,
           passedArgCount));
       return;
     }
 
-    if (argumentCount == 0) {
+    if (formatArgumentCount == 0) {
       return;
     }
 
     List<String> types = getStringArgumentTypes(formatString);
-    PsiExpression argument = null;
+    UExpression argument = null;
     int argumentIndex = startIndexOfArguments;
     boolean valid;
     for (int i = 0; i < types.size(); i++) {
       String formatType = types.get(i);
-      if (argumentIndex != arguments.length) {
-        argument = arguments[argumentIndex++];
+      if (argumentIndex != numArguments) {
+        argument = arguments.get(argumentIndex++);
       } else {
         context.report(ISSUE_ARG_COUNT, call, context.getLocation(call), String.format(
             "Wrong argument count, format string `%1$s` requires "
-                + "`%2$d` but format call supplies `%3$d`", formatString, argumentCount,
+                + "`%2$d` but format call supplies `%3$d`", formatString, formatArgumentCount,
             passedArgCount));
       }
 
@@ -172,7 +193,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       if (formatType.length() >= 2
           && Character.toLowerCase(formatType.charAt(formatType.length() - 2)) == 't') {
         // Date time conversion.
-        switch(last) {
+        switch (last) {
           // time
           case 'H':
           case 'I':
@@ -207,22 +228,21 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
           case 'D':
           case 'F':
           case 'c':
-            valid = type == Integer.TYPE
-                    || type == Calendar.class
-                    || type == Date.class;
+            valid = type == Integer.TYPE || type == Calendar.class || type == Date.class;
             if (!valid) {
-              String message = String.format("Wrong argument type for date formatting argument '#%1$d' "
-                              + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
-                              + "(argument #%5$d in method call)", i + 1, formatString, formatType,
-                      type.getSimpleName(), startIndexOfArguments + i + 1);
+              String message = String.format(
+                  "Wrong argument type for date formatting argument '#%1$d' "
+                      + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
+                      + "(argument #%5$d in method call)", i + 1, formatString, formatType,
+                  type.getSimpleName(), startIndexOfArguments + i + 1);
               context.report(ISSUE_ARG_TYPES, call, context.getLocation(argument), message);
             }
             break;
           default:
             String message = String.format("Wrong suffix for date format '#%1$d' "
-                            + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
-                            + "(argument #%5$d in method call)", i + 1, formatString, formatType,
-                    type.getSimpleName(), startIndexOfArguments + i + 1);
+                    + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
+                    + "(argument #%5$d in method call)", i + 1, formatString, formatType,
+                type.getSimpleName(), startIndexOfArguments + i + 1);
             context.report(ISSUE_FORMAT, call, context.getLocation(argument), message);
         }
         continue;
@@ -273,7 +293,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     }
   }
 
-  private static Class<?> getType(PsiExpression expression) {
+  private static Class<?> getType(UExpression expression) {
     if (expression == null) {
       return null;
     }
@@ -305,7 +325,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       }
     }
 
-    PsiType type = expression.getType();
+    PsiType type = expression.getExpressionType();
     if (type != null) {
       Class<?> typeClass = getTypeClass(type);
       return typeClass != null ? typeClass : Object.class;
@@ -355,6 +375,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       } else if ("java.lang.Float".equals(typeClassName) || "java.lang.Double".equals(
           typeClassName)) {
         return Float.TYPE;
+      } else if ("java.lang.Boolean".equals(typeClassName)) {
+        return Boolean.TYPE;
       } else {
         return null;
       }
@@ -371,8 +393,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     }
   }
 
-  private static boolean isSubclassOf(JavaContext context, PsiExpression expression, Class<?> cls) {
-    PsiType expressionType = expression.getType();
+  private static boolean isSubclassOf(JavaContext context, UExpression expression, Class<?> cls) {
+    PsiType expressionType = expression.getExpressionType();
     if (expressionType instanceof PsiClassType) {
       PsiClassType classType = (PsiClassType) expressionType;
       PsiClass resolvedClass = classType.resolve();
@@ -417,37 +439,6 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       }
     }
     return types;
-  }
-
-  private static String findLiteralValue(PsiExpression argument) {
-    if (argument instanceof PsiLiteralExpression) {
-      PsiLiteralExpression literalExpression = (PsiLiteralExpression) argument;
-      Object value = literalExpression.getValue();
-      if (value instanceof String) {
-        return (String) value;
-      }
-    } else if (argument instanceof PsiBinaryExpression) {
-      PsiBinaryExpression binaryExpression = (PsiBinaryExpression) argument;
-      if (binaryExpression.getOperationTokenType() == JavaTokenType.PLUS) {
-        String left = findLiteralValue(binaryExpression.getLOperand());
-        String right = findLiteralValue(binaryExpression.getROperand());
-        if (left != null && right != null) {
-          return left + right;
-        }
-      }
-    } else if (argument instanceof PsiReferenceExpression) {
-      PsiReferenceExpression referenceExpression = (PsiReferenceExpression) argument;
-      PsiElement resolved = referenceExpression.resolve();
-      if (resolved instanceof PsiField) {
-        PsiField field = (PsiField) resolved;
-        Object value = field.computeConstantValue();
-        if (value instanceof String) {
-          return (String) value;
-        }
-      }
-    }
-
-    return null;
   }
 
   private static int getFormatArgumentCount(@NonNull String s) {
@@ -497,75 +488,119 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return max;
   }
 
-  private static void checkMethodArguments(JavaContext context, PsiMethodCallExpression call) {
-    PsiExpression[] arguments = call.getArgumentList().getExpressions();
-    for (int i = 0; i < arguments.length; i++) {
-      PsiExpression argument = arguments[i];
+  private void checkMethodArguments(JavaContext context, UCallExpression call) {
+    List<UExpression> arguments = call.getValueArguments();
+    int numArguments = arguments.size();
+    for (int i = 0; i < numArguments; i++) {
+      UExpression argument = arguments.get(i);
       if (checkElement(context, call, argument)) {
         break;
       }
       if (i > 0 && isSubclassOf(context, argument, Throwable.class)) {
+        LintFix fix = quickFixIssueThrowable(call, arguments, argument);
         context.report(ISSUE_THROWABLE, call, context.getLocation(call),
-            "Throwable should be first argument");
+            "Throwable should be first argument", fix);
       }
     }
   }
 
-  private static void checkExceptionLogging(JavaContext context, PsiMethodCallExpression call) {
-    PsiExpression[] arguments = call.getArgumentList().getExpressions();
+  private void checkExceptionLogging(JavaContext context, UCallExpression call) {
+    List<UExpression> arguments = call.getValueArguments();
+    int numArguments = arguments.size();
 
-    if (arguments.length > 1) {
-      boolean isFirstParameterThrowable = isSubclassOf(context, arguments[0], Throwable.class);
+    if (numArguments > 1 && isSubclassOf(context, arguments.get(0), Throwable.class)) {
+      UExpression messageArg = arguments.get(1);
 
-      if (isFirstParameterThrowable) {
-        PsiExpression secondArgument = arguments[1];
-        String message = findLiteralValue(secondArgument);
+      if (isLoggingExceptionMessage(context, messageArg)) {
+        context.report(ISSUE_EXCEPTION_LOGGING, messageArg, context.getLocation(call),
+            "Explicitly logging exception message is redundant",
+            quickFixRemoveRedundantArgument(messageArg));
+        return;
+      }
 
-        boolean callsGetMessage = false;
+      String s = evaluateString(context, messageArg, true);
+      if (s == null && !canEvaluateExpression(messageArg)) {
+        // Parameters and non-final fields can't be evaluated.
+        return;
+      }
 
-        if (secondArgument instanceof PsiMethodCallExpression) {
-          PsiMethodCallExpression callExpression = (PsiMethodCallExpression) secondArgument;
-          callsGetMessage = callExpression.getMethodExpression().getCanonicalText().endsWith("getMessage");
-        }
+      if (s == null || s.isEmpty()) {
+        LintFix fix = quickFixRemoveRedundantArgument(messageArg);
+        context.report(ISSUE_EXCEPTION_LOGGING, messageArg, context.getLocation(call),
+            "Use single-argument log method instead of null/empty message", fix);
+      }
+    } else if (numArguments == 1 && !isSubclassOf(context, arguments.get(0), Throwable.class)) {
+      UExpression messageArg = arguments.get(0);
 
-        if (callsGetMessage) {
-          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
-              "Explicitly logging exception message is redundant");
-        } else if (message == null || "".equals(message)) {
-          context.report(ISSUE_EXCEPTION_LOGGING, secondArgument, context.getLocation(secondArgument),
-              "Use single-argument log method instead of null/empty message");
-        }
+      if (isLoggingExceptionMessage(context, messageArg)) {
+        context.report(ISSUE_EXCEPTION_LOGGING, messageArg, context.getLocation(call),
+            "Explicitly logging exception message is redundant",
+            quickFixReplaceMessageWithThrowable(messageArg));
       }
     }
   }
 
-  private static boolean checkElement(JavaContext context, PsiMethodCallExpression call,
-      PsiElement element) {
-    if (element instanceof PsiBinaryExpression) {
-      Class argumentType = getType((PsiBinaryExpression) element);
-      if (argumentType == String.class) {
-        context.report(ISSUE_BINARY, call, context.getLocation(element),
-            "Replace String concatenation with Timber's string formatting");
-        return true;
+  private boolean isLoggingExceptionMessage(JavaContext context, UExpression arg) {
+    if (!(arg instanceof UQualifiedReferenceExpression)) {
+      return false;
+    }
+
+    UQualifiedReferenceExpression argExpression = (UQualifiedReferenceExpression) arg;
+    UExpression selector = argExpression.getSelector();
+
+    // what other UExpressions could be a selector?
+    return isCallFromMethodInSubclassOf(context, (UCallExpression) selector, "getMessage",
+        "java.lang.Throwable");
+  }
+
+  private static boolean canEvaluateExpression(UExpression expression) {
+    // TODO - try using CallGraph?
+    if (expression instanceof ULiteralExpression) {
+      return true;
+    }
+    if (!(expression instanceof USimpleNameReferenceExpression)) {
+      return false;
+    }
+    PsiElement resolvedElement = ((USimpleNameReferenceExpression) expression).resolve();
+    return !(resolvedElement instanceof PsiField || resolvedElement instanceof PsiParameter);
+  }
+
+  private static boolean isCallFromMethodInSubclassOf(JavaContext context, UCallExpression call,
+      String methodName, String className) {
+    JavaEvaluator evaluator = context.getEvaluator();
+    PsiMethod method = call.resolve();
+    return method != null //
+        && methodName.equals(call.getMethodName()) //
+        && evaluator.isMemberInSubClassOf(method, className, false);
+  }
+
+  private boolean checkElement(JavaContext context, UCallExpression call, UElement element) {
+    if (element instanceof UBinaryExpression) {
+      UBinaryExpression binaryExpression = (UBinaryExpression) element;
+      UastBinaryOperator operator = binaryExpression.getOperator();
+      if (operator == PLUS || operator == PLUS_ASSIGN) {
+        Class argumentType = getType(binaryExpression);
+        if (argumentType == String.class) {
+          LintFix fix = quickFixIssueBinary(binaryExpression);
+          context.report(ISSUE_BINARY, call, context.getLocation(element),
+              "Replace String concatenation with Timber's string formatting", fix);
+          return true;
+        }
       }
-    } else if (element instanceof PsiIfStatement || element instanceof PsiConditionalExpression) {
+    } else if (element instanceof UIfExpression) {
       return checkConditionalUsage(context, call, element);
     }
     return false;
   }
 
-  private static boolean checkConditionalUsage(JavaContext context, PsiMethodCallExpression call,
-      PsiElement element) {
-    PsiElement thenElement;
-    PsiElement elseElement;
-    if (element instanceof PsiIfStatement) {
-      PsiIfStatement ifArg = (PsiIfStatement) element;
-      thenElement = ifArg.getThenBranch();
-      elseElement = ifArg.getElseBranch();
-    } else if (element instanceof PsiConditionalExpression) {
-      PsiConditionalExpression inlineIfArg = (PsiConditionalExpression) element;
-      thenElement = inlineIfArg.getThenExpression();
-      elseElement = inlineIfArg.getElseExpression();
+  private boolean checkConditionalUsage(JavaContext context, UCallExpression call,
+      UElement element) {
+    UElement thenElement;
+    UElement elseElement;
+    if (element instanceof UIfExpression) {
+      UIfExpression ifArg = (UIfExpression) element;
+      thenElement = ifArg.getThenExpression();
+      elseElement = ifArg.getElseExpression();
     } else {
       return false;
     }
@@ -573,6 +608,122 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       return false;
     }
     return checkElement(context, call, elseElement);
+  }
+
+  private LintFix quickFixIssueLog(UCallExpression logCall) {
+    List<UExpression> arguments = logCall.getValueArguments();
+    String methodName = logCall.getMethodName();
+    UExpression tag = arguments.get(0);
+
+    // 1st suggestion respects author's tag preference.
+    // 2nd suggestion drops it (Timber defaults to calling class name).
+    String fixSource1 = "Timber.tag(" + tag.asSourceString() + ").";
+    String fixSource2 = "Timber.";
+
+    int numArguments = arguments.size();
+    if (numArguments == 2) {
+      UExpression msgOrThrowable = arguments.get(1);
+      fixSource1 += methodName + "(" + msgOrThrowable.asSourceString() + ")";
+      fixSource2 += methodName + "(" + msgOrThrowable.asSourceString() + ")";
+    } else if (numArguments == 3) {
+      UExpression msg = arguments.get(1);
+      UExpression throwable = arguments.get(2);
+      fixSource1 +=
+          methodName + "(" + throwable.asSourceString() + ", " + msg.asSourceString() + ")";
+      fixSource2 +=
+          methodName + "(" + throwable.asSourceString() + ", " + msg.asSourceString() + ")";
+    } else {
+      throw new IllegalStateException("android.util.Log overloads should have 2 or 3 arguments");
+    }
+
+    String logCallSource = logCall.asSourceString();
+    LintFix.GroupBuilder fixGrouper = fix().group();
+    fixGrouper.add(
+        fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource1).build());
+    fixGrouper.add(
+        fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource2).build());
+    return fixGrouper.build();
+  }
+
+  private LintFix quickFixIssueFormat(UCallExpression stringFormatCall) {
+    // Handles:
+    // 1) String.format(..)
+    // 2) format(...) [static import]
+    UExpression callReceiver = stringFormatCall.getReceiver();
+    String callSourceString = callReceiver == null ? "" : callReceiver.asSourceString() + ".";
+    callSourceString += stringFormatCall.getMethodName();
+
+    return fix().name("Remove String.format(...)").composite() //
+        // Delete closing parenthesis of String.format(...)
+        .add(fix().replace().pattern(callSourceString + "\\(.*(\\))").with("").build())
+        // Delete "String.format("
+        .add(fix().replace().text(callSourceString + "(").with("").build()).build();
+  }
+
+  private LintFix quickFixIssueThrowable(UCallExpression call, List<UExpression> arguments,
+      UExpression throwable) {
+    String rearrangedArgs = throwable.asSourceString();
+    for (UExpression arg : arguments) {
+      if (arg != throwable) {
+        rearrangedArgs += (", " + arg.asSourceString());
+      }
+    }
+    return fix().replace() //
+        .pattern("\\." + call.getMethodName() + "\\((.*)\\)").with(rearrangedArgs).build();
+  }
+
+  private LintFix quickFixIssueBinary(UBinaryExpression binaryExpression) {
+    UExpression leftOperand = binaryExpression.getLeftOperand();
+    UExpression rightOperand = binaryExpression.getRightOperand();
+    boolean isLeftLiteral = isStringLiteral(leftOperand);
+    boolean isRightLiteral = isStringLiteral(rightOperand);
+
+    // "a" + "b" => "ab"
+    if (isLeftLiteral && isRightLiteral) {
+      return fix().replace() //
+          .text(binaryExpression.asSourceString())
+          .with("\"" + evaluateString(binaryExpression) + "\"")
+          .build();
+    }
+
+    String args;
+    if (isLeftLiteral) {
+      args = "\"" + evaluateString(leftOperand) + "%s\", " + rightOperand.asSourceString();
+    } else if (isRightLiteral) {
+      args = "\"%s" + evaluateString(rightOperand) + "\", " + leftOperand.asSourceString();
+    } else {
+      args = "\"%s%s\", " + leftOperand.asSourceString() + ", " + rightOperand.asSourceString();
+    }
+    return fix().replace().text(binaryExpression.asSourceString()).with(args).build();
+  }
+
+  private LintFix quickFixIssueTagLength(UExpression argument, String tag) {
+    int numCharsToTrim = tag.length() - 23;
+    return fix().replace()
+        .name("Strip last " + (numCharsToTrim == 1 ? "char" : numCharsToTrim + " chars"))
+        .text(argument.asSourceString())
+        .with("\"" + tag.substring(0, 23) + "\"")
+        .build();
+  }
+
+  private LintFix quickFixRemoveRedundantArgument(UExpression arg) {
+    return fix().replace()
+        .name("Remove redundant argument")
+        .text(", " + arg.asSourceString())
+        .with("")
+        .build();
+  }
+
+  private LintFix quickFixReplaceMessageWithThrowable(UExpression arg) {
+    // guaranteed based on callers of this method
+    UQualifiedReferenceExpression argExpression = (UQualifiedReferenceExpression) arg;
+    UExpression receiver = argExpression.getReceiver();
+
+    return fix().replace()
+        .name("Replace message with throwable")
+        .text(arg.asSourceString())
+        .with(receiver.asSourceString())
+        .build();
   }
 
   static Issue[] getIssues() {
@@ -613,10 +764,9 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
               + " of the arguments that you passed to your formatting call.", Category.MESSAGES, 9,
           Severity.ERROR,
           new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
-  public static final Issue ISSUE_TAG_LENGTH =
-      Issue.create("TimberTagLength", "Too Long Log Tags", "Log tags are only allowed to be at most"
-              + " 23 tag characters long.", Category.CORRECTNESS, 5, Severity.ERROR,
-          new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
+  public static final Issue ISSUE_TAG_LENGTH = Issue.create("TimberTagLength", "Too Long Log Tags",
+      "Log tags are only allowed to be at most" + " 23 tag characters long.", Category.CORRECTNESS,
+      5, Severity.ERROR, new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
   public static final Issue ISSUE_EXCEPTION_LOGGING =
       Issue.create("TimberExceptionLogging", "Exception Logging", "Explicitly including the"
               + " exception message is redundant when supplying an exception to log.",

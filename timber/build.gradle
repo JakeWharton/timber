@@ -18,11 +18,10 @@ afterEvaluate {
 }
 
 android {
-  compileSdkVersion rootProject.ext.compileSdkVersion
-  buildToolsVersion rootProject.ext.buildToolsVersion
+  compileSdkVersion versions.compileSdk
 
   defaultConfig {
-    minSdkVersion rootProject.ext.minSdkVersion
+    minSdkVersion versions.minSdk
     consumerProguardFiles 'consumer-proguard-rules.pro'
   }
 
@@ -30,33 +29,22 @@ android {
     textReport true
     textOutput 'stdout'
   }
-}
 
-configurations {
-  lintChecks
+  // TODO replace with https://issuetracker.google.com/issues/72050365 once released.
+  libraryVariants.all {
+    it.generateBuildConfig.enabled = false
+  }
 }
 
 dependencies {
-  provided 'org.jetbrains:annotations:13.0'
+  compileOnly deps.annotations
 
-  testCompile deps.festandroid
-  testCompile deps.festassert
-  testCompile deps.junit
-  testCompile deps.robolectric
+  testImplementation deps.annotations
+  testImplementation deps.junit
+  testImplementation deps.truth
+  testImplementation deps.robolectric
 
-  lintChecks project(path: ':timber-lint', configuration: 'lintChecks')
-}
-
-task copyLintJar(type: Copy) {
-  from(configurations.lintChecks) {
-    rename { 'lint.jar' }
-  }
-  into 'build/intermediates/lint/'
-}
-
-project.afterEvaluate {
-  def compileLintTask = project.tasks.find { it.name == 'compileLint' }
-  compileLintTask.dependsOn(copyLintJar)
+  lintChecks project(':timber-lint')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

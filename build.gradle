@@ -1,42 +1,64 @@
+apply plugin: 'com.github.ben-manes.versions'
+
 buildscript {
+  ext.versions = [
+      'minSdk': 9,
+      'compileSdk': 27,
+
+      'kotlin': '1.2.21',
+
+      'androidPlugin': '3.1.0-beta4',
+      'androidTools': '26.1.0-beta4',
+
+      'butterknife': '8.8.1',
+  ]
+
+  ext.deps = [
+      androidPlugin: "com.android.tools.build:gradle:${versions.androidPlugin}",
+      kotlinPlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
+      'butterknife': [
+          'runtime': "com.jakewharton:butterknife:${versions.butterknife}",
+          'compiler': "com.jakewharton:butterknife-compiler:${versions.butterknife}"
+      ],
+      'lint': [
+          'core': "com.android.tools.lint:lint:${versions.androidTools}",
+          'api': "com.android.tools.lint:lint-api:${versions.androidTools}",
+          'checks': "com.android.tools.lint:lint-checks:${versions.androidTools}",
+          'tests': "com.android.tools.lint:lint-tests:${versions.androidTools}",
+      ],
+      annotations: 'org.jetbrains:annotations:15.0',
+
+      junit: 'junit:junit:4.12',
+      truth: 'com.google.truth:truth:0.39',
+      robolectric: 'org.robolectric:robolectric:3.7.1',
+  ]
+
   repositories {
     jcenter()
+    google()
   }
+
   dependencies {
-    classpath 'com.android.tools.build:gradle:2.2.3'
+    classpath deps.androidPlugin
+    classpath deps.kotlinPlugin
+    classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
   }
 }
 
-allprojects {
+subprojects {
   repositories {
     mavenCentral()
     jcenter()
+    google()
+  }
+
+  tasks.withType(Test) {
+    testLogging {
+      events "failed"
+      exceptionFormat "full"
+      showExceptions true
+      showStackTraces true
+      showCauses true
+    }
   }
 }
-
-ext {
-  minSdkVersion = 9
-  targetSdkVersion = 25
-  compileSdkVersion = 25
-  buildToolsVersion = '25.0.1'
-  sourceCompatibilityVersion = JavaVersion.VERSION_1_7
-  targetCompatibilityVersion = JavaVersion.VERSION_1_7
-  lintVersion = '25.2.0'
-}
-
-ext.deps = [
-    // Test dependencies
-    junit      : 'junit:junit:4.12',
-    festassert : 'org.easytesting:fest-assert-core:2.0M10',
-    festandroid: 'com.squareup:fest-android:1.0.7',
-    mockitocore: 'org.mockito:mockito-core:1.9.5',
-    robolectric: 'org.robolectric:robolectric:3.0',
-
-    // Lint dependencies
-    lintapi    : "com.android.tools.lint:lint-api:${lintVersion}",
-    lintchecks : "com.android.tools.lint:lint-checks:${lintVersion}",
-
-    // Lint test dependencies
-    lint       : "com.android.tools.lint:lint:${lintVersion}",
-    linttests  : "com.android.tools.lint:lint-tests:${lintVersion}",
-]
