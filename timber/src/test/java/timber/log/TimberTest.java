@@ -467,6 +467,38 @@ public class TimberTest {
         .hasNoMoreMessages();
   }
 
+  @Test public void isLoggableReturnsTrueIfAtLeastOneTreeIsLoggable() {
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected boolean isLoggable(String tag, int priority) {
+        return "FIRST".equals(tag);
+      }
+    });
+
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected boolean isLoggable(String tag, int priority) {
+        return "SECOND".equals(tag);
+      }
+    });
+
+    assertThat(Timber.isLoggable("FIRST", Log.DEBUG)).isTrue();
+  }
+
+  @Test public void isLoggableReturnsFalseIfNoTreesAreLoggable() {
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected boolean isLoggable(String tag, int priority) {
+        return "FIRST".equals(tag);
+      }
+    });
+
+    Timber.plant(new Timber.DebugTree() {
+      @Override protected boolean isLoggable(String tag, int priority) {
+        return "SECOND".equals(tag);
+      }
+    });
+
+    assertThat(Timber.isLoggable("THIRD", Log.DEBUG)).isFalse();
+  }
+
   @Test public void logsUnknownHostExceptions() {
     Timber.plant(new Timber.DebugTree());
     Timber.e(truncatedThrowable(UnknownHostException.class), null);
