@@ -512,54 +512,45 @@ public class TimberTest {
     });
 
     Timber.d("Test with custom tag");
-    assertLog()
-            .hasDebugMessage("CUSTOMTAG", "Test with custom tag");
+    assertLog().hasDebugMessage("CUSTOMTAG", "Test with custom tag");
 
   }
 
   @Test public void logsWithCustomTagOverridden() {
     Timber.plant(new Timber.DebugTree() {
-      @Override
-      protected String getDefaultTag() {
+      @Override protected String getDefaultTag() {
         return "CUSTOMTAG";
       }
     });
 
     Timber.tag("NewTag").d("Tag manually set");
 
-    assertLog()
-            .hasDebugMessage("NewTag", "Tag manually set");
-
+    assertLog().hasDebugMessage("NewTag", "Tag manually set");
   }
 
   @Test public void logsWithMultipleTreesMultipleTags() {
     Timber.plant(new Timber.DebugTree() {
-      @Override
-      protected String getDefaultTag() {
+      @Override protected String getDefaultTag() {
         return "CUSTOMTAG";
       }
     });
 
     Timber.plant(new Timber.DebugTree() {
-      @Override
-      protected String getDefaultTag() {
+      @Override protected String getDefaultTag() {
         return "DIFFERENTTAG";
       }
     });
 
     Timber.d("multiple tags");
 
-    assertLog()
-            .hasDebugMessage("CUSTOMTAG", "multiple tags")
-            .hasDebugMessage("DIFFERENTTAG", "multiple tags");
-
+    assertLog().hasDebugMessage("CUSTOMTAG", "multiple tags")
+        .hasDebugMessage("DIFFERENTTAG", "multiple tags");
   }
     
   @Test public void nullArgumentObjectArray() {
     Timber.plant(new Timber.DebugTree());
     Timber.v("Test", (Object[]) null);
-    assertLog()
-        .hasVerboseMessage("TimberTest", "Test")
+    assertLog().hasVerboseMessage("TimberTest", "Test")
         .hasNoMoreMessages();
   }
 

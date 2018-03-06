@@ -413,7 +413,7 @@ public final class Timber {
      * If no tag is explicitly set, then the tree will fall back to this tag.
      * @return The default tag for this tree
      */
-    protected String getDefaultTag() {
+    @Nullable protected String getDefaultTag() {
       return null;
     }
 
