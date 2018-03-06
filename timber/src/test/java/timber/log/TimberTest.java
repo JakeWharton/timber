@@ -474,12 +474,6 @@ public class TimberTest {
       }
     });
 
-    Timber.plant(new Timber.DebugTree() {
-      @Override protected boolean isLoggable(String tag, int priority) {
-        return "SECOND".equals(tag);
-      }
-    });
-
     assertThat(Timber.isLoggable("FIRST", Log.DEBUG)).isTrue();
   }
 
