@@ -25,8 +25,8 @@ public final class Timber {
   }
 
   /** Log a verbose message with metadata and optional format args. */
-  public static void v(Map<String, Object> metaData, @NonNls String message, Object... args) {
-    TREE_OF_SOULS.v(metaData, message, args);
+  public static void v(Map<String, Object> metadata, @NonNls String message, Object... args) {
+    TREE_OF_SOULS.v(metadata, message, args);
   }
 
   /** Log a verbose exception and a message with optional format args. */
@@ -138,7 +138,7 @@ public final class Timber {
   }
 
   /** Log a warning exception with metadata. */
-  public static void w(Map<String,Object> metadata, Throwable t) {
+  public static void w(Map<String, Object> metadata, Throwable t) {
     TREE_OF_SOULS.w(metadata, t);
   }
 
@@ -796,7 +796,7 @@ public final class Timber {
 
     /** Log a warning exception. */
     public void w(Throwable t) {
-      prepareLog(Log.WARN, t, null,null);
+      prepareLog(Log.WARN, t, null, null);
     }
 
     /** Log a warning exception with metadata. */
@@ -826,7 +826,7 @@ public final class Timber {
 
     /** Log an error exception. */
     public void e(Throwable t) {
-      prepareLog(Log.ERROR, t, null,null);
+      prepareLog(Log.ERROR, t, null, null);
     }
 
     /** Log an error exception with metadata. */
@@ -866,7 +866,7 @@ public final class Timber {
 
     /** Log at {@code priority} a message with optional format args. */
     public void log(int priority, String message, Object... args) {
-      prepareLog(priority, null, null, message, args );
+      prepareLog(priority, null, null, message, args);
     }
 
     /** Log at {@code priority} metadata and a message with optional format args. */

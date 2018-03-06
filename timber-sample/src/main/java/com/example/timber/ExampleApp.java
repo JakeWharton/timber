@@ -47,7 +47,8 @@ public class ExampleApp extends Application {
       log(priority, tag, message, t, null);
     }
 
-    @Override protected void log(int priority, String tag, @NonNull String message, Throwable t, Map<String, Object> metadata) {
+    @Override protected void log(int priority, String tag, @NonNull String message, Throwable t,
+                                 Map<String, Object> metadata) {
       if (priority == Log.VERBOSE || priority == Log.DEBUG) {
         return;
       }
