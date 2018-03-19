@@ -142,8 +142,13 @@ public final class Timber {
     return TREE_OF_SOULS;
   }
 
-  public static Tree tagPermanent(String permanentTag) {
-    return new PermanentTagTree(forestAsArray, permanentTag);
+  @SuppressWarnings("ConstantConditions")
+  public static Tree tagged(@SuppressWarnings("SameParameterValue") @NotNull String tag) {
+    if (tag == null) {
+      throw new NullPointerException("tree == null");
+    }
+
+    return new PermanentlyTaggedTree(forestAsArray, tag);
   }
 
   /** Add a new logging tree. */
@@ -387,6 +392,14 @@ public final class Timber {
         explicitTag.remove();
       }
       return tag;
+    }
+
+    /**
+     * Set a one-time tag for use on the next logging call.
+     * This scopes the behaviour of {@link Timber#tag(String)} onto this specific Tree
+     */
+    public void tag(final String tag) {
+      explicitTag.set(tag);
     }
 
     /** Log a verbose message with optional format args. */
@@ -645,24 +658,4 @@ public final class Timber {
     }
   }
 
-  private static class PermanentTagTree extends Tree {
-
-    private final Tree[] forest;
-
-    private final String permanentTag;
-
-
-    PermanentTagTree(Tree[] forest, String permanentTag) {
-      this.forest = forest;
-      this.permanentTag = permanentTag;
-    }
-
-
-    @Override
-    protected void log(int priority, String tag, String message, Throwable t) {
-      for (Tree tree : forest) {
-        tree.log(priority, permanentTag, message, t);
-      }
-    }
-  }
 }
