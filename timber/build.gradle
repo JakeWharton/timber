@@ -37,7 +37,7 @@ android {
 }
 
 dependencies {
-  compileOnly deps.annotations
+  implementation deps.annotations
 
   testImplementation deps.annotations
   testImplementation deps.junit
