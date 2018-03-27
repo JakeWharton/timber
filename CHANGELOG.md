@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+Version 4.7.0 *(2018-03-27)*
+----------------------------
+
+ * Fix: Support lint version 26.1.0.
+ * Fix: Check single-argument log method in TimberExceptionLogging.
+
+
 Version 4.6.1 *(2018-02-12)*
 ----------------------------
 
