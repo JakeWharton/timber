@@ -1,6 +1,7 @@
 package timber.lint
 
 import com.android.tools.lint.checks.infrastructure.TestFiles.java
+import com.android.tools.lint.checks.infrastructure.TestFiles.kt
 import com.android.tools.lint.checks.infrastructure.TestFiles.manifest
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import org.junit.Test
@@ -288,7 +289,6 @@ class WrongTimberUsageDetectorTest {
         .run()
         .expectClean()
   }
-
 
   @Test fun throwableNotAtBeginning() {
     lint()
@@ -691,6 +691,34 @@ class WrongTimberUsageDetectorTest {
             |""".trimMargin())
   }
 
+  @Test fun exceptionLoggingUsingExceptionMessageArgumentInKotlin() {
+    lint()
+        .files(TIMBER_STUB,
+            kt("""
+              |package foo
+              |import timber.log.Timber
+              |class Example {
+              |  fun log() {
+              |     val e = Exception()
+              |     Timber.d(e, e.message)
+              |  }
+              |}
+              """.trimMargin()))
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .run()
+        .expect("""
+            |src/foo/Example.kt:6: Warning: Explicitly logging exception message is redundant [TimberExceptionLogging]
+            |     Timber.d(e, e.message)
+            |     ~~~~~~~~~~~~~~~~~~~~~~
+            |0 errors, 1 warnings""".trimMargin())
+              .expectFixDiffs("""
+            |Fix for src/foo/Example.kt line 5: Remove redundant argument:
+            |@@ -6 +6
+            |-      Timber.d(e, e.message)
+            |+      Timber.d(e)
+            |""".trimMargin())
+  }
+
   @Test fun exceptionLoggingUsingVariable() {
     lint()
         .files(TIMBER_STUB,
@@ -887,6 +915,27 @@ class WrongTimberUsageDetectorTest {
                 |     Timber.d("%b", Boolean.valueOf(true));
                 |  }
                 |}""".trimMargin()))
+        .issues(*WrongTimberUsageDetector.getIssues())
+        .run()
+        .expectClean()
+  }
+
+  @Test fun memberVariable() {
+    lint()
+        .files(TIMBER_STUB,
+            java("""
+                |package foo;
+                |import timber.log.Timber;
+                |public class Example {
+                |  public static class Bar {
+                |    public static String baz = "timber";
+                |  }
+                |  public void log() {
+                |    Bar bar = new Bar();
+                |    Timber.d(bar.baz);
+                |  }
+                |}
+                """.trimMargin()))
         .issues(*WrongTimberUsageDetector.getIssues())
         .run()
         .expectClean()
