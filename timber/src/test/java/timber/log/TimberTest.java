@@ -510,6 +510,23 @@ public class TimberTest {
         .hasNoMoreMessages();
   }
 
+  @Test public void overrideLoggingDepth() {
+    final String expectedTag = TimberTest.class.getSimpleName();
+    final String testMessage = "Test message";
+
+    Timber.plant(new Timber.DebugTree() {
+      @Override
+      protected int getLoggingDepth() {
+        return 6;
+      }
+    });
+    TimberWrapper.v(testMessage);
+
+    assertLog()
+            .hasVerboseMessage(expectedTag, testMessage)
+            .hasNoMoreMessages();
+  }
+
   private static <T extends Throwable> T truncatedThrowable(Class<T> throwableClass) {
     try {
       T throwable = throwableClass.newInstance();
@@ -595,6 +612,13 @@ public class TimberTest {
 
     public void hasNoMoreMessages() {
       assertThat(items).hasSize(index);
+    }
+  }
+
+  private static final class TimberWrapper {
+
+    public static void v(String message, Object... args) {
+      Timber.v(message, args);
     }
   }
 }
