@@ -517,7 +517,7 @@ public class TimberTest {
     Timber.plant(new Timber.DebugTree() {
       @Override
       protected int getLoggingDepth() {
-        return 6;
+        return super.getLoggingDepth() + 1;
       }
     });
     TimberWrapper.v(testMessage);
