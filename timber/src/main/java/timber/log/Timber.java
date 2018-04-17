@@ -594,7 +594,7 @@ public final class Timber {
      * Define how deep the desired tag will be in the call stack. 5 by default, but may need to
      * be overridden if you're wrapping Timber or something.
      */
-    protected int getLoggingDepth() {
+    protected int getTagDepth() {
       return CALL_STACK_INDEX;
     }
 
@@ -607,7 +607,7 @@ public final class Timber {
       // DO NOT switch this to Thread.getCurrentThread().getStackTrace(). The test will pass
       // because Robolectric runs them on the JVM but on Android the elements are different.
       StackTraceElement[] stackTrace = new Throwable().getStackTrace();
-      final int callStackIndex = getLoggingDepth();
+      final int callStackIndex = getTagDepth();
       if (stackTrace.length <= callStackIndex) {
         throw new IllegalStateException(
             "Synthetic stacktrace didn't have enough elements: are you using proguard?");

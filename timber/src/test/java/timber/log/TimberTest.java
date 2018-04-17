@@ -510,14 +510,14 @@ public class TimberTest {
         .hasNoMoreMessages();
   }
 
-  @Test public void overrideLoggingDepth() {
+  @Test public void overrideTagDepth() {
     final String expectedTag = TimberTest.class.getSimpleName();
     final String testMessage = "Test message";
 
     Timber.plant(new Timber.DebugTree() {
       @Override
-      protected int getLoggingDepth() {
-        return super.getLoggingDepth() + 1;
+      protected int getTagDepth() {
+        return super.getTagDepth() + 1;
       }
     });
     TimberWrapper.v(testMessage);
