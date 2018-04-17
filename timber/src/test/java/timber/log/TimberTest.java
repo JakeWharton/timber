@@ -224,7 +224,6 @@ public class TimberTest {
         .hasNoMoreMessages();
   }
 
-  @Ignore("Currently failing because wasn't actually asserting before")
   @Test public void debugTreeGeneratedTagIsLoggable() {
     Timber.plant(new Timber.DebugTree() {
       private static final int MAX_TAG_LENGTH = 23;
@@ -243,12 +242,12 @@ public class TimberTest {
     });
     class ClassNameThatIsReallyReallyReallyLong {
       {
-        Timber.d("Hello, world!");
+        Timber.i("Hello, world!");
       }
     }
     new ClassNameThatIsReallyReallyReallyLong();
     assertLog()
-        .hasDebugMessage("TimberTest$1ClassNameTh", "Hello, world!")
+        .hasInfoMessage("TimberTest$1ClassNameTh", "Hello, world!")
         .hasNoMoreMessages();
   }
 
