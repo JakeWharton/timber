@@ -546,11 +546,21 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     }
 
     UQualifiedReferenceExpression argExpression = (UQualifiedReferenceExpression) arg;
+    PsiElement psi = argExpression.getPsi();
+
+    if (psi != null && LintUtils.isKotlin(psi.getLanguage())) {
+      return isPropertyOnSubclassOf(context, argExpression, "message", Throwable.class);
+    }
+
     UExpression selector = argExpression.getSelector();
 
     // what other UExpressions could be a selector?
+    if (!(selector instanceof UCallExpression)) {
+      return false;
+    }
+
     return isCallFromMethodInSubclassOf(context, (UCallExpression) selector, "getMessage",
-        "java.lang.Throwable");
+            Throwable.class);
   }
 
   private static boolean canEvaluateExpression(UExpression expression) {
@@ -566,12 +576,18 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   }
 
   private static boolean isCallFromMethodInSubclassOf(JavaContext context, UCallExpression call,
-      String methodName, String className) {
+      String methodName, Class classType) {
     JavaEvaluator evaluator = context.getEvaluator();
     PsiMethod method = call.resolve();
     return method != null //
         && methodName.equals(call.getMethodName()) //
-        && evaluator.isMemberInSubClassOf(method, className, false);
+        && evaluator.isMemberInSubClassOf(method, classType.getCanonicalName(), false);
+  }
+
+  private static boolean isPropertyOnSubclassOf(JavaContext context,
+          UQualifiedReferenceExpression expression, String propertyName, Class classType) {
+    return isSubclassOf(context, expression.getReceiver(), classType)
+            && expression.getSelector().asSourceString().equals(propertyName);
   }
 
   private boolean checkElement(JavaContext context, UCallExpression call, UElement element) {
