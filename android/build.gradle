@@ -27,6 +27,7 @@ android {
 
 dependencies {
   api project(':jdk')
+  implementation deps.kotlin.stdlib.jdk
 //  lintChecks project(':android-lint')
 }
 
