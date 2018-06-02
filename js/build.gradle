@@ -18,8 +18,15 @@ task populateNodeModules(type: Copy, dependsOn: compileKotlin2Js) {
   into "${buildDir}/node_modules"
 }
 
-[compileKotlin2Js, compileTestKotlin2Js]*.configure {
-  kotlinOptions.moduleKind = "commonjs"
+compileKotlin2Js {
+  kotlinOptions.moduleKind = 'umd'
+  kotlinOptions.sourceMap = true
+  kotlinOptions.metaInfo = true
+}
+
+compileTestKotlin2Js {
+  kotlinOptions.moduleKind = 'commonjs'
+  kotlinOptions.sourceMap = true
 }
 
 node {
