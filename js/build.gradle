@@ -1,7 +1,7 @@
 apply plugin: 'org.jetbrains.kotlin.platform.js'
 apply plugin: 'com.moowork.node'
 
-archivesBaseName = 'timber-js'
+archivesBaseName = 'timber'
 
 dependencies {
   expectedBy project(':common')

@@ -1,6 +1,6 @@
 apply plugin: 'org.jetbrains.kotlin.platform.jvm'
 
-archivesBaseName = 'timber-jdk'
+archivesBaseName = 'timber'
 
 dependencies {
   expectedBy project(':common')
