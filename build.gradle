@@ -5,17 +5,29 @@ buildscript {
       'minSdk': 9,
       'compileSdk': 27,
 
-      'kotlin': '1.2.31',
+      'kotlin': '1.2.41',
 
-      'androidPlugin': '3.1.1',
-      'androidTools': '26.1.1',
+      'androidPlugin': '3.1.2',
+      'androidTools': '26.1.2',
 
       'butterknife': '8.8.1',
   ]
 
   ext.deps = [
       androidPlugin: "com.android.tools.build:gradle:${versions.androidPlugin}",
-      kotlinPlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
+      'kotlin': [
+          'stdlib': [
+              'common': "org.jetbrains.kotlin:kotlin-stdlib-common:${versions.kotlin}",
+              'jdk': "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
+              'js': "org.jetbrains.kotlin:kotlin-stdlib-js:${versions.kotlin}",
+          ],
+          'test': [
+              'common': "org.jetbrains.kotlin:kotlin-test-common:${versions.kotlin}",
+              'annotations': "org.jetbrains.kotlin:kotlin-test-annotations-common:${versions.kotlin}",
+              'jdk': "org.jetbrains.kotlin:kotlin-test-junit:${versions.kotlin}",
+              'js': "org.jetbrains.kotlin:kotlin-test-js:${versions.kotlin}",
+          ],
+      ],
       'butterknife': [
           'runtime': "com.jakewharton:butterknife:${versions.butterknife}",
           'compiler': "com.jakewharton:butterknife-compiler:${versions.butterknife}"
@@ -36,12 +48,14 @@ buildscript {
   repositories {
     jcenter()
     google()
+    gradlePluginPortal()
   }
 
   dependencies {
     classpath deps.androidPlugin
-    classpath deps.kotlinPlugin
     classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
+    classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
   }
 }
 

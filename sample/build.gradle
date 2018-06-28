@@ -24,9 +24,9 @@ android {
 }
 
 dependencies {
-  implementation project(':timber')
+  implementation project(':android')
   implementation deps.butterknife.runtime
   annotationProcessor deps.butterknife.compiler
   
-  lintChecks project(':timber-lint')
+  lintChecks project(':android-lint')
 }
