@@ -25,7 +25,7 @@ Two easy steps:
  1. Install any `Tree` instances you want in the `onCreate` of your application class.
  2. Call `Timber`'s static methods everywhere throughout your app.
 
-Check out the sample app in `timber-sample/` to see it in action.
+Check out the sample app in `sample/` to see it in action.
 
 
 Lint
