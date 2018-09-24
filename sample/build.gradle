@@ -1,0 +1,32 @@
+apply plugin: 'com.android.application'
+
+android {
+  compileSdkVersion versions.compileSdk
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_7
+    targetCompatibility JavaVersion.VERSION_1_7
+  }
+
+  defaultConfig {
+    applicationId 'com.example.timber'
+    minSdkVersion versions.minSdk
+    targetSdkVersion versions.compileSdk
+    versionCode 1
+    versionName '1.0.0'
+  }
+
+  lintOptions {
+    textReport true
+    textOutput 'stdout'
+    ignore 'InvalidPackage'
+  }
+}
+
+dependencies {
+  implementation project(':android')
+  implementation deps.butterknife.runtime
+  annotationProcessor deps.butterknife.compiler
+  
+  lintChecks project(':android-lint')
+}

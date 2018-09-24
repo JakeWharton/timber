@@ -1,0 +1,2 @@
+<!-- TODO rename to 'timber' once https://issuetracker.google.com/issues/73450622 is fixed -->
+<manifest package="timber.log"/>

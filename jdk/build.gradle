@@ -1,0 +1,11 @@
+apply plugin: 'org.jetbrains.kotlin.platform.jvm'
+
+archivesBaseName = 'timber'
+
+dependencies {
+  expectedBy project(':common')
+  implementation deps.kotlin.stdlib.jdk
+  testImplementation deps.kotlin.test.jdk
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

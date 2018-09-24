@@ -1,10 +1,39 @@
 Change Log
 ==========
 
+Version 4.7.1 *(2018-06-28)*
+----------------------------
+
+ * Fix: Redundant argument lint check now works correctly on Kotlin sources.
+
+
+Version 4.7.0 *(2018-03-27)*
+----------------------------
+
+ * Fix: Support lint version 26.1.0.
+ * Fix: Check single-argument log method in TimberExceptionLogging.
+
+
+Version 4.6.1 *(2018-02-12)*
+----------------------------
+
+ * Fix: Lint checks now handle more edge cases around exception and message source.
+ * Fix: Useless `BuildConfig` class is no longer included.
+
+
+Version 4.6.0 *(2017-10-30)*
+----------------------------
+
+ * New: Lint checks have been ported to UAST, their stability improved, and quick-fix suggestions added. They require Android Gradle Plugin 3.0 or newer to run.
+ * New: Added nullability annotations for Kotlin users.
+ * Fix: Tag length truncation no longer occurs on API 24 or newer as the system no longer has a length restriction.
+ * Fix: Handle when a `null` array is supplied for the message arguments. This can occur when using various bytecode optimization tools.
+
+
 Version 4.5.1 *(2017-01-20)*
 ----------------------------
 
- Fix: String formatting lint check now correctly works with dates.
+ * Fix: String formatting lint check now correctly works with dates.
 
 
 Version 4.5.0 *(2017-01-09)*

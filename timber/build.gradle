@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.kageiit.lintrules'
 apply plugin: 'checkstyle'
 
 task checkstyle(type: Checkstyle) {
@@ -19,11 +18,10 @@ afterEvaluate {
 }
 
 android {
-  compileSdkVersion rootProject.ext.compileSdkVersion
-  buildToolsVersion rootProject.ext.buildToolsVersion
+  compileSdkVersion versions.compileSdk
 
   defaultConfig {
-    minSdkVersion rootProject.ext.minSdkVersion
+    minSdkVersion versions.minSdk
     consumerProguardFiles 'consumer-proguard-rules.pro'
   }
 
@@ -31,17 +29,22 @@ android {
     textReport true
     textOutput 'stdout'
   }
+
+  // TODO replace with https://issuetracker.google.com/issues/72050365 once released.
+  libraryVariants.all {
+    it.generateBuildConfig.enabled = false
+  }
 }
 
 dependencies {
-  compileOnly 'org.jetbrains:annotations:15.0'
+  implementation deps.annotations
 
-  testImplementation deps.festandroid
-  testImplementation deps.festassert
+  testImplementation deps.annotations
   testImplementation deps.junit
+  testImplementation deps.truth
   testImplementation deps.robolectric
 
-  lintRules project(':timber-lint')
+  lintChecks project(':timber-lint')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
