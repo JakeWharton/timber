@@ -1,78 +1,99 @@
-apply plugin: 'com.github.ben-manes.versions'
+//apply plugin: 'com.github.ben-manes.versions'
 
 buildscript {
-  ext.versions = [
-      'minSdk': 9,
-      'compileSdk': 28,
+    ext.versions = [
+            'minSdk'       : 9,
+            'compileSdk'   : 27,
 
-      'kotlin': '1.2.51',
+            'kotlin'       : '1.3.0',
 
-      'androidPlugin': '3.1.3',
-      'androidTools': '26.1.3',
+            'androidPlugin': '3.2.1',
+            'androidTools' : '26.1.2',
 
-      'butterknife': '8.8.1',
-  ]
+            'butterknife'  : '8.8.1',
+    ]
 
-  ext.deps = [
-      androidPlugin: "com.android.tools.build:gradle:${versions.androidPlugin}",
-      'kotlin': [
-          'stdlib': [
-              'common': "org.jetbrains.kotlin:kotlin-stdlib-common:${versions.kotlin}",
-              'jdk': "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
-              'js': "org.jetbrains.kotlin:kotlin-stdlib-js:${versions.kotlin}",
-          ],
-          'test': [
-              'common': "org.jetbrains.kotlin:kotlin-test-common:${versions.kotlin}",
-              'annotations': "org.jetbrains.kotlin:kotlin-test-annotations-common:${versions.kotlin}",
-              'jdk': "org.jetbrains.kotlin:kotlin-test-junit:${versions.kotlin}",
-              'js': "org.jetbrains.kotlin:kotlin-test-js:${versions.kotlin}",
-          ],
-      ],
-      'butterknife': [
-          'runtime': "com.jakewharton:butterknife:${versions.butterknife}",
-          'compiler': "com.jakewharton:butterknife-compiler:${versions.butterknife}"
-      ],
-      'lint': [
-          'core': "com.android.tools.lint:lint:${versions.androidTools}",
-          'api': "com.android.tools.lint:lint-api:${versions.androidTools}",
-          'checks': "com.android.tools.lint:lint-checks:${versions.androidTools}",
-          'tests': "com.android.tools.lint:lint-tests:${versions.androidTools}",
-      ],
-      annotations: 'org.jetbrains:annotations:16.0.1',
+    ext.deps = [
+            androidPlugin: "com.android.tools.build:gradle:${versions.androidPlugin}",
+            'kotlin'     : [
+                    'stdlib': [
+                            'common': "org.jetbrains.kotlin:kotlin-stdlib-common:${versions.kotlin}",
+                            'jdk'   : "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
+                            'js'    : "org.jetbrains.kotlin:kotlin-stdlib-js:${versions.kotlin}",
+                    ],
+                    'test'  : [
+                            'common'     : "org.jetbrains.kotlin:kotlin-test-common:${versions.kotlin}",
+                            'annotations': "org.jetbrains.kotlin:kotlin-test-annotations-common:${versions.kotlin}",
+                            'jdk'        : "org.jetbrains.kotlin:kotlin-test-junit:${versions.kotlin}",
+                            'js'         : "org.jetbrains.kotlin:kotlin-test-js:${versions.kotlin}",
+                    ],
+            ],
+            'butterknife': [
+                    'runtime' : "com.jakewharton:butterknife:${versions.butterknife}",
+                    'compiler': "com.jakewharton:butterknife-compiler:${versions.butterknife}"
+            ],
+            'lint'       : [
+                    'core'  : "com.android.tools.lint:lint:${versions.androidTools}",
+                    'api'   : "com.android.tools.lint:lint-api:${versions.androidTools}",
+                    'checks': "com.android.tools.lint:lint-checks:${versions.androidTools}",
+                    'tests' : "com.android.tools.lint:lint-tests:${versions.androidTools}",
+            ],
+            annotations  : 'org.jetbrains:annotations:16.0.1',
 
-      junit: 'junit:junit:4.12',
-      truth: 'com.google.truth:truth:0.41',
-      robolectric: 'org.robolectric:robolectric:3.8',
-  ]
+            junit        : 'junit:junit:4.12',
+            truth        : 'com.google.truth:truth:0.40',
+            robolectric  : 'org.robolectric:robolectric:3.8',
+    ]
 
-  repositories {
-    jcenter()
-    google()
-    gradlePluginPortal()
-  }
+    repositories {
+        jcenter()
+        google()
+        gradlePluginPortal()
+    }
 
-  dependencies {
-    classpath deps.androidPlugin
-    classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
-    classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
-  }
 }
 
 subprojects {
-  repositories {
-    mavenCentral()
-    jcenter()
-    google()
-  }
-
-  tasks.withType(Test) {
-    testLogging {
-      events "failed"
-      exceptionFormat "full"
-      showExceptions true
-      showStackTraces true
-      showCauses true
+    repositories {
+        mavenCentral()
+        jcenter()
+        google()
     }
-  }
+
+    tasks.withType(Test) {
+        testLogging {
+            events "failed"
+            exceptionFormat "full"
+            showExceptions true
+            showStackTraces true
+            showCauses true
+        }
+    }
+}
+
+allprojects {
+    buildscript {
+        repositories {
+            maven { url "http://kotlin.bintray.com/kotlin-eap" }
+            maven { url "http://kotlin.bintray.com/kotlin-dev" }
+            maven { url 'https://dl.bintray.com/jetbrains/kotlin-native-dependencies' }
+
+            google()
+            jcenter()
+            gradlePluginPortal()
+        }
+        dependencies {
+            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
+            classpath "com.android.tools.build:gradle:$versions.androidPlugin"
+            classpath 'de.solugo.gradle:gradle-nodejs-plugin:0.6.0'
+//            classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
+        }
+    }
+    repositories {
+        maven { url "http://kotlin.bintray.com/kotlin-eap" }
+        maven { url "http://kotlin.bintray.com/kotlin-dev" }
+
+        google()
+        jcenter()
+    }
 }

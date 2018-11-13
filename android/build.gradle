@@ -26,9 +26,9 @@ android {
 }
 
 dependencies {
-  api project(':jdk')
+  api project(':common')
   implementation deps.kotlin.stdlib.jdk
 //  lintChecks project(':android-lint')
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+//apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

@@ -1,8 +1,18 @@
+pluginManagement {
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.id == "kotlin-multiplatform") {
+                useModule("org.jetbrains.kotlin:kotlin-gradle-plugin:${requested.version}")
+            }
+        }
+    }
+}
 rootProject.name = 'timber'
 
-include ':android'
-//include ':android-lint'
+
+enableFeaturePreview('GRADLE_METADATA')
+
 include ':common'
-include ':js'
-include ':jdk'
-//include ':sample'
+include ':android'
+include ':android-lint'
+include ':sample'

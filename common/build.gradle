@@ -1,11 +1,92 @@
-apply plugin: 'org.jetbrains.kotlin.platform.common'
+plugins {
+    id 'kotlin-multiplatform' version '1.3.0'
+}
+//apply plugin: 'com.moowork.node'
+apply plugin: 'de.solugo.gradle.nodejs'
 
-archivesBaseName = 'timber-common'
-
-dependencies {
-  implementation deps.kotlin.stdlib.common
-  testImplementation deps.kotlin.test.common
-  testImplementation deps.kotlin.test.annotations
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+group GROUP
+version VERSION_NAME
+
+apply plugin: 'maven-publish'
+
+kotlin {
+    targets {
+        fromPreset(presets.jvm, 'jvm')
+        fromPreset(presets.js, 'js')
+        // For ARM, preset should be changed to presets.iosArm32 or presets.iosArm64
+        // For Linux, preset should be changed to e.g. presets.linuxX64
+        // For MacOS, preset should be changed to e.g. presets.macosX64
+        fromPreset(presets.macosX64, 'macos')
+    }
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-stdlib-common'
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-test-common'
+                implementation 'org.jetbrains.kotlin:kotlin-test-annotations-common'
+            }
+        }
+        jvmMain {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+            }
+        }
+        jvmTest {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-test'
+                implementation 'org.jetbrains.kotlin:kotlin-test-junit'
+            }
+        }
+        jsMain {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-stdlib-js'
+            }
+        }
+        jsTest {
+            dependencies {
+                implementation 'org.jetbrains.kotlin:kotlin-test-js'
+            }
+        }
+        macosMain {
+        }
+        macosTest {
+        }
+    }
+}
+
+nodejs {
+    version = '10.8.0'
+    rootPath = './build'
+}
+
+[compileKotlinJs, compileTestKotlinJs]*.configure {
+    kotlinOptions.moduleKind = "commonjs"
+}
+
+task populateNodeModules(type: Copy, dependsOn: compileKotlinJs) {
+    from compileKotlinJs.destinationDir
+
+//    configurations.compileTestKotlinJs.each {
+//        from zipTree(it.absolutePath).matching { include '*.js' }
+//    }
+
+    into "${buildDir}/node_modules"
+}
+
+task runMocha(type: NodeJsTask, dependsOn: [compileTestKotlinJs, populateNodeModules]) {
+    require = ["mocha"]
+    executable = "mocha"
+    args = [projectDir.toPath().relativize(file(compileTestKotlinJs.outputFile).toPath())]
+}
+
+jsTest.dependsOn runMocha
