@@ -11,6 +11,11 @@ public final class TimberIssueRegistry extends IssueRegistry {
     return Arrays.asList(WrongTimberUsageDetector.getIssues());
   }
 
+  @Override
+  public int getMinApi() {
+    return 2;
+  }
+
   @Override public int getApi() {
     return ApiKt.CURRENT_API;
   }
