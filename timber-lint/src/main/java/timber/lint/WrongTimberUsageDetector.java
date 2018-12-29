@@ -233,7 +233,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
           case 'D':
           case 'F':
           case 'c':
-            valid = type == Integer.TYPE || type == Calendar.class || type == Date.class;
+            valid = type == Integer.TYPE || type == Calendar.class || type == Date.class
+                || type == Long.TYPE;
             if (!valid) {
               String message = String.format(
                   "Wrong argument type for date formatting argument '#%1$d' "
