@@ -51,6 +51,37 @@ class WrongTimberUsageDetectorTest {
             |""".trimMargin())
   }
 
+  @Test fun usingAndroidLogWithTwoArgumentsInKotlin() {
+    lint()
+        .files(
+            kt("""
+                |package foo
+                |import android.util.Log
+                |class Example {
+                |  fun log() {
+                |    Log.d("TAG", "msg")
+                |  }
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_LOG)
+        .run()
+        .expect("""
+            |src/foo/Example.kt:5: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
+            |    Log.d("TAG", "msg")
+            |    ~~~~~~~~~~~~~~~~~~~
+            |0 errors, 1 warnings""".trimMargin())
+        .expectFixDiffs("""
+            |Fix for src/foo/Example.kt line 4: Replace with Timber.tag("TAG").d("msg"):
+            |@@ -5 +5
+            |-     Log.d("TAG", "msg")
+            |+     Timber.tag("TAG").d("msg")
+            |Fix for src/foo/Example.kt line 4: Replace with Timber.d("msg"):
+            |@@ -5 +5
+            |-     Log.d("TAG", "msg")
+            |+     Timber.d("msg")
+            |""".trimMargin())
+  }
+
   @Test fun usingAndroidLogWithThreeArguments() {
     lint()
         .files(
@@ -80,6 +111,38 @@ class WrongTimberUsageDetectorTest {
             |-     Log.d("TAG", "msg", new Exception());
             |+     Timber.d(new Exception(), "msg");
             |""".trimMargin())
+  }
+
+  @Test fun usingAndroidLogWithThreeArgumentsInKotlin() {
+    lint()
+        .files(
+            kt("""
+              |package foo
+              |import android.util.Log
+              |class Example {
+              |  fun log() {
+              |    val e = Exception()
+              |    Log.d("TAG", "msg", e)
+              |  }
+              |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_LOG)
+        .run()
+        .expect("""
+          |src/foo/Example.kt:6: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
+          |    Log.d("TAG", "msg", e)
+          |    ~~~~~~~~~~~~~~~~~~~~~~
+          |0 errors, 1 warnings""".trimMargin())
+        .expectFixDiffs("""
+          |Fix for src/foo/Example.kt line 5: Replace with Timber.tag("TAG").d(e, "msg"):
+          |@@ -6 +6
+          |-     Log.d("TAG", "msg", e)
+          |+     Timber.tag("TAG").d(e, "msg")
+          |Fix for src/foo/Example.kt line 5: Replace with Timber.d(e, "msg"):
+          |@@ -6 +6
+          |-     Log.d("TAG", "msg", e)
+          |+     Timber.d(e, "msg")
+          |""".trimMargin())
   }
 
   @Test fun usingFullyQualifiedAndroidLogWithTwoArguments() {

@@ -652,7 +652,14 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       throw new IllegalStateException("android.util.Log overloads should have 2 or 3 arguments");
     }
 
-    String logCallSource = logCall.asSourceString();
+    PsiElement psi = logCall.getPsi();
+    UExpression receiver = logCall.getReceiver();
+    String logCallSource;
+    if (psi != null && LintUtils.isKotlin(psi.getLanguage()) && receiver != null) {
+      logCallSource = receiver.asSourceString() + "." + logCall.asSourceString();
+    } else {
+      logCallSource = logCall.asSourceString();
+    }
     LintFix.GroupBuilder fixGrouper = fix().group();
     fixGrouper.add(
         fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource1).build());
