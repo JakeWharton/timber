@@ -19,7 +19,11 @@ private const val MAX_TAG_LENGTH = 23
  * Note: This does not check [Log.isLoggable] by default. Call [withCompliantLogging] for an
  * instance which delegates to this method prior to logging.
  */
-class LogcatTree @JvmOverloads constructor(private val defaultTag: String = "App") : Tree() {
+class LogcatTree constructor(private val tagResolver: () -> String) : Tree() {
+
+  @JvmOverloads
+  constructor(defaultTag: String = "App") : this({ defaultTag })
+
   /** Return a new [Tree] that checks [Log.isLoggable] prior to logging. */
   fun withCompliantLogging() = object : Tree() {
     override fun isLoggable(priority: Int, tag: String?): Boolean {
@@ -78,7 +82,7 @@ class LogcatTree @JvmOverloads constructor(private val defaultTag: String = "App
   }
 
   private fun String?.asSafeTag(): String {
-    val tag = this ?: defaultTag
+    val tag = this ?: tagResolver.invoke()
     // Tag length limit was removed in API 24.
     if (Build.VERSION.SDK_INT < 24 && tag.length > MAX_TAG_LENGTH) {
       return tag.substring(0, MAX_TAG_LENGTH)
