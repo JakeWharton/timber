@@ -1,5 +1,10 @@
 apply plugin: 'com.android.library'
 apply plugin: 'checkstyle'
+apply plugin: 'me.champeau.gradle.japicmp'
+
+configurations {
+  baseline
+}
 
 task checkstyle(type: Checkstyle) {
   configFile rootProject.file('checkstyle.xml')
@@ -45,6 +50,36 @@ dependencies {
   testImplementation deps.robolectric
 
   lintChecks project(':timber-lint')
+
+  baseline('com.jakewharton.timber:timber:4.7.1') {
+    transitive = false
+    force = true
+  }
+}
+
+android.libraryVariants.all { variant ->
+  if (variant.name != "release") {
+    return
+  }
+
+  task japicmp(type: me.champeau.gradle.japicmp.JapicmpTask) {
+    oldClasspath = configurations.baseline.incoming.artifactView { config ->
+      config.attributes {
+        container -> container.attribute(Attribute.of("artifactType", String.class), "jar")
+      }
+    }.artifacts.artifactFiles
+
+    // TODO query the outgoing jar in a more dynamic fashion
+    newClasspath = files("$buildDir/intermediates/packaged-classes/${variant.name}/classes.jar")
+
+    onlyBinaryIncompatibleModified = true
+    failOnModification = true
+    txtOutputFile = file("$buildDir/reports/japi.txt")
+    ignoreMissingClasses = true
+    includeSynthetic = true
+  }
+  japicmp.dependsOn(variant.assemble)
+  check.dependsOn(japicmp)
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

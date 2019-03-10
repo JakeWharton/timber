@@ -34,22 +34,25 @@ buildscript {
   ]
 
   repositories {
-    jcenter()
+    mavenCentral()
     google()
+    gradlePluginPortal()
+    jcenter()
   }
 
   dependencies {
     classpath deps.androidPlugin
     classpath deps.kotlinPlugin
     classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
+    classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.2.6'
   }
 }
 
 subprojects {
   repositories {
     mavenCentral()
-    jcenter()
     google()
+    jcenter()
   }
 
   tasks.withType(Test) {
