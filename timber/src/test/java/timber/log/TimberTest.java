@@ -326,6 +326,75 @@ public class TimberTest {
     assertExceptionLogged(Log.ERROR, "OMFG!", "java.lang.NullPointerException");
   }
 
+  @Test public void keepsPermanentTag() {
+    Timber.plant(new Timber.DebugTree());
+    final Timber.Tree log = Timber.tagged("p");
+
+    log.d("test debug");
+    log.e("test error");
+    log.i("test info");
+    log.v("test verbose");
+    log.w("test warning");
+    log.wtf("test wtf");
+
+    assertLog()
+      .hasDebugMessage("p", "test debug")
+      .hasErrorMessage("p", "test error")
+      .hasInfoMessage("p", "test info")
+      .hasVerboseMessage("p", "test verbose")
+      .hasWarnMessage("p", "test warning")
+      .hasAssertMessage("p", "test wtf"); // LOG_ID_MAIN = 0
+  }
+
+  @Test public void keepsPermanentTagWithInterrupts() {
+    Timber.plant(new Timber.DebugTree());
+    final Timber.Tree log = Timber.tagged("p");
+
+
+    log.d("test debug");
+    log.tag("debugOverride");
+    log.d("test debug override");
+
+    log.e("test error");
+    log.tag("errorOverride");
+    log.e("test error override");
+
+    log.i("test info");
+    log.tag("infoOverride");
+    log.i("test info override");
+
+    log.v("test verbose");
+    log.tag("verboseOverride");
+    log.v("test verbose override");
+
+    log.w("test warning");
+    log.tag("warningOverride");
+    log.w("test warning override");
+
+    log.wtf("test wtf");
+    log.tag("wtfOverride");
+    log.wtf("test wtf override");
+
+    assertLog()
+        .hasDebugMessage("p", "test debug")
+        .hasDebugMessage("debugOverride", "test debug override")
+
+        .hasErrorMessage("p", "test error")
+        .hasErrorMessage("errorOverride", "test error override")
+
+        .hasInfoMessage("p", "test info")
+        .hasInfoMessage("infoOverride", "test info override")
+
+        .hasVerboseMessage("p", "test verbose")
+        .hasVerboseMessage("verboseOverride", "test verbose override")
+
+        .hasWarnMessage("p", "test warning")
+        .hasWarnMessage("warningOverride", "test warning override")
+
+        .hasAssertMessage("p", "test wtf")
+        .hasAssertMessage("wtfOverride", "test wtf override"); // LOG_ID_MAIN = 0
+  }
+
   @Test public void nullMessageWithThrowable() {
     Timber.plant(new Timber.DebugTree());
     NullPointerException datThrowable = truncatedThrowable(NullPointerException.class);

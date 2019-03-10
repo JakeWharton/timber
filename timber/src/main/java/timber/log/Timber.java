@@ -142,6 +142,15 @@ public final class Timber {
     return TREE_OF_SOULS;
   }
 
+  @SuppressWarnings("ConstantConditions")
+  public static Tree tagged(@SuppressWarnings("SameParameterValue") @NotNull String tag) {
+    if (tag == null) {
+      throw new NullPointerException("tree == null");
+    }
+
+    return new PermanentlyTaggedTree(forestAsArray, tag);
+  }
+
   /** Add a new logging tree. */
   @SuppressWarnings("ConstantConditions") // Validating public API contract.
   public static void plant(@NotNull Tree tree) {
@@ -383,6 +392,14 @@ public final class Timber {
         explicitTag.remove();
       }
       return tag;
+    }
+
+    /**
+     * Set a one-time tag for use on the next logging call.
+     * This scopes the behaviour of {@link Timber#tag(String)} onto this specific Tree
+     */
+    public void tag(final String tag) {
+      explicitTag.set(tag);
     }
 
     /** Log a verbose message with optional format args. */
@@ -640,4 +657,5 @@ public final class Timber {
       }
     }
   }
+
 }
