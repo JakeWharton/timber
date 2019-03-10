@@ -1,8 +1,5 @@
-rootProject.name = 'timber'
+include ':timber'
+include ':timber-lint'
+include ':timber-sample'
 
-include ':android'
-//include ':android-lint'
-include ':common'
-include ':js'
-include ':jdk'
-//include ':sample'
+rootProject.name = 'timber-root'

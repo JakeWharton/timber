@@ -15,19 +15,7 @@ buildscript {
 
   ext.deps = [
       androidPlugin: "com.android.tools.build:gradle:${versions.androidPlugin}",
-      'kotlin': [
-          'stdlib': [
-              'common': "org.jetbrains.kotlin:kotlin-stdlib-common:${versions.kotlin}",
-              'jdk': "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
-              'js': "org.jetbrains.kotlin:kotlin-stdlib-js:${versions.kotlin}",
-          ],
-          'test': [
-              'common': "org.jetbrains.kotlin:kotlin-test-common:${versions.kotlin}",
-              'annotations': "org.jetbrains.kotlin:kotlin-test-annotations-common:${versions.kotlin}",
-              'jdk': "org.jetbrains.kotlin:kotlin-test-junit:${versions.kotlin}",
-              'js': "org.jetbrains.kotlin:kotlin-test-js:${versions.kotlin}",
-          ],
-      ],
+      kotlinPlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
       'butterknife': [
           'runtime': "com.jakewharton:butterknife:${versions.butterknife}",
           'compiler': "com.jakewharton:butterknife-compiler:${versions.butterknife}"
@@ -48,14 +36,12 @@ buildscript {
   repositories {
     jcenter()
     google()
-    gradlePluginPortal()
   }
 
   dependencies {
     classpath deps.androidPlugin
+    classpath deps.kotlinPlugin
     classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
-    classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
   }
 }
 
