@@ -88,12 +88,17 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       return;
     }
     // Handles Timber.X(..) and Timber.tag(..).X(..) where X in (v|d|i|w|e|wtf).
-    if (evaluator.isMemberInClass(method, "timber.log.Timber") //
-        || evaluator.isMemberInClass(method, "timber.log.Timber.Tree")) {
+    if (isTimberLogMethod(method, evaluator)) {
       checkMethodArguments(context, call);
       checkFormatArguments(context, call);
       checkExceptionLogging(context, call);
     }
+  }
+
+  private boolean isTimberLogMethod(PsiMethod method, JavaEvaluator evaluator) {
+    return evaluator.isMemberInClass(method, "timber.log.Timber")
+        || evaluator.isMemberInClass(method, "timber.log.Timber.Companion")
+        || evaluator.isMemberInClass(method, "timber.log.Timber.Tree");
   }
 
   private void checkNestedStringFormat(JavaContext context, UCallExpression call) {

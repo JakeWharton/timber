@@ -1,23 +1,25 @@
 package timber.lint
 
 import com.android.tools.lint.checks.infrastructure.TestFiles.java
+import com.android.tools.lint.checks.infrastructure.TestFiles.kotlin
 import com.android.tools.lint.checks.infrastructure.TestFiles.kt
 import com.android.tools.lint.checks.infrastructure.TestFiles.manifest
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import org.junit.Test
 
 class WrongTimberUsageDetectorTest {
-  private val TIMBER_STUB = java("""
-      |package timber.log;
-      |public class Timber {
-      |  public static void d(String s, Object... args) {}
-      |  public static void d(Throwable t, String s, Object... args) {}
-      |  public static Tree tag(String tag) { return new Tree(); }
-      |  public static class Tree {
-      |    public void d(String s, Object... args) {}
-      |    public void d(Throwable t, String s, Object... args) {}
+  private val TIMBER_STUB = kotlin("""
+      |package timber.log
+      |class Timber private constructor() {
+      |  private companion object {
+      |    @JvmStatic fun d(message: String?, vararg args: Any?) {}
+      |    @JvmStatic fun d(t: Throwable?, message: String, vararg args: Any?) {}
+      |    @JvmStatic fun tag(tag: String) = Tree()
       |  }
-      |  private static final Tree TREE_OF_SOULS = new Tree();
+      |  open class Tree {
+      |    open fun d(message: String?, vararg args: Any?) {}
+      |    open fun d(t: Throwable?, message: String?, vararg args: Any?) {}
+      |  }
       |}""".trimMargin())
 
   @Test fun usingAndroidLogWithTwoArguments() {

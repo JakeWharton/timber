@@ -15,7 +15,10 @@ buildscript {
 
   ext.deps = [
       androidPlugin: "com.android.tools.build:gradle:${versions.androidPlugin}",
-      kotlinPlugin: "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
+      'kotlin': [
+          'plugin': "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
+          'stdlib': "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
+      ],
       'butterknife': [
           'runtime': "com.jakewharton:butterknife:${versions.butterknife}",
           'compiler': "com.jakewharton:butterknife-compiler:${versions.butterknife}"
@@ -42,7 +45,7 @@ buildscript {
 
   dependencies {
     classpath deps.androidPlugin
-    classpath deps.kotlinPlugin
+    classpath deps.kotlin.plugin
     classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
     classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.2.6'
   }
