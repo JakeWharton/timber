@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NonNls;
@@ -23,9 +24,20 @@ public final class Timber {
     TREE_OF_SOULS.v(message, args);
   }
 
+  /** Log a verbose message with metadata and optional format args. */
+  public static void v(Map<String, Object> metadata, @NonNls String message, Object... args) {
+    TREE_OF_SOULS.v(metadata, message, args);
+  }
+
   /** Log a verbose exception and a message with optional format args. */
   public static void v(Throwable t, @NonNls String message, Object... args) {
     TREE_OF_SOULS.v(t, message, args);
+  }
+
+  /** Log a verbose exception and a message with optional format args. */
+  public static void v(Throwable t, Map<String, Object> metadata,
+                       @NonNls String message, Object... args) {
+    TREE_OF_SOULS.v(t, metadata, message, args);
   }
 
   /** Log a verbose exception. */
@@ -33,14 +45,29 @@ public final class Timber {
     TREE_OF_SOULS.v(t);
   }
 
+  /** Log a verbose exception with metadata. */
+  public static void v(Map<String, Object> metadata, Throwable t) {
+    TREE_OF_SOULS.v(metadata, t);
+  }
+
   /** Log a debug message with optional format args. */
   public static void d(@NonNls String message, Object... args) {
     TREE_OF_SOULS.d(message, args);
   }
 
+  /** Log a debug message with metadata and optional format args. */
+  public static void d(Map<String, Object> metadata, @NonNls String message, Object... args) {
+    TREE_OF_SOULS.d(metadata, message, args);
+  }
   /** Log a debug exception and a message with optional format args. */
   public static void d(Throwable t, @NonNls String message, Object... args) {
     TREE_OF_SOULS.d(t, message, args);
+  }
+
+  /** Log a debug exception and a message with optional format args. */
+  public static void d(Throwable t, Map<String, Object> metadata,
+                       @NonNls String message, Object... args) {
+    TREE_OF_SOULS.d(t, metadata, message, args);
   }
 
   /** Log a debug exception. */
@@ -48,9 +75,19 @@ public final class Timber {
     TREE_OF_SOULS.d(t);
   }
 
+  /** Log a debug exception with metadata. */
+  public static void d(Map<String, Object> metadata, Throwable t) {
+    TREE_OF_SOULS.d(metadata, t);
+  }
+
   /** Log an info message with optional format args. */
   public static void i(@NonNls String message, Object... args) {
     TREE_OF_SOULS.i(message, args);
+  }
+
+  /** Log an info message with metadata and optional format args. */
+  public static void i(Map<String, Object> metaData, @NonNls String message, Object... args) {
+    TREE_OF_SOULS.i(metaData, message, args);
   }
 
   /** Log an info exception and a message with optional format args. */
@@ -58,9 +95,20 @@ public final class Timber {
     TREE_OF_SOULS.i(t, message, args);
   }
 
+  /** Log an info exception and a message with optional format args. */
+  public static void i(Throwable t, Map<String, Object> metadata,
+                       @NonNls String message, Object... args) {
+    TREE_OF_SOULS.i(t, metadata, message, args);
+  }
+
   /** Log an info exception. */
   public static void i(Throwable t) {
     TREE_OF_SOULS.i(t);
+  }
+
+  /** Log an info exception with metadata. */
+  public static void i(Map<String, Object> metadata, Throwable t) {
+    TREE_OF_SOULS.i(metadata, t);
   }
 
   /** Log a warning message with optional format args. */
@@ -68,9 +116,20 @@ public final class Timber {
     TREE_OF_SOULS.w(message, args);
   }
 
+  /** Log a warning message with metadata and optional format args. */
+  public static void w(Map<String, Object> metaData, @NonNls String message, Object... args) {
+    TREE_OF_SOULS.w(metaData, message, args);
+  }
+
   /** Log a warning exception and a message with optional format args. */
   public static void w(Throwable t, @NonNls String message, Object... args) {
     TREE_OF_SOULS.w(t, message, args);
+  }
+
+  /** Log a verbose exception and a message with optional format args. */
+  public static void w(Throwable t, Map<String, Object> metadata,
+                       @NonNls String message, Object... args) {
+    TREE_OF_SOULS.w(t, metadata, message, args);
   }
 
   /** Log a warning exception. */
@@ -78,9 +137,19 @@ public final class Timber {
     TREE_OF_SOULS.w(t);
   }
 
+  /** Log a warning exception with metadata. */
+  public static void w(Map<String, Object> metadata, Throwable t) {
+    TREE_OF_SOULS.w(metadata, t);
+  }
+
   /** Log an error message with optional format args. */
   public static void e(@NonNls String message, Object... args) {
     TREE_OF_SOULS.e(message, args);
+  }
+
+  /** Log an error message with metadata and optional format args. */
+  public static void e(Map<String, Object> metaData, @NonNls String message, Object... args) {
+    TREE_OF_SOULS.e(metaData, message, args);
   }
 
   /** Log an error exception and a message with optional format args. */
@@ -88,9 +157,20 @@ public final class Timber {
     TREE_OF_SOULS.e(t, message, args);
   }
 
+  /** Log an error exception and a message with optional format args. */
+  public static void e(Throwable t, Map<String, Object> metadata, @NonNls String message,
+                       Object... args) {
+    TREE_OF_SOULS.e(t, metadata, message, args);
+  }
+
   /** Log an error exception. */
   public static void e(Throwable t) {
     TREE_OF_SOULS.e(t);
+  }
+
+  /** Log an error exception with metadata. */
+  public static void e(Map<String, Object> metadata, Throwable t) {
+    TREE_OF_SOULS.e(metadata, t);
   }
 
   /** Log an assert message with optional format args. */
@@ -98,14 +178,30 @@ public final class Timber {
     TREE_OF_SOULS.wtf(message, args);
   }
 
+  /** Log an assert message with metadata and optional format args. */
+  public static void wtf(Map<String, Object> metaData, @NonNls String message, Object... args) {
+    TREE_OF_SOULS.wtf(metaData, message, args);
+  }
+
   /** Log an assert exception and a message with optional format args. */
   public static void wtf(Throwable t, @NonNls String message, Object... args) {
     TREE_OF_SOULS.wtf(t, message, args);
   }
 
+  /** Log an assert exception and a message with optional format args. */
+  public static void wtf(Throwable t, Map<String, Object> metadata, @NonNls String message,
+                         Object... args) {
+    TREE_OF_SOULS.wtf(t, metadata, message, args);
+  }
+
   /** Log an assert exception. */
   public static void wtf(Throwable t) {
     TREE_OF_SOULS.wtf(t);
+  }
+
+  /** Log an assert exception with metadata. */
+  public static void wtf(Map<String, Object> metadata, Throwable t) {
+    TREE_OF_SOULS.wtf(metadata, t);
   }
 
   /** Log at {@code priority} a message with optional format args. */
@@ -223,10 +319,27 @@ public final class Timber {
       }
     }
 
+    @Override public void v(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].v(metadata, message, args);
+      }
+    }
+
     @Override public void v(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
       for (Tree tree : forest) {
         tree.v(t, message, args);
+      }
+    }
+
+    @Override public void v(Throwable t, Map<String, Object> metadata,
+                            String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].v(t, metadata, message, args);
       }
     }
 
@@ -237,10 +350,26 @@ public final class Timber {
       }
     }
 
+    @Override public void v(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].v(metadata, t);
+      }
+    }
+
     @Override public void d(String message, Object... args) {
       Tree[] forest = forestAsArray;
       for (Tree tree : forest) {
         tree.d(message, args);
+      }
+    }
+
+    @Override public void d(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].d(metadata, message, args);
       }
     }
 
@@ -251,10 +380,27 @@ public final class Timber {
       }
     }
 
+    @Override public void d(Throwable t, Map<String, Object> metadata,
+                            String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].d(t, metadata, message, args);
+      }
+    }
+
     @Override public void d(Throwable t) {
       Tree[] forest = forestAsArray;
       for (Tree tree : forest) {
         tree.d(t);
+      }
+    }
+
+    @Override public void d(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].d(metadata, t);
       }
     }
 
@@ -265,10 +411,27 @@ public final class Timber {
       }
     }
 
+    @Override public void i(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].i(metadata, message, args);
+      }
+    }
+
     @Override public void i(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
       for (Tree tree : forest) {
         tree.i(t, message, args);
+      }
+    }
+
+    @Override public void i(Throwable t, Map<String, Object> metadata,
+                            String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].i(t, metadata, message, args);
       }
     }
 
@@ -279,10 +442,26 @@ public final class Timber {
       }
     }
 
+    @Override public void i(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].i(metadata, t);
+      }
+    }
+
     @Override public void w(String message, Object... args) {
       Tree[] forest = forestAsArray;
       for (Tree tree : forest) {
         tree.w(message, args);
+      }
+    }
+
+    @Override public void w(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].w(metadata, message, args);
       }
     }
 
@@ -293,10 +472,27 @@ public final class Timber {
       }
     }
 
+    @Override public void w(Throwable t, Map<String, Object> metadata, String message,
+                            Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].w(t, metadata, message, args);
+      }
+    }
+
     @Override public void w(Throwable t) {
       Tree[] forest = forestAsArray;
       for (Tree tree : forest) {
         tree.w(t);
+      }
+    }
+
+    @Override public void w(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].w(metadata, t);
       }
     }
 
@@ -307,10 +503,27 @@ public final class Timber {
       }
     }
 
+    @Override public void e(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].e(metadata, message, args);
+      }
+    }
+
     @Override public void e(Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
       for (Tree tree : forest) {
         tree.e(t, message, args);
+      }
+    }
+
+    @Override public void e(Throwable t, Map<String, Object> metadata, String message,
+                            Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].e(t, metadata, message, args);
       }
     }
 
@@ -321,10 +534,26 @@ public final class Timber {
       }
     }
 
+    @Override public void e(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].e(metadata, t);
+      }
+    }
+
     @Override public void wtf(String message, Object... args) {
       Tree[] forest = forestAsArray;
       for (Tree tree : forest) {
         tree.wtf(message, args);
+      }
+    }
+
+    @Override public void wtf(Map<String, Object> metadata, String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].wtf(metadata, message, args);
       }
     }
 
@@ -335,10 +564,27 @@ public final class Timber {
       }
     }
 
+    @Override public void wtf(Throwable t, Map<String, Object> metadata, String message,
+                              Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].wtf(t, metadata, message, args);
+      }
+    }
+
     @Override public void wtf(Throwable t) {
       Tree[] forest = forestAsArray;
       for (Tree tree : forest) {
         tree.wtf(t);
+      }
+    }
+
+    @Override public void wtf(Map<String, Object> metadata, Throwable t) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].wtf(metadata, t);
       }
     }
 
@@ -349,10 +595,28 @@ public final class Timber {
       }
     }
 
+    @Override public void log(int priority, Map<String, Object> metadata,
+                    String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].log(priority, metadata, message, args);
+      }
+    }
+
     @Override public void log(int priority, Throwable t, String message, Object... args) {
       Tree[] forest = forestAsArray;
       for (Tree tree : forest) {
         tree.log(priority, t, message, args);
+      }
+    }
+
+    @Override public void log(int priority, Throwable t, Map<String, Object> metadata,
+                              String message, Object... args) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].log(priority, t, metadata, message, args);
       }
     }
 
@@ -361,6 +625,19 @@ public final class Timber {
       for (Tree tree : forest) {
         tree.log(priority, t);
       }
+    }
+
+    @Override public void log(int priority, Throwable t, Map<String, Object> metadata) {
+      Tree[] forest = forestAsArray;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, count = forest.length; i < count; i++) {
+        forest[i].log(priority, t, metadata);
+      }
+    }
+
+    @Override protected void log(int priority, String tag, @NotNull String message, Throwable t,
+                                 Map<String, Object> metadata) {
+      throw new AssertionError("Missing override for log method. test test");
     }
 
     @Override protected void log(int priority, String tag, @NotNull String message, Throwable t) {
@@ -387,107 +664,213 @@ public final class Timber {
 
     /** Log a verbose message with optional format args. */
     public void v(String message, Object... args) {
-      prepareLog(Log.VERBOSE, null, message, args);
+      prepareLog(Log.VERBOSE, null, null, message, args);
+    }
+
+    /** Log a verbose message with metadata and optional format args. */
+    public void v(Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.VERBOSE, null, metadata, message, args);
     }
 
     /** Log a verbose exception and a message with optional format args. */
     public void v(Throwable t, String message, Object... args) {
-      prepareLog(Log.VERBOSE, t, message, args);
+      prepareLog(Log.VERBOSE, t, null, message, args);
+    }
+
+    /** Log a verbose exception with metadata and a message with optional format args. */
+    public void v(Throwable t, Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.VERBOSE, t, metadata, message, args);
     }
 
     /** Log a verbose exception. */
     public void v(Throwable t) {
-      prepareLog(Log.VERBOSE, t, null);
+      prepareLog(Log.VERBOSE, t, null, null);
+    }
+
+    /** Log a verbose exception with metadata. */
+    public void v(Map<String, Object> metadata, Throwable t) {
+      prepareLog(Log.VERBOSE, t, metadata, null);
     }
 
     /** Log a debug message with optional format args. */
     public void d(String message, Object... args) {
-      prepareLog(Log.DEBUG, null, message, args);
+      prepareLog(Log.DEBUG, null, null, message, args);
+    }
+
+    /** Log a debug message with metadata and optional format args. */
+    public void d(Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.DEBUG, null, metadata, message, args);
     }
 
     /** Log a debug exception and a message with optional format args. */
     public void d(Throwable t, String message, Object... args) {
-      prepareLog(Log.DEBUG, t, message, args);
+      prepareLog(Log.DEBUG, t, null, message, args);
+    }
+
+    /** Log a debug exception with metadata and a message with optional format args. */
+    public void d(Throwable t, Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.DEBUG, t, metadata, message, args);
     }
 
     /** Log a debug exception. */
     public void d(Throwable t) {
-      prepareLog(Log.DEBUG, t, null);
+      prepareLog(Log.DEBUG, t, null, null);
+    }
+
+    /** Log a verbose exception with metadata. */
+    public void d(Map<String, Object> metadata, Throwable t) {
+      prepareLog(Log.DEBUG, t, metadata, null);
     }
 
     /** Log an info message with optional format args. */
     public void i(String message, Object... args) {
-      prepareLog(Log.INFO, null, message, args);
+      prepareLog(Log.INFO, null, null, message, args);
+    }
+
+    /** Log an info message with metadata and optional format args. */
+    public void i(Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.INFO, null, metadata, message, args);
     }
 
     /** Log an info exception and a message with optional format args. */
     public void i(Throwable t, String message, Object... args) {
-      prepareLog(Log.INFO, t, message, args);
+      prepareLog(Log.INFO, t, null, message, args);
+    }
+
+    /** Log an info exception with metadata and a message with optional format args. */
+    public void i(Throwable t, Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.INFO, t, metadata, message, args);
     }
 
     /** Log an info exception. */
     public void i(Throwable t) {
-      prepareLog(Log.INFO, t, null);
+      prepareLog(Log.INFO, t, null, null);
+    }
+
+    /** Log an info exception with metadata. */
+    public void i(Map<String, Object> metadata, Throwable t) {
+      prepareLog(Log.INFO, t, metadata, null);
     }
 
     /** Log a warning message with optional format args. */
     public void w(String message, Object... args) {
-      prepareLog(Log.WARN, null, message, args);
+      prepareLog(Log.WARN, null, null, message, args);
+    }
+
+    /** Log a warning message with metadata and optional format args. */
+    public void w(Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.WARN, null, metadata, message, args);
     }
 
     /** Log a warning exception and a message with optional format args. */
     public void w(Throwable t, String message, Object... args) {
-      prepareLog(Log.WARN, t, message, args);
+      prepareLog(Log.WARN, t, null, message, args);
+    }
+
+    /** Log a warning exception with metadata and a message with optional format args. */
+    public void w(Throwable t, Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.WARN, t, metadata, message, args);
     }
 
     /** Log a warning exception. */
     public void w(Throwable t) {
-      prepareLog(Log.WARN, t, null);
+      prepareLog(Log.WARN, t, null, null);
+    }
+
+    /** Log a warning exception with metadata. */
+    public void w(Map<String, Object> metadata, Throwable t) {
+      prepareLog(Log.WARN, t, metadata, null);
     }
 
     /** Log an error message with optional format args. */
     public void e(String message, Object... args) {
-      prepareLog(Log.ERROR, null, message, args);
+      prepareLog(Log.ERROR, null, null, message, args);
+    }
+
+    /** Log an error message with metadata and optional format args. */
+    public void e(Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.ERROR, null, metadata, message, args);
     }
 
     /** Log an error exception and a message with optional format args. */
     public void e(Throwable t, String message, Object... args) {
-      prepareLog(Log.ERROR, t, message, args);
+      prepareLog(Log.ERROR, t, null, message, args);
+    }
+
+    /** Log an error exception with metadata and a message with optional format args. */
+    public void e(Throwable t, Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.ERROR, t, metadata, message, args);
     }
 
     /** Log an error exception. */
     public void e(Throwable t) {
-      prepareLog(Log.ERROR, t, null);
+      prepareLog(Log.ERROR, t, null, null);
+    }
+
+    /** Log an error exception with metadata. */
+    public void e(Map<String, Object> metadata, Throwable t) {
+      prepareLog(Log.ERROR, t, metadata, null);
     }
 
     /** Log an assert message with optional format args. */
     public void wtf(String message, Object... args) {
-      prepareLog(Log.ASSERT, null, message, args);
+      prepareLog(Log.ASSERT, null, null, message, args);
+    }
+
+    /** Log a verbose message with metadata and optional format args. */
+    public void wtf(Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.VERBOSE, null, metadata, message, args);
     }
 
     /** Log an assert exception and a message with optional format args. */
     public void wtf(Throwable t, String message, Object... args) {
-      prepareLog(Log.ASSERT, t, message, args);
+      prepareLog(Log.ASSERT, t, null, message, args);
+    }
+
+    /** Log a verbose exception with metadata and a message with optional format args. */
+    public void wtf(Throwable t, Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(Log.VERBOSE, t, metadata, message, args);
     }
 
     /** Log an assert exception. */
     public void wtf(Throwable t) {
-      prepareLog(Log.ASSERT, t, null);
+      prepareLog(Log.ASSERT, t, null, null);
+    }
+
+    /** Log a verbose exception with metadata. */
+    public void wtf(Map<String, Object> metadata, Throwable t) {
+      prepareLog(Log.VERBOSE, t, metadata, null);
     }
 
     /** Log at {@code priority} a message with optional format args. */
     public void log(int priority, String message, Object... args) {
-      prepareLog(priority, null, message, args);
+      prepareLog(priority, null, null, message, args);
+    }
+
+    /** Log at {@code priority} metadata and a message with optional format args. */
+    public void log(int priority, Map<String, Object> metadata, String message, Object... args) {
+      prepareLog(priority, null, metadata,  message, args);
     }
 
     /** Log at {@code priority} an exception and a message with optional format args. */
     public void log(int priority, Throwable t, String message, Object... args) {
-      prepareLog(priority, t, message, args);
+      prepareLog(priority, t, null, message, args);
+    }
+
+    /** Log at {@code priority} an exception, metadata and a message with optional format args. */
+    public void log(int priority, Throwable t, Map<String, Object> metadata,
+                    String message, Object... args) {
+      prepareLog(priority, t, metadata, message, args);
     }
 
     /** Log at {@code priority} an exception. */
     public void log(int priority, Throwable t) {
-      prepareLog(priority, t, null);
+      prepareLog(priority, t, null, null);
+    }
+
+    /** Log at {@code priority} an exception and metadata. */
+    public void log(int priority, Throwable t, Map<String, Object> metadata) {
+      prepareLog(priority, t, metadata, null);
     }
 
     /**
@@ -505,7 +888,8 @@ public final class Timber {
       return isLoggable(priority);
     }
 
-    private void prepareLog(int priority, Throwable t, String message, Object... args) {
+    private void prepareLog(int priority, Throwable t, Map<String, Object> metadata,
+                            String message, Object... args) {
       // Consume tag even when message is not loggable so that next message is correctly tagged.
       String tag = getTag();
 
@@ -529,7 +913,11 @@ public final class Timber {
         }
       }
 
-      log(priority, tag, message, t);
+      if (metadata == null) {
+        log(priority, tag, message, t);
+      } else {
+        log(priority, tag, message, t, metadata);
+      }
     }
 
     /**
@@ -547,6 +935,20 @@ public final class Timber {
       t.printStackTrace(pw);
       pw.flush();
       return sw.toString();
+    }
+
+    /**
+     * Write a log message to its destination. This must be overridden in order to capture metadata.
+     *
+     * @param priority Log level. See {@link Log} for constants.
+     * @param tag Explicit or inferred tag. May be {@code null}.
+     * @param message Formatted log message. May be {@code null}, but then {@code t} will not be.
+     * @param t Accompanying exceptions. May be {@code null}, but then {@code message} will not be.
+     * @param metadata metadata associated with the log statement. May be {@code null}.
+     */
+    protected void log(int priority, @Nullable String tag, @NotNull String message,
+                                @Nullable Throwable t, @Nullable Map<String, Object> metadata) {
+      throw new IllegalArgumentException("You must override this method to log with metadata");
     }
 
     /**
