@@ -63,10 +63,6 @@ android.libraryVariants.all { variant ->
     txtOutputFile = file("$buildDir/reports/japi.txt")
     ignoreMissingClasses = true
     includeSynthetic = true
-    fieldExcludes = [
-        // Changed to public (via internal) and synthetic (to hide from public API).
-        'timber.log.Timber#FOREST'
-    ]
   }
   japicmp.dependsOn(variant.assemble)
   check.dependsOn(japicmp)
