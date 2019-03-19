@@ -66,15 +66,6 @@ class TimberTest {
     assertThat(Timber.treeCount).isEqualTo(0)
   }
 
-  @Test fun nullTreeArray() {
-    @Suppress("UNCHECKED_CAST") // Testing an unexpected null array value.
-    val nullTrees = arrayOfNulls<Timber.Tree?>(1) as Array<Timber.Tree>
-
-    assertThrows<IllegalArgumentException> {
-      Timber.plant(*nullTrees)
-    }
-  }
-
   @Test fun forestReturnsAllPlanted() {
     val tree1 = Timber.DebugTree()
     val tree2 = Timber.DebugTree()
