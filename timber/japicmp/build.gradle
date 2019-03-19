@@ -1,0 +1,38 @@
+configurations {
+  baseline
+  latest
+}
+
+dependencies {
+  baseline('com.jakewharton.timber:timber:4.7.1') {
+    transitive = false
+    force = true
+  }
+  latest project(path: ':timber', configuration: 'releaseRuntimeElements')
+}
+
+task japicmp(type: me.champeau.gradle.japicmp.JapicmpTask) {
+  oldClasspath = configurations.baseline.incoming.artifactView { config ->
+    config.attributes { container ->
+      container.attribute(Attribute.of("artifactType", String.class), "jar")
+    }
+  }.artifacts.artifactFiles
+
+  newClasspath = configurations.latest.incoming.artifactView { config ->
+    config.attributes { container ->
+      container.attribute(Attribute.of("artifactType", String.class), "jar")
+    }
+  }.artifacts.artifactFiles
+
+  onlyBinaryIncompatibleModified = true
+  failOnModification = true
+  txtOutputFile = file("$buildDir/reports/japi.txt")
+  ignoreMissingClasses = true
+  includeSynthetic = true
+}
+
+def check = tasks.create('check')
+check.dependsOn(japicmp)
+
+def build = tasks.create('build')
+build.dependsOn(check)
