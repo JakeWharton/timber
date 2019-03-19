@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'checkstyle'
 apply plugin: 'me.champeau.gradle.japicmp'
 
@@ -37,11 +38,13 @@ android {
 
   // TODO replace with https://issuetracker.google.com/issues/72050365 once released.
   libraryVariants.all {
-    it.generateBuildConfig.enabled = false
+    // TODO re-enable once https://issuetracker.google.com/issues/128749768 is figured out.
+    //it.generateBuildConfig.enabled = false
   }
 }
 
 dependencies {
+  api deps.kotlin.stdlib
   implementation deps.annotations
 
   testImplementation deps.annotations
@@ -77,6 +80,10 @@ android.libraryVariants.all { variant ->
     txtOutputFile = file("$buildDir/reports/japi.txt")
     ignoreMissingClasses = true
     includeSynthetic = true
+    fieldExcludes = [
+        // Changed to public (via internal) and synthetic (to hide from public API).
+        'timber.log.Timber#FOREST'
+    ]
   }
   japicmp.dependsOn(variant.assemble)
   check.dependsOn(japicmp)
