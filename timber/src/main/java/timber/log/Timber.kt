@@ -194,35 +194,32 @@ class Timber private constructor() {
 
   /** A [Tree] for debug builds. Automatically infers the tag from the calling class. */
   open class DebugTree : Tree() {
-    override val tag: String?
-      get() {
-        super.tag?.let { return it }
+    private val fqcnIgnore = listOf(
+        Timber::class.java.name,
+        Timber.Companion::class.java.name,
+        Timber.Companion.TreeOfSouls::class.java.name,
+        Tree::class.java.name,
+        DebugTree::class.java.name
+    )
 
-        // DO NOT switch this to Thread.getCurrentThread().getStackTrace(). The test will pass
-        // because Robolectric runs them on the JVM but on Android the elements are different.
-        val stackTrace = Throwable().stackTrace
-        if (stackTrace.size <= CALL_STACK_INDEX) {
-          throw IllegalStateException(
-              "Synthetic stacktrace didn't have enough elements: are you using proguard?")
-        }
-        return createStackElementTag(stackTrace[CALL_STACK_INDEX])
-      }
+    override val tag: String?
+      get() = super.tag ?: Throwable().stackTrace
+          .first { it.className !in fqcnIgnore }
+          .createStackElementTag()
 
     /**
      * Extract the tag which should be used for the message from the `element`. By default
      * this will use the class name without any anonymous class suffixes (e.g., `Foo$1`
      * becomes `Foo`).
      *
-     *
      * Note: This will not be called if a [manual tag][.tag] was specified.
     */
-    protected open fun createStackElementTag(element: StackTraceElement): String? {
-      var tag = element.className
+    protected open fun StackTraceElement.createStackElementTag(): String? {
+      var tag = className.substringAfterLast('.')
       val m = ANONYMOUS_CLASS.matcher(tag)
       if (m.find()) {
         tag = m.replaceAll("")
       }
-      tag = tag.substringAfterLast('.')
       // Tag length limit was removed in API 24.
       return if (tag.length <= MAX_TAG_LENGTH || Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         tag
@@ -271,12 +268,11 @@ class Timber private constructor() {
     companion object {
       private const val MAX_LOG_LENGTH = 4000
       private const val MAX_TAG_LENGTH = 23
-      private const val CALL_STACK_INDEX = 6
       private val ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$")
     }
   }
 
-  private companion object {
+  companion object {
     /** Log a verbose message with optional format args. */
     @JvmStatic fun v(@NonNls message: String?, vararg args: Any?) {
       TREE_OF_SOULS.v(message, *args)
@@ -455,7 +451,9 @@ class Timber private constructor() {
 
     /** A [Tree] that delegates to all planted trees in the [forest][.FOREST]. */
     @JvmSynthetic // Hide from public API.
-    @JvmField internal val TREE_OF_SOULS = object : Tree() {
+    @JvmField internal val TREE_OF_SOULS: Tree = TreeOfSouls()
+
+    private class TreeOfSouls : Tree() {
       override fun v(message: String?, vararg args: Any?) {
         for (tree in forestAsArray) {
           tree.v(message, *args)
