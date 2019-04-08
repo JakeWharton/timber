@@ -906,6 +906,23 @@ class WrongTimberUsageDetectorTest {
         .expectClean()
   }
 
+  @Test fun systemTimeMillisValidMessage() {
+    lint()
+        .files(TIMBER_STUB,
+            java("""
+                |package foo;
+                |import timber.log.Timber;
+                |public class Example {
+                |  public void log() {
+                |    Timber.d("%tc", System.currentTimeMillis());
+                |  }
+                |}""".trimMargin())
+        )
+        .issues(*WrongTimberUsageDetector.getIssues())
+        .run()
+        .expectClean()
+  }
+
   @Test fun wrappedBooleanType() {
     lint()
         .files(TIMBER_STUB,
