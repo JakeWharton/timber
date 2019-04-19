@@ -30,7 +30,7 @@ dependencies {
   testImplementation deps.truth
   testImplementation deps.robolectric
 
-  lintChecks project(':timber-lint')
+  lintPublish project(':timber-lint')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

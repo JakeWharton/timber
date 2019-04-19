@@ -27,6 +27,4 @@ dependencies {
   implementation project(':timber')
   implementation deps.butterknife.runtime
   annotationProcessor deps.butterknife.compiler
-  
-  lintChecks project(':timber-lint')
 }

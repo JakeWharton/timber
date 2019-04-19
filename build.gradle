@@ -7,8 +7,8 @@ buildscript {
 
       'kotlin': '1.3.21',
 
-      'androidPlugin': '3.3.2',
-      'androidTools': '26.3.2',
+      'androidPlugin': '3.4.0',
+      'androidTools': '26.4.0',
 
       'butterknife': '8.8.1',
   ]
