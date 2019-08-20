@@ -186,8 +186,8 @@ class Timber private constructor() {
      *
      * @param priority Log level. See [Log] for constants.
      * @param tag Explicit or inferred tag. May be `null`.
-     * @param message Formatted log message. May be `null`, but then `t` will not be.
-     * @param t Accompanying exceptions. May be `null`, but then `message` will not be.
+     * @param message Formatted log message.
+     * @param t Accompanying exceptions. May be `null`.
      */
     protected abstract fun log(priority: Int, tag: String?, message: String, t: Throwable?)
   }
