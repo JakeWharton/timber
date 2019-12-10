@@ -603,6 +603,10 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       if (operator == PLUS || operator == PLUS_ASSIGN) {
         Class argumentType = getType(binaryExpression);
         if (argumentType == String.class) {
+          if (isStringLiteral(binaryExpression.getLeftOperand())
+                  && isStringLiteral(binaryExpression.getRightOperand())) {
+            return false;
+          }
           LintFix fix = quickFixIssueBinary(binaryExpression);
           context.report(ISSUE_BINARY, call, context.getLocation(element),
               "Replace String concatenation with Timber's string formatting", fix);
