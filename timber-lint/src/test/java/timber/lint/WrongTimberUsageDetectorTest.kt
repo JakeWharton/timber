@@ -333,17 +333,7 @@ class WrongTimberUsageDetectorTest {
                 |}""".trimMargin()))
         .issues(WrongTimberUsageDetector.ISSUE_BINARY)
         .run()
-        .expect("""
-            |src/foo/Example.java:5: Warning: Replace String concatenation with Timber's string formatting [BinaryOperationInTimber]
-            |     Timber.d("foo" + "bar");
-            |              ~~~~~~~~~~~~~
-            |0 errors, 1 warnings""".trimMargin())
-        .expectFixDiffs("""
-            |Fix for src/foo/Example.java line 4: Replace with "foobar":
-            |@@ -5 +5
-            |-      Timber.d("foo" + "bar");
-            |+      Timber.d("foobar");
-            |""".trimMargin())
+        .expectClean()
   }
 
   @Test fun stringConcatenationLeftLiteral() {
