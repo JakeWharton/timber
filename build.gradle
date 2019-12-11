@@ -29,6 +29,7 @@ buildscript {
           'checks': "com.android.tools.lint:lint-checks:${versions.androidTools}",
           'tests': "com.android.tools.lint:lint-tests:${versions.androidTools}",
       ],
+      asm: 'org.ow2.asm:asm:7.1',
       annotations: 'org.jetbrains:annotations:16.0.1',
 
       junit: 'junit:junit:4.12',

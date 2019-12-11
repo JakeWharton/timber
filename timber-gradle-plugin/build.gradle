@@ -1,0 +1,11 @@
+apply plugin: 'kotlin'
+
+dependencies {
+  compileOnly gradleApi()
+  compileOnly deps.androidPlugin
+
+  implementation deps.asm
+  implementation deps.kotlin.stdlib
+}
+
+apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

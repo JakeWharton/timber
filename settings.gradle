@@ -1,5 +1,6 @@
 include ':timber'
 include ':timber:japicmp'
+include ':timber-gradle-plugin'
 include ':timber-lint'
 include ':timber-sample'
 
