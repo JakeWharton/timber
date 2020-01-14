@@ -5,8 +5,7 @@ import android.util.Log
 import org.jetbrains.annotations.NonNls
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.util.ArrayList
-import java.util.Collections
+import java.util.*
 import java.util.Collections.unmodifiableList
 import java.util.regex.Pattern
 
@@ -269,6 +268,17 @@ class Timber private constructor() {
       private const val MAX_TAG_LENGTH = 23
       private val ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$")
     }
+  }
+
+  /**
+   * A [Tree] for debug builds.
+   * Automatically shows a Hyperlink to the calling Class and Linenumber in the Logs.
+   * Allows quick lookup of the caller source just by clicking on the Hyperlink in the Log.
+   * @param showMethodName Whether or not to show the method name as well
+   */
+  class HyperlinkedDebugTree(private val showMethodName: Boolean = true) : DebugTree() {
+    override fun createStackElementTag(element: StackTraceElement) =
+            with(element) { "($fileName:$lineNumber) ${if (showMethodName) " $methodName()" else ""}" }
   }
 
   companion object Forest : Tree() {
