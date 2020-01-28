@@ -5,7 +5,8 @@ import android.util.Log
 import org.jetbrains.annotations.NonNls
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.util.*
+import java.util.ArrayList
+import java.util.Collections
 import java.util.Collections.unmodifiableList
 import java.util.regex.Pattern
 
