@@ -165,7 +165,7 @@ class Timber private constructor() {
         }
       }
 
-      log(priority, tag, message, t)
+      logMessage(priority, tag, message, t, args)
     }
 
     /** Formats a log message with optional arguments. */
@@ -189,7 +189,7 @@ class Timber private constructor() {
      * @param message Formatted log message.
      * @param t Accompanying exceptions. May be `null`.
      */
-    protected abstract fun log(priority: Int, tag: String?, message: String, t: Throwable?)
+    protected abstract fun logMessage(priority: Int, tag: String?, message: String, t: Throwable?, vararg args: Any?)
   }
 
   /** A [Tree] for debug builds. Automatically infers the tag from the calling class. */
@@ -234,7 +234,7 @@ class Timber private constructor() {
      *
      * {@inheritDoc}
     */
-    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+    override fun logMessage(priority: Int, tag: String?, message: String, t: Throwable?, vararg args: Any?) {
       if (message.length < MAX_LOG_LENGTH) {
         if (priority == Log.ASSERT) {
           Log.wtf(tag, message)
@@ -378,7 +378,7 @@ class Timber private constructor() {
       treeArray.forEach { it.log(priority, t) }
     }
 
-    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+    override fun logMessage(priority: Int, tag: String?, message: String, t: Throwable?, vararg args: Any?) {
       throw AssertionError() // Missing override for log method.
     }
 
