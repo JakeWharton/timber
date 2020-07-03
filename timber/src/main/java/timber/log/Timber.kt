@@ -193,26 +193,18 @@ class Timber private constructor() {
   }
 
   /** A [Tree] for debug builds. Automatically infers the tag from the calling class. */
-  open class DebugTree : Tree() {
-    private val fqcnIgnore = mutableSetOf(
+  open class DebugTree(vararg ignoredClasses: Class<*>) : Tree() {
+    private val fqcnIgnore = setOf(
         Timber::class.java.name,
         Timber.Forest::class.java.name,
         Tree::class.java.name,
         DebugTree::class.java.name
-    )
+    ).plus(ignoredClasses.map { it.name })
 
     override val tag: String?
       get() = super.tag ?: Throwable().stackTrace
           .first { it.className !in fqcnIgnore }
           .let(::createStackElementTag)
-
-    /**
-     * Register an extra class name to be ignored when inferring the log tag from the
-     * stacktrace.
-     */
-    fun ignoreForTagging(ignoredClass: Class<out Any>) {
-      fqcnIgnore.add(ignoredClass.name)
-    }
 
     /**
      * Extract the tag which should be used for the message from the `element`. By default

@@ -210,8 +210,7 @@ class TimberTest {
   }
 
   @Test fun debugTreeDoesNotUseIgnoredClassForTag() {
-    val tree = Timber.DebugTree()
-    tree.ignoreForTagging(ThisIsAReallyLongClassName::class.java)
+    val tree = Timber.DebugTree(ThisIsAReallyLongClassName::class.java)
     Timber.plant(tree)
 
     ThisIsAReallyLongClassName().run()
