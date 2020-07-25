@@ -17,7 +17,7 @@ class Timber private constructor() {
   }
 
   /** A facade for handling logging calls. Install instances via [`Timber.plant()`][.plant]. */
-  abstract class Tree {
+  abstract class Tree(private val attachStackTraceString: Boolean = true) {
     @get:JvmSynthetic // Hide from public API.
     internal val explicitTag = ThreadLocal<String>()
 
@@ -155,12 +155,12 @@ class Timber private constructor() {
         if (t == null) {
           return  // Swallow message if it's null and there's no throwable.
         }
-        message = getStackTraceString(t)
+        message = if (attachStackTraceString) getStackTraceString(t) else ""
       } else {
         if (args.isNotEmpty()) {
           message = formatMessage(message, args)
         }
-        if (t != null) {
+        if (t != null && attachStackTraceString) {
           message += "\n" + getStackTraceString(t)
         }
       }
