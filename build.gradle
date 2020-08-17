@@ -5,16 +5,25 @@ buildscript {
       'minSdk': 9,
       'compileSdk': 28,
 
-      'kotlin': '1.3.21',
+      'kotlin': '1.3.72',
 
-      'androidPlugin': '4.0.0',
-      'androidTools': '27.0.0',
+      'androidPlugin': '4.0.1',
+      'androidTools': '27.0.1',
 
+      'annotations': '19.0.0',
       'butterknife': '8.8.1',
+      'japicmpPlugin': '0.2.6',
+      'versionsPlugin': '0.17.0',
+
+      'junit': '4.13',
+      'roboelectric': '3.8',
+      'truth': '1.0.1'
   ]
 
   ext.deps = [
-      androidPlugin: "com.android.tools.build:gradle:${versions.androidPlugin}",
+      'androidPlugin': "com.android.tools.build:gradle:${versions.androidPlugin}",
+      'japicmpPlugin': "me.champeau.gradle:japicmp-gradle-plugin:${versions.japicmpPlugin}",
+      'versionsPlugin': "com.github.ben-manes:gradle-versions-plugin:${versions.versionsPlugin}",
       'kotlin': [
           'plugin': "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
           'stdlib': "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
@@ -29,11 +38,11 @@ buildscript {
           'checks': "com.android.tools.lint:lint-checks:${versions.androidTools}",
           'tests': "com.android.tools.lint:lint-tests:${versions.androidTools}",
       ],
-      annotations: 'org.jetbrains:annotations:19.0.0',
+      'annotations': "org.jetbrains:annotations:${versions.annotations}",
 
-      junit: 'junit:junit:4.12',
-      truth: 'com.google.truth:truth:0.41',
-      robolectric: 'org.robolectric:robolectric:3.8',
+      'junit': "junit:junit:${versions.junit}",
+      'truth': "com.google.truth:truth:${versions.truth}",
+      'robolectric': "org.robolectric:robolectric:${versions.roboelectric}",
   ]
 
   repositories {
@@ -46,8 +55,8 @@ buildscript {
   dependencies {
     classpath deps.androidPlugin
     classpath deps.kotlin.plugin
-    classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
-    classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.2.6'
+    classpath deps.versionsPlugin
+    classpath deps.japicmpPlugin
   }
 }
 

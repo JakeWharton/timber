@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.uast.UBinaryExpression;
 import org.jetbrains.uast.UCallExpression;
 import org.jetbrains.uast.UElement;
@@ -66,32 +68,32 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return Arrays.asList("tag", "format", "v", "d", "i", "w", "e", "wtf");
   }
 
-  @Override public void visitMethod(JavaContext context, UCallExpression call, PsiMethod method) {
-    String methodName = call.getMethodName();
+  @Override public void visitMethodCall(@NotNull JavaContext context, @NotNull UCallExpression node, @NotNull PsiMethod method) {
+    String methodName = node.getMethodName();
     JavaEvaluator evaluator = context.getEvaluator();
 
     if ("format".equals(methodName) && evaluator.isMemberInClass(method, "java.lang.String")) {
-      checkNestedStringFormat(context, call);
+      checkNestedStringFormat(context, node);
       return;
     }
     // As of API 24, Log tags are no longer limited to 23 chars.
     if ("tag".equals(methodName)
         && evaluator.isMemberInClass(method, "timber.log.Timber")
         && context.getMainProject().getMinSdk() <= 23) {
-      checkTagLength(context, call);
+      checkTagLength(context, node);
       return;
     }
     if (evaluator.isMemberInClass(method, "android.util.Log")) {
-      LintFix fix = quickFixIssueLog(call);
-      context.report(ISSUE_LOG, call, context.getLocation(call), "Using 'Log' instead of 'Timber'",
+      LintFix fix = quickFixIssueLog(node);
+      context.report(ISSUE_LOG, node, context.getLocation(node), "Using 'Log' instead of 'Timber'",
           fix);
       return;
     }
     // Handles Timber.X(..) and Timber.tag(..).X(..) where X in (v|d|i|w|e|wtf).
     if (isTimberLogMethod(method, evaluator)) {
-      checkMethodArguments(context, call);
-      checkFormatArguments(context, call);
-      checkExceptionLogging(context, call);
+      checkMethodArguments(context, node);
+      checkFormatArguments(context, node);
+      checkExceptionLogging(context, node);
     }
   }
 

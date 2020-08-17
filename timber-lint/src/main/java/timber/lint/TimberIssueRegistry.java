@@ -14,4 +14,8 @@ public final class TimberIssueRegistry extends IssueRegistry {
   @Override public int getApi() {
     return ApiKt.CURRENT_API;
   }
+
+  @Override public int getMinApi() {
+    return getApi();
+  }
 }
