@@ -662,7 +662,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       throw new IllegalStateException("android.util.Log overloads should have 2 or 3 arguments");
     }
 
-    String logCallSource = logCall.asSourceString();
+    String logCallSource = logCall.getUastParent().asSourceString();
     LintFix.GroupBuilder fixGrouper = fix().group();
     fixGrouper.add(
         fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource1).build());
