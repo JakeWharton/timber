@@ -51,6 +51,34 @@ class WrongTimberUsageDetectorTest {
             |-     Log.d("TAG", "msg");
             |+     Timber.d("msg");
             |""".trimMargin())
+
+    lint()
+        .files(
+            kt("""
+                |package foo
+                |import android.util.Log
+                |class Example {
+                |  fun log() {
+                |    Log.d("TAG", "msg")
+                |  }
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_LOG)
+        .run()
+        .expect("""
+            |src/foo/Example.kt:5: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
+            |    Log.d("TAG", "msg")
+            |    ~~~~~~~~~~~~~~~~~~~
+            |0 errors, 1 warnings""".trimMargin())
+        .expectFixDiffs("""
+            |Fix for src/foo/Example.kt line 5: Replace with Timber.tag("TAG").d("msg"):
+            |@@ -5 +5
+            |-     Log.d("TAG", "msg")
+            |+     Timber.tag("TAG").d("msg")
+            |Fix for src/foo/Example.kt line 5: Replace with Timber.d("msg"):
+            |@@ -5 +5
+            |-     Log.d("TAG", "msg")
+            |+     Timber.d("msg")""".trimMargin())
   }
 
   @Test fun usingAndroidLogWithThreeArguments() {
@@ -82,6 +110,25 @@ class WrongTimberUsageDetectorTest {
             |-     Log.d("TAG", "msg", new Exception());
             |+     Timber.d(new Exception(), "msg");
             |""".trimMargin())
+
+    lint()
+        .files(
+            kt("""
+                |package foo
+                |import android.util.Log
+                |class Example {
+                |  fun log() {
+                |    Log.d("TAG", "msg", Exception())
+                |  }
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_LOG)
+        .run()
+        .expect("""
+            |src/foo/Example.kt:5: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
+            |    Log.d("TAG", "msg", Exception())
+            |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            |0 errors, 1 warnings""".trimMargin())
   }
 
   @Test fun usingFullyQualifiedAndroidLogWithTwoArguments() {
@@ -111,6 +158,34 @@ class WrongTimberUsageDetectorTest {
             |@@ -4 +4
             |-     android.util.Log.d("TAG", "msg");
             |+     Timber.d("msg");
+            |""".trimMargin())
+
+    lint()
+        .files(
+            kt("""
+                |package foo
+                |class Example {
+                |  fun log() {
+                |    android.util.Log.d("TAG", "msg")
+                |  }
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_LOG)
+        .run()
+        .expect("""
+            |src/foo/Example.kt:4: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
+            |    android.util.Log.d("TAG", "msg")
+            |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            |0 errors, 1 warnings""".trimMargin())
+        .expectFixDiffs("""
+            |Fix for src/foo/Example.kt line 4: Replace with Timber.tag("TAG").d("msg"):
+            |@@ -4 +4
+            |-     android.util.Log.d("TAG", "msg")
+            |+     Timber.tag("TAG").d("msg")
+            |Fix for src/foo/Example.kt line 4: Replace with Timber.d("msg"):
+            |@@ -4 +4
+            |-     android.util.Log.d("TAG", "msg")
+            |+     Timber.d("msg")
             |""".trimMargin())
   }
 
@@ -142,6 +217,24 @@ class WrongTimberUsageDetectorTest {
             |-     android.util.Log.d("TAG", "msg", new Exception());
             |+     Timber.d(new Exception(), "msg");
             |""".trimMargin())
+
+    lint()
+        .files(
+            kt("""
+                |package foo
+                |class Example {
+                |  fun log() {
+                |    android.util.Log.d("TAG", "msg", Exception());
+                |  }
+                |}""".trimMargin())
+        )
+        .issues(WrongTimberUsageDetector.ISSUE_LOG)
+        .run()
+        .expect("""
+            |src/foo/Example.kt:4: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
+            |    android.util.Log.d("TAG", "msg", Exception());
+            |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            |0 errors, 1 warnings""".trimMargin())
   }
 
   @Test fun innerStringFormat() {
