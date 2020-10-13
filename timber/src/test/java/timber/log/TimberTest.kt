@@ -138,7 +138,7 @@ class TimberTest {
         .hasNoMoreMessages()
   }
 
-  internal inner class ThisIsAReallyLongClassName {
+  internal class ThisIsAReallyLongClassName {
     fun run() {
       Timber.d("Hello, world!")
     }
