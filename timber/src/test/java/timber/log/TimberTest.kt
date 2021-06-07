@@ -7,6 +7,7 @@ import java.net.ConnectException
 import java.net.UnknownHostException
 import java.util.ArrayList
 import java.util.concurrent.CountDownLatch
+import java.util.Locale
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -304,6 +305,36 @@ class TimberTest {
         .hasDebugMessage("TimberTest", 'b'.repeat(2000))
         .hasDebugMessage("TimberTest", 'c'.repeat(3000))
         .hasNoMoreMessages()
+  }
+
+  @Test fun logMessageWithDefaultLocale() {
+    val defaultLocale = Locale.getDefault()
+
+    Locale.setDefault(Locale.US)
+    Timber.d("There is %d %s", 1, "tree")
+
+    Locale.setDefault(Locale("ar"))
+    Timber.d("There are %d %s", 2, "trees")
+
+    Locale.setDefault(defaultLocale)
+
+    assertLog()
+      .hasDebugMessage("TimberTest", "There is 1 tree")
+      .hasDebugMessage("TimberTest", "There are 2 trees")
+      .hasNoMoreMessages()
+  }
+
+  @Test fun logMessageWithCustomLocale() {
+    Timber.setLocale(Locale.US)
+    Timber.d("There is %d %s", 1, "tree")
+
+    Timber.setLocale(Locale("ar"))
+    Timber.d("There are %d %s", 2, "trees")
+
+    assertLog()
+      .hasDebugMessage("TimberTest", "There is 1 tree")
+      .hasDebugMessage("TimberTest", "There are 2 trees")
+      .hasNoMoreMessages()
   }
 
   @Test fun nullMessageWithoutThrowable() {
