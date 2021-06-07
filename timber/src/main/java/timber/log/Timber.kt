@@ -8,6 +8,7 @@ import java.io.StringWriter
 import java.util.ArrayList
 import java.util.Collections
 import java.util.Collections.unmodifiableList
+import java.util.Locale
 import java.util.regex.Pattern
 
 /** Logging for lazy people. */
@@ -169,7 +170,13 @@ class Timber private constructor() {
     }
 
     /** Formats a log message with optional arguments. */
-    protected open fun formatMessage(message: String, args: Array<out Any?>) = message.format(*args)
+    protected open fun formatMessage(message: String, args: Array<out Any?>): String {
+      if (locale == null) {
+        return message.format(*args)
+      }
+
+      return message.format(locale!!, *args)
+    }
 
     private fun getStackTraceString(t: Throwable): String {
       // Don't replace this with Log.getStackTraceString() - it hides
@@ -447,6 +454,10 @@ class Timber private constructor() {
 
     @get:[JvmStatic JvmName("treeCount")]
     val treeCount get() = treeArray.size
+
+    @get:JvmSynthetic
+    @set:[JvmStatic JvmName("setLocale")]
+    open var locale: Locale? = null
 
     // Both fields guarded by 'trees'.
     private val trees = ArrayList<Tree>()
