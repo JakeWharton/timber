@@ -10,7 +10,6 @@ import com.android.tools.lint.detector.api.Implementation;
 import com.android.tools.lint.detector.api.Issue;
 import com.android.tools.lint.detector.api.JavaContext;
 import com.android.tools.lint.detector.api.LintFix;
-import com.android.tools.lint.detector.api.LintUtils;
 import com.android.tools.lint.detector.api.Scope;
 import com.android.tools.lint.detector.api.Severity;
 import com.intellij.psi.PsiClass;
@@ -22,13 +21,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiMethodCallExpression;
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import org.jetbrains.uast.UBinaryExpression;
 import org.jetbrains.uast.UCallExpression;
 import org.jetbrains.uast.UElement;
@@ -40,6 +33,14 @@ import org.jetbrains.uast.UQualifiedReferenceExpression;
 import org.jetbrains.uast.USimpleNameReferenceExpression;
 import org.jetbrains.uast.UastBinaryOperator;
 import org.jetbrains.uast.util.UastExpressionUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_BOOLEAN;
 import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_BYTE;
@@ -53,9 +54,12 @@ import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_OBJECT;
 import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_SHORT;
 import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_STRING;
 import static com.android.tools.lint.detector.api.ConstantEvaluator.evaluateString;
+import static com.android.tools.lint.detector.api.Lint.isKotlin;
+import static com.android.tools.lint.detector.api.Lint.isString;
+import static com.android.tools.lint.detector.api.Lint.skipParentheses;
 import static org.jetbrains.uast.UastBinaryOperator.PLUS;
 import static org.jetbrains.uast.UastBinaryOperator.PLUS_ASSIGN;
-import static org.jetbrains.uast.UastLiteralUtils.isStringLiteral;
+import static org.jetbrains.uast.UastLiteralUtils.isInjectionHost;
 import static org.jetbrains.uast.UastUtils.evaluateString;
 
 public final class WrongTimberUsageDetector extends Detector implements Detector.UastScanner {
@@ -66,7 +70,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     return Arrays.asList("tag", "format", "v", "d", "i", "w", "e", "wtf");
   }
 
-  @Override public void visitMethod(JavaContext context, UCallExpression call, PsiMethod method) {
+  @Override public void visitMethodCall(JavaContext context, UCallExpression call, PsiMethod method) {
     String methodName = call.getMethodName();
     JavaEvaluator evaluator = context.getEvaluator();
 
@@ -104,7 +108,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   private void checkNestedStringFormat(JavaContext context, UCallExpression call) {
     UElement current = call;
     while (true) {
-      current = LintUtils.skipParentheses(current.getUastParent());
+      current = skipParentheses(current.getUastParent());
       if (current == null || current instanceof UMethod) {
         // Reached AST root or code block node; String.format not inside Timber.X(..).
         return;
@@ -316,7 +320,7 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     } else if (expression instanceof PsiLiteralExpression) {
       PsiLiteralExpression literalExpression = (PsiLiteralExpression) expression;
       PsiType expressionType = literalExpression.getType();
-      if (LintUtils.isString(expressionType)) {
+      if (isString(expressionType)) {
         return String.class;
       } else if (expressionType == PsiType.INT) {
         return Integer.TYPE;
@@ -552,9 +556,9 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
     }
 
     UQualifiedReferenceExpression argExpression = (UQualifiedReferenceExpression) arg;
-    PsiElement psi = argExpression.getPsi();
+    PsiElement psi = argExpression.getSourcePsi();
 
-    if (psi != null && LintUtils.isKotlin(psi.getLanguage())) {
+    if (psi != null && isKotlin(psi.getLanguage())) {
       return isPropertyOnSubclassOf(context, argExpression, "message", Throwable.class);
     }
 
@@ -603,8 +607,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
       if (operator == PLUS || operator == PLUS_ASSIGN) {
         Class argumentType = getType(binaryExpression);
         if (argumentType == String.class) {
-          if (isStringLiteral(binaryExpression.getLeftOperand())
-                  && isStringLiteral(binaryExpression.getRightOperand())) {
+          if (isInjectionHost(binaryExpression.getLeftOperand())
+                  && isInjectionHost(binaryExpression.getRightOperand())) {
             return false;
           }
           LintFix fix = quickFixIssueBinary(binaryExpression);
@@ -701,8 +705,8 @@ public final class WrongTimberUsageDetector extends Detector implements Detector
   private LintFix quickFixIssueBinary(UBinaryExpression binaryExpression) {
     UExpression leftOperand = binaryExpression.getLeftOperand();
     UExpression rightOperand = binaryExpression.getRightOperand();
-    boolean isLeftLiteral = isStringLiteral(leftOperand);
-    boolean isRightLiteral = isStringLiteral(rightOperand);
+    boolean isLeftLiteral = isInjectionHost(leftOperand);
+    boolean isRightLiteral = isInjectionHost(rightOperand);
 
     // "a" + "b" => "ab"
     if (isLeftLiteral && isRightLiteral) {

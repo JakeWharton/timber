@@ -6,6 +6,7 @@ import com.android.tools.lint.checks.infrastructure.TestFiles.kt
 import com.android.tools.lint.checks.infrastructure.TestFiles.manifest
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import org.junit.Test
+import java.io.File
 
 class WrongTimberUsageDetectorTest {
   private val TIMBER_STUB = kotlin("""
@@ -34,6 +35,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_LOG)
         .run()
         .expect("""
@@ -65,6 +67,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_LOG)
         .run()
         .expect("""
@@ -125,6 +128,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_LOG)
         .run()
         .expect("""
@@ -156,6 +160,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
         .expect("""
@@ -184,6 +189,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
         .expect("""
@@ -212,6 +218,7 @@ class WrongTimberUsageDetectorTest {
                 |  private String id(String s) { return s; }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
         .expect("""
@@ -234,6 +241,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
         .expect("""
@@ -257,6 +265,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
         .expectClean()
@@ -273,6 +282,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
         .expectClean()
@@ -287,6 +297,7 @@ class WrongTimberUsageDetectorTest {
                 |  static String[] X = { String.format("%s", 100) };
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()
         .expectClean()
@@ -305,6 +316,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_THROWABLE)
         .run()
         .expect("""
@@ -330,7 +342,9 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.d("foo" + "bar");
                 |  }
-                |}""".trimMargin()))
+                |}""".trimMargin())
+        )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_BINARY)
         .run()
         .expectClean()
@@ -347,7 +361,9 @@ class WrongTimberUsageDetectorTest {
                 |     String foo = "foo";
                 |     Timber.d(foo + "bar");
                 |  }
-                |}""".trimMargin()))
+                |}""".trimMargin())
+        )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_BINARY)
         .run()
         .expect("""
@@ -374,7 +390,9 @@ class WrongTimberUsageDetectorTest {
                 |     String bar = "bar";
                 |     Timber.d("foo" + bar);
                 |  }
-                |}""".trimMargin()))
+                |}""".trimMargin())
+        )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_BINARY)
         .run()
         .expect("""
@@ -402,7 +420,9 @@ class WrongTimberUsageDetectorTest {
                 |     String bar = "bar";
                 |     Timber.d(foo + bar);
                 |  }
-                |}""".trimMargin()))
+                |}""".trimMargin())
+        )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_BINARY)
         .run()
         .expect("""
@@ -431,6 +451,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_BINARY)
         .run()
         .expect("""
@@ -452,6 +473,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
         .run()
         .expect("""
@@ -473,6 +495,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
         .run()
         .expect("""
@@ -494,6 +517,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
         .run()
         .expect("""
@@ -515,6 +539,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
         .run()
         .expect("""
@@ -537,6 +562,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
         .run()
         .expect("""
@@ -559,6 +585,7 @@ class WrongTimberUsageDetectorTest {
                 |}""".trimMargin()),
             manifest().minSdk(24)
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
         .run()
         .expectClean()
@@ -576,6 +603,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
         .run()
         .expect("""
@@ -597,6 +625,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
         .run()
         .expect("""
@@ -618,6 +647,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
         .run()
         .expect("""
@@ -640,6 +670,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expect("""
@@ -668,6 +699,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expect("""
@@ -695,7 +727,9 @@ class WrongTimberUsageDetectorTest {
               |     Timber.d(e, e.message)
               |  }
               |}
-              """.trimMargin()))
+              """.trimMargin())
+        )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expect("""
@@ -725,6 +759,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expectClean()
@@ -742,6 +777,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expectClean()
@@ -762,6 +798,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expectClean()
@@ -781,6 +818,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expectClean()
@@ -800,6 +838,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expectClean()
@@ -818,6 +857,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expect("""
@@ -846,6 +886,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expect("""
@@ -874,6 +915,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expectClean()
@@ -891,6 +933,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(*WrongTimberUsageDetector.getIssues())
         .run()
         .expectClean()
@@ -908,6 +951,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        .allowMissingSdk()
         .issues(*WrongTimberUsageDetector.getIssues())
         .run()
         .expectClean()
@@ -923,7 +967,9 @@ class WrongTimberUsageDetectorTest {
                 |  public void log() {
                 |     Timber.d("%b", Boolean.valueOf(true));
                 |  }
-                |}""".trimMargin()))
+                |}""".trimMargin())
+        )
+        .allowMissingSdk()
         .issues(*WrongTimberUsageDetector.getIssues())
         .run()
         .expectClean()
@@ -944,7 +990,9 @@ class WrongTimberUsageDetectorTest {
                 |    Timber.d(bar.baz);
                 |  }
                 |}
-                """.trimMargin()))
+                """.trimMargin())
+        )
+        .allowMissingSdk()
         .issues(*WrongTimberUsageDetector.getIssues())
         .run()
         .expectClean()

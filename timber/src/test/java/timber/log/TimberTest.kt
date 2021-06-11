@@ -30,7 +30,7 @@ class TimberTest {
   // NOTE: This class references the line number. Keep it at the top so it does not change.
   @Test fun debugTreeCanAlterCreatedTag() {
     Timber.plant(object : Timber.DebugTree() {
-      override fun createStackElementTag(element: StackTraceElement): String? {
+      override fun createStackElementTag(element: StackTraceElement): String {
         return super.createStackElementTag(element) + ':'.toString() + element.lineNumber
       }
     })
@@ -175,8 +175,8 @@ class TimberTest {
     }.run()
 
     assertLog()
-        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
-        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasDebugMessage("TimberTest", "Hello, world!")
         .hasNoMoreMessages()
   }
 
@@ -476,7 +476,7 @@ class TimberTest {
     tag: String? = null,
     index: Int = 0
   ) {
-    val logs = ShadowLog.getLogs()
+    val logs = getShadowLogs()
     assertThat(logs).hasSize(index + 1)
     val log = logs[index]
     assertThat(log.type).isEqualTo(logType)
@@ -492,7 +492,7 @@ class TimberTest {
   }
 
   private fun assertLog(): LogAssert {
-    return LogAssert(ShadowLog.getLogs())
+    return LogAssert(getShadowLogs())
   }
 
   private inline fun <reified T : Throwable> assertThrows(body: () -> Unit): ThrowableSubject {
@@ -507,7 +507,7 @@ class TimberTest {
     throw AssertionError("Expected body to throw ${T::class.java.name} but completed successfully")
   }
 
-  private class LogAssert internal constructor(private val items: List<LogItem>) {
+  private class LogAssert constructor(private val items: List<LogItem>) {
     private var index = 0
 
     fun hasVerboseMessage(tag: String, message: String): LogAssert {
@@ -547,3 +547,5 @@ class TimberTest {
     }
   }
 }
+
+private fun getShadowLogs() = ShadowLog.getLogs().filter { it.tag != "MonitoringInstr" }
