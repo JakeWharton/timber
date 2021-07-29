@@ -1,11 +1,13 @@
 package com.example.timber;
 
-import android.app.Application;
-import android.support.annotation.NonNull;
-import android.util.Log;
-import timber.log.Timber;
-
 import static timber.log.Timber.DebugTree;
+
+import android.app.Application;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import timber.log.Timber;
 
 public class ExampleApp extends Application {
   @Override public void onCreate() {
