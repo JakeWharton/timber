@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'com.vanniktech.maven.publish'
 
 android {
   compileSdkVersion versions.compileSdk
@@ -32,5 +33,3 @@ dependencies {
 
   lintPublish project(':timber-lint')
 }
-
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
