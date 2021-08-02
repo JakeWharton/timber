@@ -476,7 +476,7 @@ class TimberTest {
     tag: String? = null,
     index: Int = 0
   ) {
-    val logs = ShadowLog.getLogs()
+    val logs = getLogs()
     assertThat(logs).hasSize(index + 1)
     val log = logs[index]
     assertThat(log.type).isEqualTo(logType)
@@ -492,8 +492,10 @@ class TimberTest {
   }
 
   private fun assertLog(): LogAssert {
-    return LogAssert(ShadowLog.getLogs())
+    return LogAssert(getLogs())
   }
+
+  private fun getLogs() = ShadowLog.getLogs().filter { it.tag != ROBOLECTRIC_INSTRUMENTATION_TAG }
 
   private inline fun <reified T : Throwable> assertThrows(body: () -> Unit): ThrowableSubject {
     try {
@@ -545,5 +547,9 @@ class TimberTest {
     fun hasNoMoreMessages() {
       assertThat(items).hasSize(index)
     }
+  }
+
+  private companion object {
+    private const val ROBOLECTRIC_INSTRUMENTATION_TAG = "MonitoringInstr"
   }
 }
