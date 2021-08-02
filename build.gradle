@@ -2,8 +2,8 @@ apply plugin: 'com.github.ben-manes.versions'
 
 buildscript {
   ext.versions = [
-      'minSdk': 9,
-      'compileSdk': 28,
+      'minSdk': 14,
+      'compileSdk': 30,
 
       'kotlin': '1.3.21',
 
@@ -23,10 +23,10 @@ buildscript {
           'checks': "com.android.tools.lint:lint-checks:${versions.androidTools}",
           'tests': "com.android.tools.lint:lint-tests:${versions.androidTools}",
       ],
-      annotations: 'org.jetbrains:annotations:19.0.0',
+      annotations: 'org.jetbrains:annotations:20.1.0',
 
-      junit: 'junit:junit:4.12',
-      truth: 'com.google.truth:truth:0.41',
+      junit: 'junit:junit:4.13.2',
+      truth: 'com.google.truth:truth:1.1.2',
       robolectric: 'org.robolectric:robolectric:4.6.1',
   ]
 
@@ -34,14 +34,13 @@ buildscript {
     mavenCentral()
     google()
     gradlePluginPortal()
-    jcenter()
   }
 
   dependencies {
     classpath deps.androidPlugin
     classpath deps.kotlin.plugin
-    classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
-    classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.2.6'
+    classpath 'com.github.ben-manes:gradle-versions-plugin:0.39.0'
+    classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.2.9'
     classpath 'com.vanniktech:gradle-maven-publish-plugin:0.17.0'
   }
 }
@@ -50,7 +49,6 @@ subprojects {
   repositories {
     mavenCentral()
     google()
-    jcenter()
   }
 
   tasks.withType(Test) {
