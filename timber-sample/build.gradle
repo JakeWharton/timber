@@ -8,6 +8,10 @@ android {
     targetCompatibility JavaVersion.VERSION_1_7
   }
 
+  buildFeatures {
+    viewBinding = true
+  }
+
   defaultConfig {
     applicationId 'com.example.timber'
     minSdkVersion versions.minSdk
@@ -25,6 +29,4 @@ android {
 
 dependencies {
   implementation project(':timber')
-  implementation deps.butterknife.runtime
-  annotationProcessor deps.butterknife.compiler
 }
