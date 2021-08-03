@@ -9,6 +9,7 @@ dependencies {
   compileOnly deps.lint.checks
   testImplementation deps.lint.core
   testImplementation deps.lint.tests
+  testImplementation deps.junit
 }
 
 jar {
