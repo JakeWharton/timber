@@ -30,7 +30,7 @@ class TimberTest {
   // NOTE: This class references the line number. Keep it at the top so it does not change.
   @Test fun debugTreeCanAlterCreatedTag() {
     Timber.plant(object : Timber.DebugTree() {
-      override fun createStackElementTag(element: StackTraceElement): String? {
+      override fun createStackElementTag(element: StackTraceElement): String {
         return super.createStackElementTag(element) + ':'.toString() + element.lineNumber
       }
     })
@@ -166,17 +166,103 @@ class TimberTest {
         .hasNoMoreMessages()
   }
 
+  @Suppress("ObjectLiteralToLambda")
   @Test fun debugTreeTagGenerationStripsAnonymousClassMarker() {
     Timber.plant(Timber.DebugTree())
-    Runnable {
-      Timber.d("Hello, world!")
+    object : Runnable {
+      override fun run() {
+        Timber.d("Hello, world!")
 
-      Runnable { Timber.d("Hello, world!") }.run()
+        object : Runnable {
+          override fun run() {
+            Timber.d("Hello, world!")
+          }
+        }.run()
+      }
     }.run()
 
     assertLog()
         .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
         .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+        .hasNoMoreMessages()
+  }
+
+  @Suppress("ObjectLiteralToLambda")
+  @Test fun debugTreeTagGenerationStripsAnonymousClassMarkerWithInnerSAMLambda() {
+    Timber.plant(Timber.DebugTree())
+    object : Runnable {
+      override fun run() {
+        Timber.d("Hello, world!")
+
+        Runnable { Timber.d("Hello, world!") }.run()
+      }
+    }.run()
+
+    assertLog()
+            .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+            .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+            .hasNoMoreMessages()
+  }
+
+  @Suppress("ObjectLiteralToLambda")
+  @Test fun debugTreeTagGenerationStripsAnonymousClassMarkerWithOuterSAMLambda() {
+    Timber.plant(Timber.DebugTree())
+
+    Runnable {
+      Timber.d("Hello, world!")
+
+      object : Runnable {
+        override fun run() {
+          Timber.d("Hello, world!")
+        }
+      }.run()
+    }.run()
+
+    assertLog()
+            .hasDebugMessage("TimberTest", "Hello, world!")
+            .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+            .hasNoMoreMessages()
+  }
+
+  // NOTE: this will fail on some future version of Kotlin when lambdas are compiled using invokedynamic
+  // Fix will be to expect the tag to be "TimberTest" as opposed to "TimberTest\$debugTreeTag"
+  @Test
+  fun debugTreeTagGenerationStripsAnonymousLambdaClassMarker() {
+    Timber.plant(Timber.DebugTree())
+
+    val outer = {
+      Timber.d("Hello, world!")
+
+      val inner = {
+        Timber.d("Hello, world!")
+      }
+
+      inner()
+    }
+
+    outer()
+
+    assertLog()
+        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+        .hasNoMoreMessages()
+  }
+
+  @Test
+  fun debugTreeTagGenerationForSAMLambdasUsesClassName() {
+    Timber.plant(Timber.DebugTree())
+
+    Runnable {
+      Timber.d("Hello, world!")
+
+      Runnable {
+        Timber.d("Hello, world!")
+      }.run()
+    }.run()
+
+    assertLog()
+        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasDebugMessage("TimberTest", "Hello, world!")
         .hasNoMoreMessages()
   }
 
@@ -509,7 +595,7 @@ class TimberTest {
     throw AssertionError("Expected body to throw ${T::class.java.name} but completed successfully")
   }
 
-  private class LogAssert internal constructor(private val items: List<LogItem>) {
+  private class LogAssert constructor(private val items: List<LogItem>) {
     private var index = 0
 
     fun hasVerboseMessage(tag: String, message: String): LogAssert {

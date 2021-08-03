@@ -9,6 +9,7 @@ import java.util.ArrayList
 import java.util.Collections
 import java.util.Collections.unmodifiableList
 import java.util.regex.Pattern
+import kotlin.math.min
 
 /** Logging for lazy people. */
 class Timber private constructor() {
@@ -251,7 +252,7 @@ class Timber private constructor() {
         var newline = message.indexOf('\n', i)
         newline = if (newline != -1) newline else length
         do {
-          val end = Math.min(newline, i + MAX_LOG_LENGTH)
+          val end = min(newline, i + MAX_LOG_LENGTH)
           val part = message.substring(i, end)
           if (priority == Log.ASSERT) {
             Log.wtf(tag, part)
