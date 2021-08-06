@@ -220,7 +220,7 @@ class Timber private constructor() {
         tag = m.replaceAll("")
       }
       // Tag length limit was removed in API 26.
-      return if (tag.length <= MAX_TAG_LENGTH || Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      return if (tag.length <= MAX_TAG_LENGTH || Build.VERSION.SDK_INT >= 26) {
         tag
       } else {
         tag.substring(0, MAX_TAG_LENGTH)
