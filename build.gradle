@@ -41,7 +41,8 @@ buildscript {
     classpath deps.kotlin.plugin
     classpath 'com.github.ben-manes:gradle-versions-plugin:0.39.0'
     classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.2.9'
-    classpath 'com.vanniktech:gradle-maven-publish-plugin:0.17.0'
+    classpath 'com.vanniktech:gradle-maven-publish-plugin:0.14.2'
+    classpath 'org.jetbrains.dokka:dokka-gradle-plugin:1.4.32'
   }
 }
 
