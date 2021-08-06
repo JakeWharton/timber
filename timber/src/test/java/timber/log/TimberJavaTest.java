@@ -10,7 +10,7 @@ public class TimberJavaTest {
     try {
       Timber.plant((Timber.Tree) null);
       fail();
-    } catch (IllegalArgumentException ignored) {
+    } catch (NullPointerException ignored) {
     }
   }
 
@@ -19,7 +19,7 @@ public class TimberJavaTest {
     try {
       Timber.plant((Timber.Tree[]) null);
       fail();
-    } catch (IllegalArgumentException ignored) {
+    } catch (NullPointerException ignored) {
     }
     try {
       Timber.plant(new Timber.Tree[] { null });

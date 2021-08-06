@@ -7,6 +7,8 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 dependencies {
   compileOnly deps.lint.api
   compileOnly deps.lint.checks
+
+  testImplementation deps.junit
   testImplementation deps.lint.core
   testImplementation deps.lint.tests
   testImplementation deps.junit

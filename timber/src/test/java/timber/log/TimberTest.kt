@@ -166,12 +166,19 @@ class TimberTest {
         .hasNoMoreMessages()
   }
 
+  @Suppress("ObjectLiteralToLambda") // Lambdas != anonymous classes.
   @Test fun debugTreeTagGenerationStripsAnonymousClassMarker() {
     Timber.plant(Timber.DebugTree())
-    Runnable {
-      Timber.d("Hello, world!")
+    object : Runnable {
+      override fun run() {
+        Timber.d("Hello, world!")
 
-      Runnable { Timber.d("Hello, world!") }.run()
+        object : Runnable {
+          override fun run() {
+            Timber.d("Hello, world!")
+          }
+        }.run()
+      }
     }.run()
 
     assertLog()
