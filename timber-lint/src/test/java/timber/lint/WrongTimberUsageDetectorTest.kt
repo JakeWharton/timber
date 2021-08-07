@@ -585,7 +585,7 @@ class WrongTimberUsageDetectorTest {
                     |}""".trimMargin()),
                     manifest().minSdk(26)
                 )
-                        .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
+                .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
                 .run()
                 .expectClean()
     }
@@ -981,4 +981,3 @@ class WrongTimberUsageDetectorTest {
         .expectClean()
   }
 }
-
