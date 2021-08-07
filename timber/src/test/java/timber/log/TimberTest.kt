@@ -144,7 +144,7 @@ class TimberTest {
     }
   }
 
-  @Config(sdk = [23])
+  @Config(sdk = [25])
   @Test fun debugTreeTagTruncation() {
     Timber.plant(Timber.DebugTree())
 
@@ -155,7 +155,7 @@ class TimberTest {
         .hasNoMoreMessages()
   }
 
-  @Config(sdk = [24])
+  @Config(sdk = [26])
   @Test fun debugTreeTagNoTruncation() {
     Timber.plant(Timber.DebugTree())
 
