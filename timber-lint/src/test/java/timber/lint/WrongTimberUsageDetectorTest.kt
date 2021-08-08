@@ -184,6 +184,8 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
+        // Remove when AGP 7.1.0-alpha07 is out
+        // https://groups.google.com/g/lint-dev/c/BigCO8sMhKU
         .allowCompilationErrors()
         .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
         .run()

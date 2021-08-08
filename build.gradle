@@ -7,6 +7,7 @@ buildscript {
 
       'kotlin': '1.5.21',
 
+      // Update WrongTimberUsageDetectorTest#innerStringFormatWithStaticImport when >= 7.1.0-alpha07
       'androidPlugin': '7.0.0',
       'androidTools': '30.0.0',
   ]
