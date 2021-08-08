@@ -1,5 +1,7 @@
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
+apply plugin: 'org.jetbrains.kotlin.kapt'
+apply plugin: 'com.android.lint'
 
 targetCompatibility = JavaVersion.VERSION_1_8
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -7,15 +9,10 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 dependencies {
   compileOnly deps.lint.api
   compileOnly deps.lint.checks
-
+  compileOnly deps.auto.serviceAnnotations
+  kapt deps.auto.service
   testImplementation deps.junit
   testImplementation deps.lint.core
   testImplementation deps.lint.tests
   testImplementation deps.junit
-}
-
-jar {
-  manifest {
-    attributes('Lint-Registry-v2': 'timber.lint.TimberIssueRegistry')
-  }
 }

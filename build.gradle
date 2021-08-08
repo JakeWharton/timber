@@ -6,6 +6,7 @@ buildscript {
       'compileSdk': 30,
 
       'kotlin': '1.5.21',
+      'autoService': '1.0-rc7',
 
       // Update WrongTimberUsageDetectorTest#innerStringFormatWithStaticImport when >= 7.1.0-alpha07
       'androidPlugin': '7.0.0',
@@ -23,6 +24,10 @@ buildscript {
           'api': "com.android.tools.lint:lint-api:${versions.androidTools}",
           'checks': "com.android.tools.lint:lint-checks:${versions.androidTools}",
           'tests': "com.android.tools.lint:lint-tests:${versions.androidTools}",
+      ],
+      'auto': [
+          'service': "com.google.auto.service:auto-service:${versions.autoService}",
+          'serviceAnnotations': "com.google.auto.service:auto-service-annotations:${versions.autoService}",
       ],
       annotations: 'org.jetbrains:annotations:20.1.0',
 
