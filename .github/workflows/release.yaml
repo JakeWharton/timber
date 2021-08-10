@@ -43,5 +43,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: site
           FOLDER: timber/build/dokka/html/
-          TARGET_FOLDER: docs/4.x/
+          TARGET_FOLDER: docs/5.x/
           CLEAN: true

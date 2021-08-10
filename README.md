@@ -83,10 +83,38 @@ Download
 --------
 
 ```groovy
-implementation 'com.jakewharton.timber:timber:4.7.1'
+repositories {
+  mavenCental()
+}
+
+dependencies {
+  implementation 'com.jakewharton.timber:timber:5.0.0'
+}
 ```
 
-Snapshots of the development version are available in [Sonatype's `snapshots` repository][snap].
+Documentation is available at [jakewharton.github.io/timber/docs/5.x/](https://jakewharton.github.io/timber/docs/5.x/).
+
+<details>
+<summary>Snapshots of the development version are available in Sonatype's snapshots repository.</summary>
+<p>
+
+```groovy
+repositories {
+  mavenCental()
+  maven {
+    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+  }
+}
+
+dependencies {
+  implementation 'com.jakewharton.timber:timber:5.1.0-SNAPSHOT'
+}
+```
+
+Snapshot documentation is available at [jakewharton.github.io/timber/docs/latest/](https://jakewharton.github.io/timber/docs/latest/).
+
+</p>
+</details>
 
 
 License
