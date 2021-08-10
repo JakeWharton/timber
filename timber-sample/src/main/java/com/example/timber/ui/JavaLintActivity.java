@@ -10,7 +10,7 @@ import timber.log.Timber;
 import static java.lang.String.format;
 
 @SuppressLint("Registered") //
-public class LintActivity extends Activity {
+public class JavaLintActivity extends Activity {
   /**
    * Below are some examples of how NOT to use Timber.
    *

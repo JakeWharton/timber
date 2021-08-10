@@ -74,7 +74,10 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     val methodName = node.methodName
     val evaluator = context.evaluator
 
-    if ("format" == methodName && evaluator.isMemberInClass(method, "java.lang.String")) {
+    if ("format" == methodName &&
+      (evaluator.isMemberInClass(method, "java.lang.String") ||
+          evaluator.isMemberInClass(method, "kotlin.text.StringsKt__StringsJVMKt"))
+    ) {
       checkNestedStringFormat(context, node)
       return
     }
@@ -122,8 +125,9 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       }
       if (current.isMethodCall()) {
         val psiMethod = (current as UCallExpression).resolve()
-        if (Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod!!.name)
-          && context.evaluator.isMemberInClass(psiMethod, "timber.log.Timber")
+        if (psiMethod != null &&
+          Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.name)
+          && isTimberLogMethod(psiMethod, context.evaluator)
         ) {
           context.report(
             Incident(
@@ -615,15 +619,15 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       3 -> {
         val msg = arguments[1]
         val throwable = arguments[2]
-        fixSource1 += "$methodName(${throwable.asSourceString()}, ${msg.asSourceString()})"
-        fixSource2 += "$methodName(${throwable.asSourceString()}, ${msg.asSourceString()})"
+        fixSource1 += "$methodName(${throwable.sourcePsi?.text}, ${msg.asSourceString()})"
+        fixSource2 += "$methodName(${throwable.sourcePsi?.text}, ${msg.asSourceString()})"
       }
       else -> {
         throw IllegalStateException("android.util.Log overloads should have 2 or 3 arguments")
       }
     }
 
-    val logCallSource = logCall.asSourceString()
+    val logCallSource = logCall.uastParent!!.sourcePsi?.text
     return fix().group()
       .add(
         fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource1).build()
