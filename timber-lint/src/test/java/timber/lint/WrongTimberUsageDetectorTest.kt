@@ -922,7 +922,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(*WrongTimberUsageDetector.getIssues())
+        .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
         .run()
         .expectClean()
   }
@@ -939,7 +939,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(*WrongTimberUsageDetector.getIssues())
+        .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
         .run()
         .expectClean()
   }
@@ -956,7 +956,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(*WrongTimberUsageDetector.getIssues())
+        .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
         .run()
         .expectClean()
   }
@@ -978,7 +978,7 @@ class WrongTimberUsageDetectorTest {
                 |}
                 """.trimMargin())
         )
-        .issues(*WrongTimberUsageDetector.getIssues())
+        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
         .run()
         .expectClean()
   }
