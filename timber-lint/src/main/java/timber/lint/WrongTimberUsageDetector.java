@@ -1,814 +1,807 @@
-package timber.lint;
+package timber.lint
 
-import com.android.annotations.NonNull;
-import com.android.annotations.Nullable;
-import com.android.tools.lint.checks.StringFormatDetector;
-import com.android.tools.lint.client.api.JavaEvaluator;
-import com.android.tools.lint.detector.api.Category;
-import com.android.tools.lint.detector.api.Detector;
-import com.android.tools.lint.detector.api.Implementation;
-import com.android.tools.lint.detector.api.Incident;
-import com.android.tools.lint.detector.api.Issue;
-import com.android.tools.lint.detector.api.JavaContext;
-import com.android.tools.lint.detector.api.LintFix;
-import com.android.tools.lint.detector.api.Scope;
-import com.android.tools.lint.detector.api.Severity;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiClassType;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiField;
-import com.intellij.psi.PsiLiteralExpression;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.PsiMethodCallExpression;
-import com.intellij.psi.PsiParameter;
-import com.intellij.psi.PsiType;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.jetbrains.uast.UBinaryExpression;
-import org.jetbrains.uast.UCallExpression;
-import org.jetbrains.uast.UElement;
-import org.jetbrains.uast.UExpression;
-import org.jetbrains.uast.UIfExpression;
-import org.jetbrains.uast.ULiteralExpression;
-import org.jetbrains.uast.UMethod;
-import org.jetbrains.uast.UQualifiedReferenceExpression;
-import org.jetbrains.uast.USimpleNameReferenceExpression;
-import org.jetbrains.uast.UastBinaryOperator;
-import org.jetbrains.uast.util.UastExpressionUtils;
+import com.android.tools.lint.detector.api.skipParentheses
+import org.jetbrains.uast.util.isMethodCall
+import com.android.tools.lint.detector.api.minSdkLessThan
+import com.android.tools.lint.detector.api.isString
+import com.android.tools.lint.detector.api.isKotlin
+import org.jetbrains.uast.isInjectionHost
+import org.jetbrains.uast.evaluateString
+import com.android.tools.lint.detector.api.Detector
+import com.android.tools.lint.detector.api.JavaContext
+import org.jetbrains.uast.UCallExpression
+import com.intellij.psi.PsiMethod
+import com.android.tools.lint.client.api.JavaEvaluator
+import com.android.tools.lint.detector.api.LintFix
+import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.UExpression
+import com.android.tools.lint.detector.api.Incident
+import org.jetbrains.uast.UQualifiedReferenceExpression
+import org.jetbrains.uast.UBinaryExpression
+import org.jetbrains.uast.UastBinaryOperator
+import org.jetbrains.uast.UIfExpression
+import com.intellij.psi.PsiMethodCallExpression
+import com.intellij.psi.PsiLiteralExpression
+import com.intellij.psi.PsiType
+import com.intellij.psi.PsiClassType
+import com.android.tools.lint.checks.StringFormatDetector
+import com.android.tools.lint.client.api.TYPE_BOOLEAN
+import com.android.tools.lint.client.api.TYPE_BOOLEAN_WRAPPER
+import com.android.tools.lint.client.api.TYPE_BYTE
+import com.android.tools.lint.client.api.TYPE_BYTE_WRAPPER
+import com.android.tools.lint.client.api.TYPE_CHAR
+import com.android.tools.lint.client.api.TYPE_DOUBLE
+import com.android.tools.lint.client.api.TYPE_DOUBLE_WRAPPER
+import com.android.tools.lint.client.api.TYPE_FLOAT
+import com.android.tools.lint.client.api.TYPE_FLOAT_WRAPPER
+import com.android.tools.lint.client.api.TYPE_INT
+import com.android.tools.lint.client.api.TYPE_INTEGER_WRAPPER
+import com.android.tools.lint.client.api.TYPE_LONG
+import com.android.tools.lint.client.api.TYPE_LONG_WRAPPER
+import com.android.tools.lint.client.api.TYPE_NULL
+import com.android.tools.lint.client.api.TYPE_OBJECT
+import com.android.tools.lint.client.api.TYPE_SHORT
+import com.android.tools.lint.client.api.TYPE_SHORT_WRAPPER
+import com.android.tools.lint.client.api.TYPE_STRING
+import com.android.tools.lint.detector.api.Category.Companion.CORRECTNESS
+import com.android.tools.lint.detector.api.Category.Companion.MESSAGES
+import com.android.tools.lint.detector.api.ConstantEvaluator.evaluateString
+import com.android.tools.lint.detector.api.Detector.UastScanner
+import com.android.tools.lint.detector.api.Implementation
+import com.android.tools.lint.detector.api.Issue
+import com.android.tools.lint.detector.api.Scope.Companion.JAVA_FILE_SCOPE
+import com.android.tools.lint.detector.api.Severity.ERROR
+import com.android.tools.lint.detector.api.Severity.WARNING
+import org.jetbrains.uast.ULiteralExpression
+import org.jetbrains.uast.USimpleNameReferenceExpression
+import com.intellij.psi.PsiField
+import com.intellij.psi.PsiParameter
+import java.lang.Byte
+import java.lang.Double
+import java.lang.Float
+import java.lang.IllegalStateException
+import java.lang.Long
+import java.lang.Short
+import java.util.Calendar
+import java.util.Date
+import java.util.regex.Pattern
 
-import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_BOOLEAN;
-import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_BYTE;
-import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_CHAR;
-import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_DOUBLE;
-import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_FLOAT;
-import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_INT;
-import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_LONG;
-import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_NULL;
-import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_OBJECT;
-import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_SHORT;
-import static com.android.tools.lint.client.api.JavaEvaluatorKt.TYPE_STRING;
-import static com.android.tools.lint.detector.api.ConstantEvaluator.evaluateString;
-import static com.android.tools.lint.detector.api.Constraints.minSdkLessThan;
-import static com.android.tools.lint.detector.api.Lint.isKotlin;
-import static com.android.tools.lint.detector.api.Lint.isString;
-import static com.android.tools.lint.detector.api.Lint.skipParentheses;
-import static org.jetbrains.uast.UastBinaryOperator.PLUS;
-import static org.jetbrains.uast.UastBinaryOperator.PLUS_ASSIGN;
-import static org.jetbrains.uast.UastLiteralUtils.isInjectionHost;
-import static org.jetbrains.uast.UastUtils.evaluateString;
+class WrongTimberUsageDetector : Detector(), UastScanner {
+  override fun getApplicableMethodNames() = listOf("tag", "format", "v", "d", "i", "w", "e", "wtf")
 
-public final class WrongTimberUsageDetector extends Detector implements Detector.UastScanner {
-  private final static String GET_STRING_METHOD = "getString";
-  private final static String TIMBER_TREE_LOG_METHOD_REGEXP = "(v|d|i|w|e|wtf)";
+  override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
+    val methodName = node.methodName
+    val evaluator = context.evaluator
 
-  @Override public List<String> getApplicableMethodNames() {
-    return Arrays.asList("tag", "format", "v", "d", "i", "w", "e", "wtf");
-  }
-
-  @Override public void visitMethodCall(JavaContext context, UCallExpression call, PsiMethod method) {
-    String methodName = call.getMethodName();
-    JavaEvaluator evaluator = context.getEvaluator();
-
-    if ("format".equals(methodName) && evaluator.isMemberInClass(method, "java.lang.String")) {
-      checkNestedStringFormat(context, call);
-      return;
+    if ("format" == methodName && evaluator.isMemberInClass(method, "java.lang.String")) {
+      checkNestedStringFormat(context, node)
+      return
     }
     // As of API 26, Log tags are no longer limited to 23 chars.
-    if ("tag".equals(methodName)
-        && evaluator.isMemberInClass(method, "timber.log.Timber")
-        && context.getProject().getMinSdk() <= 25) {
-      checkTagLength(context, call);
-      return;
+    if ("tag" == methodName
+      && evaluator.isMemberInClass(method, "timber.log.Timber")
+      && context.project.minSdk < 26
+    ) {
+      checkTagLength(context, node)
+      return
     }
     if (evaluator.isMemberInClass(method, "android.util.Log")) {
-      LintFix fix = quickFixIssueLog(call);
-      context.report(ISSUE_LOG, call, context.getLocation(call), "Using 'Log' instead of 'Timber'",
-          fix);
-      return;
+      context.report(
+        Incident(
+          issue = ISSUE_LOG,
+          scope = node,
+          location = context.getLocation(node),
+          message = "Using 'Log' instead of 'Timber'",
+          fix = quickFixIssueLog(node)
+        )
+      )
+      return
     }
     // Handles Timber.X(..) and Timber.tag(..).X(..) where X in (v|d|i|w|e|wtf).
     if (isTimberLogMethod(method, evaluator)) {
-      checkMethodArguments(context, call);
-      checkFormatArguments(context, call);
-      checkExceptionLogging(context, call);
+      checkMethodArguments(context, node)
+      checkFormatArguments(context, node)
+      checkExceptionLogging(context, node)
     }
   }
 
-  private boolean isTimberLogMethod(PsiMethod method, JavaEvaluator evaluator) {
+  private fun isTimberLogMethod(method: PsiMethod, evaluator: JavaEvaluator): Boolean {
     return evaluator.isMemberInClass(method, "timber.log.Timber")
         || evaluator.isMemberInClass(method, "timber.log.Timber.Companion")
-        || evaluator.isMemberInClass(method, "timber.log.Timber.Tree");
+        || evaluator.isMemberInClass(method, "timber.log.Timber.Tree")
   }
 
-  private void checkNestedStringFormat(JavaContext context, UCallExpression call) {
-    UElement current = call;
+  private fun checkNestedStringFormat(context: JavaContext, call: UCallExpression) {
+    var current: UElement? = call
     while (true) {
-      current = skipParentheses(current.getUastParent());
-      if (current == null || current instanceof UMethod) {
+      current = skipParentheses(current!!.uastParent)
+      if (current == null || current is UMethod) {
         // Reached AST root or code block node; String.format not inside Timber.X(..).
-        return;
+        return
       }
-      if (UastExpressionUtils.isMethodCall(current)) {
-        UCallExpression maybeTimberLogCall = (UCallExpression) current;
-        JavaEvaluator evaluator = context.getEvaluator();
-        PsiMethod psiMethod = maybeTimberLogCall.resolve();
-        if (Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.getName())
-            && evaluator.isMemberInClass(psiMethod, "timber.log.Timber")) {
-          LintFix fix = quickFixIssueFormat(call);
-          context.report(ISSUE_FORMAT, call, context.getLocation(call),
-              "Using 'String#format' inside of 'Timber'", fix);
-          return;
+      if (current.isMethodCall()) {
+        val psiMethod = (current as UCallExpression).resolve()
+        if (Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod!!.name)
+          && context.evaluator.isMemberInClass(psiMethod, "timber.log.Timber")
+        ) {
+          context.report(
+            Incident(
+              issue = ISSUE_FORMAT,
+              scope = call,
+              location = context.getLocation(call),
+              message = "Using 'String#format' inside of 'Timber'",
+              fix = quickFixIssueFormat(call)
+            )
+          )
+          return
         }
       }
     }
   }
 
-  private void checkTagLength(JavaContext context, UCallExpression call) {
-    List<UExpression> arguments = call.getValueArguments();
-    UExpression argument = arguments.get(0);
-    String tag = evaluateString(context, argument, true);
-    if (tag != null && tag.length() > 23) {
-      String message =
-          String.format(Locale.US, "The logging tag can be at most 23 characters, was %1$d (%2$s)",
-              tag.length(), tag);
-      LintFix fix = quickFixIssueTagLength(argument, tag);
+  private fun checkTagLength(context: JavaContext, call: UCallExpression) {
+    val argument = call.valueArguments[0]
+    val tag = evaluateString(context, argument, true)
+    if (tag != null && tag.length > 23) {
       context.report(
-          new Incident(
-              ISSUE_TAG_LENGTH,
-              argument,
-              context.getLocation(argument),
-              message,
-              fix
-          ), minSdkLessThan(26)
-      );
+        Incident(
+          issue = ISSUE_TAG_LENGTH,
+          scope = argument,
+          location = context.getLocation(argument),
+          message = "The logging tag can be at most 23 characters, was ${tag.length} ($tag)",
+          fix = quickFixIssueTagLength(argument, tag)
+        ),
+        constraint = minSdkLessThan(26)
+      )
     }
   }
 
-  private static void checkFormatArguments(JavaContext context, UCallExpression call) {
-    List<UExpression> arguments = call.getValueArguments();
-    int numArguments = arguments.size();
+  private fun checkFormatArguments(context: JavaContext, call: UCallExpression) {
+    val arguments = call.valueArguments
+    val numArguments = arguments.size
     if (numArguments == 0) {
-      return;
+      return
     }
 
-    int startIndexOfArguments = 1;
-    UExpression formatStringArg = arguments.get(0);
-    if (isSubclassOf(context, formatStringArg, Throwable.class)) {
+    var startIndexOfArguments = 1
+    var formatStringArg = arguments[0]
+    if (isSubclassOf(context, formatStringArg, Throwable::class.java)) {
       if (numArguments == 1) {
-        return;
+        return
       }
-      formatStringArg = arguments.get(1);
-      startIndexOfArguments++;
+      formatStringArg = arguments[1]
+      startIndexOfArguments++
     }
 
-    String formatString = evaluateString(context, formatStringArg, true);
-    // We passed for example a method call
-    if (formatString == null) {
-      return;
-    }
+    val formatString = evaluateString(context, formatStringArg, true)
+      ?: return // We passed for example a method call
 
-    int formatArgumentCount = getFormatArgumentCount(formatString);
-    int passedArgCount = numArguments - startIndexOfArguments;
+    val formatArgumentCount = getFormatArgumentCount(formatString)
+    val passedArgCount = numArguments - startIndexOfArguments
     if (formatArgumentCount < passedArgCount) {
-      context.report(ISSUE_ARG_COUNT, call, context.getLocation(call), String.format(
-          Locale.US, "Wrong argument count, format string `%1$s` requires "
-              + "`%2$d` but format call supplies `%3$d`", formatString, formatArgumentCount,
-          passedArgCount));
-      return;
+      context.report(
+        Incident(
+          issue = ISSUE_ARG_COUNT,
+          scope = call,
+          location = context.getLocation(call),
+          message = "Wrong argument count, format string `${formatString}` requires `${formatArgumentCount}` but format call supplies `${passedArgCount}`"
+        )
+      )
+      return
     }
 
     if (formatArgumentCount == 0) {
-      return;
+      return
     }
 
-    List<String> types = getStringArgumentTypes(formatString);
-    UExpression argument = null;
-    int argumentIndex = startIndexOfArguments;
-    boolean valid;
-    for (int i = 0; i < types.size(); i++) {
-      String formatType = types.get(i);
+    val types = getStringArgumentTypes(formatString)
+    var argument: UExpression? = null
+    var argumentIndex = startIndexOfArguments
+    var valid: Boolean
+    for (i in types.indices) {
+      val formatType = types[i]
       if (argumentIndex != numArguments) {
-        argument = arguments.get(argumentIndex++);
+        argument = arguments[argumentIndex++]
       } else {
-        context.report(ISSUE_ARG_COUNT, call, context.getLocation(call), String.format(
-            Locale.US, "Wrong argument count, format string `%1$s` requires "
-                + "`%2$d` but format call supplies `%3$d`", formatString, formatArgumentCount,
-            passedArgCount));
+        context.report(
+          Incident(
+            issue = ISSUE_ARG_COUNT,
+            scope = call,
+            location = context.getLocation(call),
+            message = "Wrong argument count, format string `${formatString}` requires `${formatArgumentCount}` but format call supplies `${passedArgCount}`"
+          )
+        )
       }
 
-      Class type = getType(argument);
-      if (type == null) {
-        continue;
-      }
-
-      char last = formatType.charAt(formatType.length() - 1);
-      if (formatType.length() >= 2
-          && Character.toLowerCase(formatType.charAt(formatType.length() - 2)) == 't') {
+      val type = getType(argument) ?: continue
+      val last = formatType.last()
+      if (formatType.length >= 2 && formatType[formatType.length - 2].toLowerCase() == 't') {
         // Date time conversion.
-        switch (last) {
-          // time
-          case 'H':
-          case 'I':
-          case 'k':
-          case 'l':
-          case 'M':
-          case 'S':
-          case 'L':
-          case 'N':
-          case 'p':
-          case 'z':
-          case 'Z':
-          case 's':
-          case 'Q':
-            // date
-          case 'B':
-          case 'b':
-          case 'h':
-          case 'A':
-          case 'a':
-          case 'C':
-          case 'Y':
-          case 'y':
-          case 'j':
-          case 'm':
-          case 'd':
-          case 'e':
-            // date/time
-          case 'R':
-          case 'T':
-          case 'r':
-          case 'D':
-          case 'F':
-          case 'c':
-            valid = type == Integer.TYPE || type == Calendar.class || type == Date.class
-                || type == Long.TYPE;
+        when (last) {
+          'H', 'I', 'k', 'l', 'M', 'S', 'L', 'N', 'p', 'z', 'Z', 's', 'Q', // time
+          'B', 'b', 'h', 'A', 'a', 'C', 'Y', 'y', 'j', 'm', 'd', 'e', // date
+          'R', 'T', 'r', 'D', 'F', 'c' -> { // date/time
+            valid =
+              type == Integer.TYPE || type == Calendar::class.java || type == Date::class.java || type == java.lang.Long.TYPE
             if (!valid) {
-              String message = String.format(
-                  Locale.US, "Wrong argument type for date formatting argument '#%1$d' "
-                      + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
-                      + "(argument #%5$d in method call)", i + 1, formatString, formatType,
-                  type.getSimpleName(), startIndexOfArguments + i + 1);
-              context.report(ISSUE_ARG_TYPES, call, context.getLocation(argument), message);
+              context.report(
+                Incident(
+                  issue = ISSUE_ARG_TYPES,
+                  scope = call,
+                  location = context.getLocation(argument),
+                  message = "Wrong argument type for date formatting argument '#${i + 1}' in `${formatString}`: conversion is '`${formatType}`', received `${type.simpleName}` (argument #${startIndexOfArguments + i + 1} in method call)"
+                )
+              )
             }
-            break;
-          default:
-            String message = String.format(Locale.US, "Wrong suffix for date format '#%1$d' "
-                    + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
-                    + "(argument #%5$d in method call)", i + 1, formatString, formatType,
-                type.getSimpleName(), startIndexOfArguments + i + 1);
-            context.report(ISSUE_FORMAT, call, context.getLocation(argument), message);
+          }
+          else -> {
+            context.report(
+              Incident(
+                issue = ISSUE_FORMAT,
+                scope = call,
+                location = context.getLocation(argument),
+                message = "Wrong suffix for date format '#${i + 1}' in `${formatString}`: conversion is '`${formatType}`', received `${type.simpleName}` (argument #${startIndexOfArguments + i + 1} in method call)"
+              )
+            )
+          }
         }
-        continue;
+        continue
       }
-      switch (last) {
-        case 'b':
-        case 'B':
-          valid = type == Boolean.TYPE;
-          break;
-        case 'x':
-        case 'X':
-        case 'd':
-        case 'o':
-        case 'e':
-        case 'E':
-        case 'f':
-        case 'g':
-        case 'G':
-        case 'a':
-        case 'A':
-          valid = type == Integer.TYPE
-              || type == Float.TYPE
-              || type == Double.TYPE
-              || type == Long.TYPE
-              || type == Byte.TYPE
-              || type == Short.TYPE;
-          break;
-        case 'c':
-        case 'C':
-          valid = type == Character.TYPE;
-          break;
-        case 'h':
-        case 'H':
-          valid = type != Boolean.TYPE && !Number.class.isAssignableFrom(type);
-          break;
-        case 's':
-        case 'S':
-        default:
-          valid = true;
+
+      valid = when (last) {
+        'b', 'B' -> type == java.lang.Boolean.TYPE
+        'x', 'X', 'd', 'o', 'e', 'E', 'f', 'g', 'G', 'a', 'A' -> {
+          type == Integer.TYPE || type == java.lang.Float.TYPE || type == java.lang.Double.TYPE || type == java.lang.Long.TYPE || type == java.lang.Byte.TYPE || type == java.lang.Short.TYPE
+        }
+        'c', 'C' -> type == Character.TYPE
+        'h', 'H' -> type != java.lang.Boolean.TYPE && !Number::class.java.isAssignableFrom(type)
+        's', 'S' -> true
+        else -> true
       }
       if (!valid) {
-        String message = String.format(Locale.US, "Wrong argument type for formatting argument '#%1$d' "
-                + "in `%2$s`: conversion is '`%3$s`', received `%4$s` "
-                + "(argument #%5$d in method call)", i + 1, formatString, formatType,
-            type.getSimpleName(), startIndexOfArguments + i + 1);
-        context.report(ISSUE_ARG_TYPES, call, context.getLocation(argument), message);
+        context.report(
+          Incident(
+            issue = ISSUE_ARG_TYPES,
+            scope = call,
+            location = context.getLocation(argument),
+            message = "Wrong argument type for formatting argument '#${i + 1}' in `${formatString}`: conversion is '`${formatType}`', received `${type.simpleName}` (argument #${startIndexOfArguments + i + 1} in method call)"
+          )
+        )
       }
     }
   }
 
-  private static Class<?> getType(UExpression expression) {
+  private fun getType(expression: UExpression?): Class<*>? {
     if (expression == null) {
-      return null;
+      return null
     }
-    if (expression instanceof PsiMethodCallExpression) {
-      PsiMethodCallExpression call = (PsiMethodCallExpression) expression;
-      PsiMethod method = call.resolveMethod();
-      if (method == null) {
-        return null;
+    if (expression is PsiMethodCallExpression) {
+      val call = expression as PsiMethodCallExpression
+      val method = call.resolveMethod() ?: return null
+      val methodName = method.name
+      if (methodName == GET_STRING_METHOD) {
+        return String::class.java
       }
-      String methodName = method.getName();
-      if (methodName.equals(GET_STRING_METHOD)) {
-        return String.class;
-      }
-    } else if (expression instanceof PsiLiteralExpression) {
-      PsiLiteralExpression literalExpression = (PsiLiteralExpression) expression;
-      PsiType expressionType = literalExpression.getType();
-      if (isString(expressionType)) {
-        return String.class;
-      } else if (expressionType == PsiType.INT) {
-        return Integer.TYPE;
-      } else if (expressionType == PsiType.FLOAT) {
-        return Float.TYPE;
-      } else if (expressionType == PsiType.CHAR) {
-        return Character.TYPE;
-      } else if (expressionType == PsiType.BOOLEAN) {
-        return Boolean.TYPE;
-      } else if (expressionType == PsiType.NULL) {
-        return Object.class;
+    } else if (expression is PsiLiteralExpression) {
+      val literalExpression = expression as PsiLiteralExpression
+      val expressionType = literalExpression.type
+      when {
+        isString(expressionType!!) -> return String::class.java
+        expressionType === PsiType.INT -> return Integer.TYPE
+        expressionType === PsiType.FLOAT -> return java.lang.Float.TYPE
+        expressionType === PsiType.CHAR -> return Character.TYPE
+        expressionType === PsiType.BOOLEAN -> return java.lang.Boolean.TYPE
+        expressionType === PsiType.NULL -> return Any::class.java
       }
     }
 
-    PsiType type = expression.getExpressionType();
+    val type = expression.getExpressionType()
     if (type != null) {
-      Class<?> typeClass = getTypeClass(type);
-      return typeClass != null ? typeClass : Object.class;
+      val typeClass = getTypeClass(type)
+      return typeClass ?: Any::class.java
     }
 
-    return null;
+    return null
   }
 
-  private static Class<?> getTypeClass(@Nullable PsiType type) {
-    if (type != null) {
-      return getTypeClass(type.getCanonicalText());
-    }
-    return null;
-  }
-
-  private static Class<?> getTypeClass(@Nullable String typeClassName) {
-    if (typeClassName == null) {
-      return null;
-    } else if (typeClassName.equals(TYPE_STRING) || "String".equals(typeClassName)) {
-      return String.class;
-    } else if (typeClassName.equals(TYPE_INT)) {
-      return Integer.TYPE;
-    } else if (typeClassName.equals(TYPE_BOOLEAN)) {
-      return Boolean.TYPE;
-    } else if (typeClassName.equals(TYPE_NULL)) {
-      return Object.class;
-    } else if (typeClassName.equals(TYPE_LONG)) {
-      return Long.TYPE;
-    } else if (typeClassName.equals(TYPE_FLOAT)) {
-      return Float.TYPE;
-    } else if (typeClassName.equals(TYPE_DOUBLE)) {
-      return Double.TYPE;
-    } else if (typeClassName.equals(TYPE_CHAR)) {
-      return Character.TYPE;
-    } else if ("BigDecimal".equals(typeClassName) || "java.math.BigDecimal".equals(typeClassName)) {
-      return Float.TYPE;
-    } else if ("BigInteger".equals(typeClassName) || "java.math.BigInteger".equals(typeClassName)) {
-      return Integer.TYPE;
-    } else if (typeClassName.equals(TYPE_OBJECT)) {
-      return null;
-    } else if (typeClassName.startsWith("java.lang.")) {
-      if ("java.lang.Integer".equals(typeClassName)
-          || "java.lang.Short".equals(typeClassName)
-          || "java.lang.Byte".equals(typeClassName)
-          || "java.lang.Long".equals(typeClassName)) {
-        return Integer.TYPE;
-      } else if ("java.lang.Float".equals(typeClassName) || "java.lang.Double".equals(
-          typeClassName)) {
-        return Float.TYPE;
-      } else if ("java.lang.Boolean".equals(typeClassName)) {
-        return Boolean.TYPE;
-      } else {
-        return null;
-      }
-    } else if (typeClassName.equals(TYPE_BYTE)) {
-      return Byte.TYPE;
-    } else if (typeClassName.equals(TYPE_SHORT)) {
-      return Short.TYPE;
-    } else if ("Date".equals(typeClassName) || "java.util.Date".equals(typeClassName)) {
-      return Date.class;
-    } else if ("Calendar".equals(typeClassName) || "java.util.Calendar".equals(typeClassName)) {
-      return Calendar.class;
-    } else {
-      return null;
+  private fun getTypeClass(type: PsiType?): Class<*>? {
+    return when (type?.canonicalText) {
+      null -> null
+      TYPE_STRING, "String" -> String::class.java
+      TYPE_INT -> Integer.TYPE
+      TYPE_BOOLEAN -> java.lang.Boolean.TYPE
+      TYPE_NULL -> Object::class.java
+      TYPE_LONG -> Long.TYPE
+      TYPE_FLOAT -> Float.TYPE
+      TYPE_DOUBLE -> Double.TYPE
+      TYPE_CHAR -> Character.TYPE
+      TYPE_OBJECT -> null
+      TYPE_INTEGER_WRAPPER, TYPE_SHORT_WRAPPER, TYPE_BYTE_WRAPPER, TYPE_LONG_WRAPPER -> Integer.TYPE
+      TYPE_FLOAT_WRAPPER, TYPE_DOUBLE_WRAPPER -> Float.TYPE
+      TYPE_BOOLEAN_WRAPPER -> java.lang.Boolean.TYPE
+      TYPE_BYTE -> Byte.TYPE
+      TYPE_SHORT -> Short.TYPE
+      "Date", "java.util.Date" -> Date::class.java
+      "Calendar", "java.util.Calendar" -> Calendar::class.java
+      "BigDecimal", "java.math.BigDecimal" -> Float.TYPE
+      "BigInteger", "java.math.BigInteger" -> Integer.TYPE
+      else -> null
     }
   }
 
-  private static boolean isSubclassOf(JavaContext context, UExpression expression, Class<?> cls) {
-    PsiType expressionType = expression.getExpressionType();
-    if (expressionType instanceof PsiClassType) {
-      PsiClassType classType = (PsiClassType) expressionType;
-      PsiClass resolvedClass = classType.resolve();
-      return context.getEvaluator().extendsClass(resolvedClass, cls.getName(), false);
+  private fun isSubclassOf(
+    context: JavaContext, expression: UExpression, cls: Class<*>
+  ): Boolean {
+    val expressionType = expression.getExpressionType()
+    if (expressionType is PsiClassType) {
+      return context.evaluator.extendsClass(expressionType.resolve(), cls.name, false)
     }
-    return false;
+    return false
   }
 
-  private static List<String> getStringArgumentTypes(String formatString) {
-    List<String> types = new ArrayList<>();
-    Matcher matcher = StringFormatDetector.FORMAT.matcher(formatString);
-    int index = 0;
-    int prevIndex = 0;
+  private fun getStringArgumentTypes(formatString: String): List<String> {
+    val types = mutableListOf<String>()
+    val matcher = StringFormatDetector.FORMAT.matcher(formatString)
+    var index = 0
+    var prevIndex = 0
+
     while (true) {
       if (matcher.find(index)) {
-        int matchStart = matcher.start();
+        val matchStart = matcher.start()
         while (prevIndex < matchStart) {
-          char c = formatString.charAt(prevIndex);
+          val c = formatString[prevIndex]
           if (c == '\\') {
-            prevIndex++;
+            prevIndex++
           }
-          prevIndex++;
+          prevIndex++
         }
         if (prevIndex > matchStart) {
-          index = prevIndex;
-          continue;
+          index = prevIndex
+          continue
         }
 
-        index = matcher.end();
-        String str = formatString.substring(matchStart, matcher.end());
-        if ("%%".equals(str) || "%n".equals(str)) {
-          continue;
+        index = matcher.end()
+        val str = formatString.substring(matchStart, matcher.end())
+        if ("%%" == str || "%n" == str) {
+          continue
         }
-        String time = matcher.group(5);
-        if ("t".equalsIgnoreCase(time)) {
-          types.add(time + matcher.group(6));
+        val time = matcher.group(5)
+        types += if ("t".equals(time, ignoreCase = true)) {
+          time + matcher.group(6)
         } else {
-          types.add(matcher.group(6));
+          matcher.group(6)
         }
       } else {
-        break;
+        break
       }
     }
-    return types;
+    return types
   }
 
-  private static int getFormatArgumentCount(@NonNull String s) {
-    Matcher matcher = StringFormatDetector.FORMAT.matcher(s);
-    int index = 0;
-    int prevIndex = 0;
-    int nextNumber = 1;
-    int max = 0;
+  private fun getFormatArgumentCount(s: String): Int {
+    val matcher = StringFormatDetector.FORMAT.matcher(s)
+    var index = 0
+    var prevIndex = 0
+    var nextNumber = 1
+    var max = 0
     while (true) {
       if (matcher.find(index)) {
-        String value = matcher.group(6);
-        if ("%".equals(value) || "n".equals(value)) {
-          index = matcher.end();
-          continue;
+        val value = matcher.group(6)
+        if ("%" == value || "n" == value) {
+          index = matcher.end()
+          continue
         }
-        int matchStart = matcher.start();
-        for (; prevIndex < matchStart; prevIndex++) {
-          char c = s.charAt(prevIndex);
+        val matchStart = matcher.start()
+        while (prevIndex < matchStart) {
+          val c = s[prevIndex]
           if (c == '\\') {
-            prevIndex++;
+            prevIndex++
           }
+          prevIndex++
         }
         if (prevIndex > matchStart) {
-          index = prevIndex;
-          continue;
+          index = prevIndex
+          continue
         }
 
-        int number;
-        String numberString = matcher.group(1);
+        var number: Int
+        var numberString = matcher.group(1)
         if (numberString != null) {
           // Strip off trailing $
-          numberString = numberString.substring(0, numberString.length() - 1);
-          number = Integer.parseInt(numberString);
-          nextNumber = number + 1;
+          numberString = numberString.substring(0, numberString.length - 1)
+          number = numberString.toInt()
+          nextNumber = number + 1
         } else {
-          number = nextNumber++;
+          number = nextNumber++
         }
         if (number > max) {
-          max = number;
+          max = number
         }
-        index = matcher.end();
+        index = matcher.end()
       } else {
-        break;
+        break
       }
     }
-
-    return max;
+    return max
   }
 
-  private void checkMethodArguments(JavaContext context, UCallExpression call) {
-    List<UExpression> arguments = call.getValueArguments();
-    int numArguments = arguments.size();
-    for (int i = 0; i < numArguments; i++) {
-      UExpression argument = arguments.get(i);
-      if (checkElement(context, call, argument)) {
-        break;
-      }
-      if (i > 0 && isSubclassOf(context, argument, Throwable.class)) {
-        LintFix fix = quickFixIssueThrowable(call, arguments, argument);
-        context.report(ISSUE_THROWABLE, call, context.getLocation(call),
-            "Throwable should be first argument", fix);
+  private fun checkMethodArguments(context: JavaContext, call: UCallExpression) {
+    call.valueArguments.forEachIndexed loop@{ i, argument ->
+      if (checkElement(context, call, argument)) return@loop
+
+      if (i > 0 && isSubclassOf(context, argument, Throwable::class.java)) {
+        context.report(
+          Incident(
+            issue = ISSUE_THROWABLE,
+            scope = call,
+            location = context.getLocation(call),
+            message = "Throwable should be first argument",
+            fix = quickFixIssueThrowable(call, call.valueArguments, argument)
+          )
+        )
       }
     }
   }
 
-  private void checkExceptionLogging(JavaContext context, UCallExpression call) {
-    List<UExpression> arguments = call.getValueArguments();
-    int numArguments = arguments.size();
-
-    if (numArguments > 1 && isSubclassOf(context, arguments.get(0), Throwable.class)) {
-      UExpression messageArg = arguments.get(1);
+  private fun checkExceptionLogging(context: JavaContext, call: UCallExpression) {
+    val arguments = call.valueArguments
+    val numArguments = arguments.size
+    if (numArguments > 1 && isSubclassOf(context, arguments[0], Throwable::class.java)) {
+      val messageArg = arguments[1]
 
       if (isLoggingExceptionMessage(context, messageArg)) {
-        context.report(ISSUE_EXCEPTION_LOGGING, messageArg, context.getLocation(call),
-            "Explicitly logging exception message is redundant",
-            quickFixRemoveRedundantArgument(messageArg));
-        return;
+        context.report(
+          Incident(
+            issue = ISSUE_EXCEPTION_LOGGING,
+            scope = messageArg,
+            location = context.getLocation(call),
+            message = "Explicitly logging exception message is redundant",
+            fix = quickFixRemoveRedundantArgument(messageArg)
+          )
+        )
+        return
       }
 
-      String s = evaluateString(context, messageArg, true);
+      val s = evaluateString(context, messageArg, true)
       if (s == null && !canEvaluateExpression(messageArg)) {
         // Parameters and non-final fields can't be evaluated.
-        return;
+        return
       }
 
       if (s == null || s.isEmpty()) {
-        LintFix fix = quickFixRemoveRedundantArgument(messageArg);
-        context.report(ISSUE_EXCEPTION_LOGGING, messageArg, context.getLocation(call),
-            "Use single-argument log method instead of null/empty message", fix);
+        context.report(
+          Incident(
+            issue = ISSUE_EXCEPTION_LOGGING,
+            scope = messageArg,
+            location = context.getLocation(call),
+            message = "Use single-argument log method instead of null/empty message",
+            fix = quickFixRemoveRedundantArgument(messageArg)
+          )
+        )
       }
-    } else if (numArguments == 1 && !isSubclassOf(context, arguments.get(0), Throwable.class)) {
-      UExpression messageArg = arguments.get(0);
+    } else if (numArguments == 1 && !isSubclassOf(context, arguments[0], Throwable::class.java)) {
+      val messageArg = arguments[0]
 
       if (isLoggingExceptionMessage(context, messageArg)) {
-        context.report(ISSUE_EXCEPTION_LOGGING, messageArg, context.getLocation(call),
-            "Explicitly logging exception message is redundant",
-            quickFixReplaceMessageWithThrowable(messageArg));
+        context.report(
+          Incident(
+            issue = ISSUE_EXCEPTION_LOGGING,
+            scope = messageArg,
+            location = context.getLocation(call),
+            message = "Explicitly logging exception message is redundant",
+            fix = quickFixReplaceMessageWithThrowable(messageArg)
+          )
+        )
       }
     }
   }
 
-  private boolean isLoggingExceptionMessage(JavaContext context, UExpression arg) {
-    if (!(arg instanceof UQualifiedReferenceExpression)) {
-      return false;
+  private fun isLoggingExceptionMessage(context: JavaContext, arg: UExpression): Boolean {
+    if (arg !is UQualifiedReferenceExpression) {
+      return false
     }
 
-    UQualifiedReferenceExpression argExpression = (UQualifiedReferenceExpression) arg;
-    PsiElement psi = argExpression.getSourcePsi();
-
-    if (psi != null && isKotlin(psi.getLanguage())) {
-      return isPropertyOnSubclassOf(context, argExpression, "message", Throwable.class);
+    val psi = arg.sourcePsi
+    if (psi != null && isKotlin(psi.language)) {
+      return isPropertyOnSubclassOf(context, arg, "message", Throwable::class.java)
     }
 
-    UExpression selector = argExpression.getSelector();
+    val selector = arg.selector
 
     // what other UExpressions could be a selector?
-    if (!(selector instanceof UCallExpression)) {
-      return false;
-    }
-
-    return isCallFromMethodInSubclassOf(context, (UCallExpression) selector, "getMessage",
-            Throwable.class);
+    return if (selector !is UCallExpression) {
+      false
+    } else isCallFromMethodInSubclassOf(
+      context = context,
+      call = selector,
+      methodName = "getMessage",
+      classType = Throwable::class.java
+    )
   }
 
-  private static boolean canEvaluateExpression(UExpression expression) {
+  private fun canEvaluateExpression(expression: UExpression): Boolean {
     // TODO - try using CallGraph?
-    if (expression instanceof ULiteralExpression) {
-      return true;
+    if (expression is ULiteralExpression) {
+      return true
     }
-    if (!(expression instanceof USimpleNameReferenceExpression)) {
-      return false;
+    if (expression !is USimpleNameReferenceExpression) {
+      return false
     }
-    PsiElement resolvedElement = ((USimpleNameReferenceExpression) expression).resolve();
-    return !(resolvedElement instanceof PsiField || resolvedElement instanceof PsiParameter);
+    val resolvedElement = expression.resolve()
+    return !(resolvedElement is PsiField || resolvedElement is PsiParameter)
   }
 
-  private static boolean isCallFromMethodInSubclassOf(JavaContext context, UCallExpression call,
-      String methodName, Class classType) {
-    JavaEvaluator evaluator = context.getEvaluator();
-    PsiMethod method = call.resolve();
-    return method != null //
-        && methodName.equals(call.getMethodName()) //
-        && evaluator.isMemberInSubClassOf(method, classType.getCanonicalName(), false);
+  private fun isCallFromMethodInSubclassOf(
+    context: JavaContext, call: UCallExpression, methodName: String, classType: Class<*>
+  ): Boolean {
+    val method = call.resolve()
+    return method != null
+        && methodName == call.methodName
+        && context.evaluator.isMemberInSubClassOf(method, classType.canonicalName, false)
   }
 
-  private static boolean isPropertyOnSubclassOf(JavaContext context,
-          UQualifiedReferenceExpression expression, String propertyName, Class classType) {
-    return isSubclassOf(context, expression.getReceiver(), classType)
-            && expression.getSelector().asSourceString().equals(propertyName);
+  private fun isPropertyOnSubclassOf(
+    context: JavaContext,
+    expression: UQualifiedReferenceExpression,
+    propertyName: String,
+    classType: Class<*>
+  ): Boolean {
+    return isSubclassOf(context, expression.receiver, classType)
+        && expression.selector.asSourceString() == propertyName
   }
 
-  private boolean checkElement(JavaContext context, UCallExpression call, UElement element) {
-    if (element instanceof UBinaryExpression) {
-      UBinaryExpression binaryExpression = (UBinaryExpression) element;
-      UastBinaryOperator operator = binaryExpression.getOperator();
-      if (operator == PLUS || operator == PLUS_ASSIGN) {
-        Class argumentType = getType(binaryExpression);
-        if (argumentType == String.class) {
-          if (isInjectionHost(binaryExpression.getLeftOperand())
-                  && isInjectionHost(binaryExpression.getRightOperand())) {
-            return false;
+  private fun checkElement(
+    context: JavaContext, call: UCallExpression, element: UElement?
+  ): Boolean {
+    if (element is UBinaryExpression) {
+      val operator = element.operator
+      if (operator === UastBinaryOperator.PLUS || operator === UastBinaryOperator.PLUS_ASSIGN) {
+        val argumentType = getType(element)
+        if (argumentType == String::class.java) {
+          if (element.leftOperand.isInjectionHost()
+            && element.rightOperand.isInjectionHost()
+          ) {
+            return false
           }
-          LintFix fix = quickFixIssueBinary(binaryExpression);
-          context.report(ISSUE_BINARY, call, context.getLocation(element),
-              "Replace String concatenation with Timber's string formatting", fix);
-          return true;
+          context.report(
+            Incident(
+              issue = ISSUE_BINARY,
+              scope = call,
+              location = context.getLocation(element),
+              message = "Replace String concatenation with Timber's string formatting",
+              fix = quickFixIssueBinary(element)
+            )
+          )
+          return true
         }
       }
-    } else if (element instanceof UIfExpression) {
-      return checkConditionalUsage(context, call, element);
+    } else if (element is UIfExpression) {
+      return checkConditionalUsage(context, call, element)
     }
-    return false;
+    return false
   }
 
-  private boolean checkConditionalUsage(JavaContext context, UCallExpression call,
-      UElement element) {
-    UElement thenElement;
-    UElement elseElement;
-    if (element instanceof UIfExpression) {
-      UIfExpression ifArg = (UIfExpression) element;
-      thenElement = ifArg.getThenExpression();
-      elseElement = ifArg.getElseExpression();
+  private fun checkConditionalUsage(
+    context: JavaContext, call: UCallExpression, element: UElement
+  ): Boolean {
+    return if (element is UIfExpression) {
+      if (checkElement(context, call, element.thenExpression)) {
+        false
+      } else {
+        checkElement(context, call, element.elseExpression)
+      }
     } else {
-      return false;
+      false
     }
-    if (checkElement(context, call, thenElement)) {
-      return false;
-    }
-    return checkElement(context, call, elseElement);
   }
 
-  private LintFix quickFixIssueLog(UCallExpression logCall) {
-    List<UExpression> arguments = logCall.getValueArguments();
-    String methodName = logCall.getMethodName();
-    UExpression tag = arguments.get(0);
+  private fun quickFixIssueLog(logCall: UCallExpression): LintFix {
+    val arguments = logCall.valueArguments
+    val methodName = logCall.methodName
+    val tag = arguments[0]
 
     // 1st suggestion respects author's tag preference.
     // 2nd suggestion drops it (Timber defaults to calling class name).
-    String fixSource1 = "Timber.tag(" + tag.asSourceString() + ").";
-    String fixSource2 = "Timber.";
+    var fixSource1 = "Timber.tag(${tag.asSourceString()})."
+    var fixSource2 = "Timber."
 
-    int numArguments = arguments.size();
-    if (numArguments == 2) {
-      UExpression msgOrThrowable = arguments.get(1);
-      fixSource1 += methodName + "(" + msgOrThrowable.asSourceString() + ")";
-      fixSource2 += methodName + "(" + msgOrThrowable.asSourceString() + ")";
-    } else if (numArguments == 3) {
-      UExpression msg = arguments.get(1);
-      UExpression throwable = arguments.get(2);
-      fixSource1 +=
-          methodName + "(" + throwable.asSourceString() + ", " + msg.asSourceString() + ")";
-      fixSource2 +=
-          methodName + "(" + throwable.asSourceString() + ", " + msg.asSourceString() + ")";
-    } else {
-      throw new IllegalStateException("android.util.Log overloads should have 2 or 3 arguments");
+    when (arguments.size) {
+      2 -> {
+        val msgOrThrowable = arguments[1]
+        fixSource1 += "$methodName(${msgOrThrowable.asSourceString()})"
+        fixSource2 += "$methodName(${msgOrThrowable.asSourceString()})"
+      }
+      3 -> {
+        val msg = arguments[1]
+        val throwable = arguments[2]
+        fixSource1 += "$methodName(${throwable.asSourceString()}, ${msg.asSourceString()})"
+        fixSource2 += "$methodName(${throwable.asSourceString()}, ${msg.asSourceString()})"
+      }
+      else -> {
+        throw IllegalStateException("android.util.Log overloads should have 2 or 3 arguments")
+      }
     }
 
-    String logCallSource = logCall.asSourceString();
-    LintFix.GroupBuilder fixGrouper = fix().group();
-    fixGrouper.add(
-        fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource1).build());
-    fixGrouper.add(
-        fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource2).build());
-    return fixGrouper.build();
+    val logCallSource = logCall.asSourceString()
+    return fix().group()
+      .add(
+        fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource1).build()
+      )
+      .add(
+        fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource2).build()
+      )
+      .build()
   }
 
-  private LintFix quickFixIssueFormat(UCallExpression stringFormatCall) {
+  private fun quickFixIssueFormat(stringFormatCall: UCallExpression): LintFix {
     // Handles:
     // 1) String.format(..)
     // 2) format(...) [static import]
-    UExpression callReceiver = stringFormatCall.getReceiver();
-    String callSourceString = callReceiver == null ? "" : callReceiver.asSourceString() + ".";
-    callSourceString += stringFormatCall.getMethodName();
+    val callReceiver = stringFormatCall.receiver
+    var callSourceString = if (callReceiver == null) "" else "${callReceiver.asSourceString()}."
+    callSourceString += stringFormatCall.methodName
 
     return fix().name("Remove String.format(...)").composite() //
-        // Delete closing parenthesis of String.format(...)
-        .add(fix().replace().pattern(callSourceString + "\\(.*(\\))").with("").build())
-        // Delete "String.format("
-        .add(fix().replace().text(callSourceString + "(").with("").build()).build();
+      // Delete closing parenthesis of String.format(...)
+      .add(fix().replace().pattern("$callSourceString\\(.*(\\))").with("").build())
+      // Delete "String.format("
+      .add(fix().replace().text("$callSourceString(").with("").build()).build()
   }
 
-  private LintFix quickFixIssueThrowable(UCallExpression call, List<UExpression> arguments,
-      UExpression throwable) {
-    String rearrangedArgs = throwable.asSourceString();
-    for (UExpression arg : arguments) {
-      if (arg != throwable) {
-        rearrangedArgs += (", " + arg.asSourceString());
+  private fun quickFixIssueThrowable(
+    call: UCallExpression, arguments: List<UExpression>, throwable: UExpression
+  ): LintFix {
+    val rearrangedArgs = buildString {
+      append(throwable.asSourceString())
+      arguments.forEach { arg ->
+        if (arg !== throwable) {
+          append(", ${arg.asSourceString()}")
+        }
       }
     }
-    return fix().replace() //
-        .pattern("\\." + call.getMethodName() + "\\((.*)\\)").with(rearrangedArgs).build();
+    return fix()
+      .replace()
+      .pattern("\\." + call.methodName + "\\((.*)\\)")
+      .with(rearrangedArgs)
+      .build()
   }
 
-  private LintFix quickFixIssueBinary(UBinaryExpression binaryExpression) {
-    UExpression leftOperand = binaryExpression.getLeftOperand();
-    UExpression rightOperand = binaryExpression.getRightOperand();
-    boolean isLeftLiteral = isInjectionHost(leftOperand);
-    boolean isRightLiteral = isInjectionHost(rightOperand);
+  private fun quickFixIssueBinary(binaryExpression: UBinaryExpression): LintFix {
+    val leftOperand = binaryExpression.leftOperand
+    val rightOperand = binaryExpression.rightOperand
+    val isLeftLiteral = leftOperand.isInjectionHost()
+    val isRightLiteral = rightOperand.isInjectionHost()
 
     // "a" + "b" => "ab"
     if (isLeftLiteral && isRightLiteral) {
-      return fix().replace() //
-          .text(binaryExpression.asSourceString())
-          .with("\"" + evaluateString(binaryExpression) + "\"")
-          .build();
+      return fix().replace()
+        .text(binaryExpression.asSourceString())
+        .with("\"${binaryExpression.evaluateString()}\"")
+        .build()
     }
 
-    String args;
-    if (isLeftLiteral) {
-      args = "\"" + evaluateString(leftOperand) + "%s\", " + rightOperand.asSourceString();
-    } else if (isRightLiteral) {
-      args = "\"%s" + evaluateString(rightOperand) + "\", " + leftOperand.asSourceString();
-    } else {
-      args = "\"%s%s\", " + leftOperand.asSourceString() + ", " + rightOperand.asSourceString();
+    val args: String = when {
+      isLeftLiteral -> {
+        "\"${leftOperand.evaluateString()}%s\", ${rightOperand.asSourceString()}"
+      }
+      isRightLiteral -> {
+        "\"%s${rightOperand.evaluateString()}\", ${leftOperand.asSourceString()}"
+      }
+      else -> {
+        "\"%s%s\", ${leftOperand.asSourceString()}, ${rightOperand.asSourceString()}"
+      }
     }
-    return fix().replace().text(binaryExpression.asSourceString()).with(args).build();
+    return fix().replace().text(binaryExpression.asSourceString()).with(args).build()
   }
 
-  private LintFix quickFixIssueTagLength(UExpression argument, String tag) {
-    int numCharsToTrim = tag.length() - 23;
+  private fun quickFixIssueTagLength(argument: UExpression, tag: String): LintFix {
+    val numCharsToTrim = tag.length - 23
     return fix().replace()
-        .name("Strip last " + (numCharsToTrim == 1 ? "char" : numCharsToTrim + " chars"))
-        .text(argument.asSourceString())
-        .with("\"" + tag.substring(0, 23) + "\"")
-        .build();
+      .name("Strip last " + if (numCharsToTrim == 1) "char" else "$numCharsToTrim chars")
+      .text(argument.asSourceString())
+      .with("\"${tag.substring(0, 23)}\"")
+      .build()
   }
 
-  private LintFix quickFixRemoveRedundantArgument(UExpression arg) {
+  private fun quickFixRemoveRedundantArgument(arg: UExpression): LintFix {
     return fix().replace()
-        .name("Remove redundant argument")
-        .text(", " + arg.asSourceString())
-        .with("")
-        .build();
+      .name("Remove redundant argument")
+      .text(", ${arg.asSourceString()}")
+      .with("")
+      .build()
   }
 
-  private LintFix quickFixReplaceMessageWithThrowable(UExpression arg) {
+  private fun quickFixReplaceMessageWithThrowable(arg: UExpression): LintFix {
     // guaranteed based on callers of this method
-    UQualifiedReferenceExpression argExpression = (UQualifiedReferenceExpression) arg;
-    UExpression receiver = argExpression.getReceiver();
-
+    val receiver = (arg as UQualifiedReferenceExpression).receiver
     return fix().replace()
-        .name("Replace message with throwable")
-        .text(arg.asSourceString())
-        .with(receiver.asSourceString())
-        .build();
+      .name("Replace message with throwable")
+      .text(arg.asSourceString())
+      .with(receiver.asSourceString())
+      .build()
   }
 
-  static Issue[] getIssues() {
-    return new Issue[] {
-        ISSUE_LOG, ISSUE_FORMAT, ISSUE_THROWABLE, ISSUE_BINARY, ISSUE_ARG_COUNT, ISSUE_ARG_TYPES,
-        ISSUE_TAG_LENGTH, ISSUE_EXCEPTION_LOGGING
-    };
-  }
+  companion object {
+    private const val GET_STRING_METHOD = "getString"
+    private const val TIMBER_TREE_LOG_METHOD_REGEXP = "(v|d|i|w|e|wtf)"
 
-  public static final Issue ISSUE_LOG =
-      Issue.create("LogNotTimber", "Logging call to Log instead of Timber",
-          "Since Timber is included in the project, it is likely that calls to Log should instead"
-              + " be going to Timber.", Category.MESSAGES, 5, Severity.WARNING,
-          new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
-  public static final Issue ISSUE_FORMAT =
-      Issue.create("StringFormatInTimber", "Logging call with Timber contains String#format()",
-          "Since Timber handles String.format automatically, you may not use String#format().",
-          Category.MESSAGES, 5, Severity.WARNING,
-          new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
-  public static final Issue ISSUE_THROWABLE =
-      Issue.create("ThrowableNotAtBeginning", "Exception in Timber not at the beginning",
-          "In Timber you have to pass a Throwable at the beginning of the call.", Category.MESSAGES,
-          5, Severity.WARNING,
-          new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
-  public static final Issue ISSUE_BINARY =
-      Issue.create("BinaryOperationInTimber", "Use String#format()",
-          "Since Timber handles String#format() automatically, use this instead of String"
-              + " concatenation.", Category.MESSAGES, 5, Severity.WARNING,
-          new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
-  public static final Issue ISSUE_ARG_COUNT =
-      Issue.create("TimberArgCount", "Formatting argument types incomplete or inconsistent",
-          "When a formatted string takes arguments, you need to pass at least that amount of"
-              + " arguments to the formatting call.", Category.MESSAGES, 9, Severity.ERROR,
-          new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
-  public static final Issue ISSUE_ARG_TYPES =
-      Issue.create("TimberArgTypes", "Formatting string doesn't match passed arguments",
-          "The argument types that you specified in your formatting string does not match the types"
-              + " of the arguments that you passed to your formatting call.", Category.MESSAGES, 9,
-          Severity.ERROR,
-          new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
-  public static final Issue ISSUE_TAG_LENGTH = Issue.create("TimberTagLength", "Too Long Log Tags",
-      "Log tags are only allowed to be at most" + " 23 tag characters long.", Category.CORRECTNESS,
-      5, Severity.ERROR, new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
-  public static final Issue ISSUE_EXCEPTION_LOGGING =
-      Issue.create("TimberExceptionLogging", "Exception Logging", "Explicitly including the"
-              + " exception message is redundant when supplying an exception to log.",
-          Category.CORRECTNESS, 3, Severity.WARNING,
-          new Implementation(WrongTimberUsageDetector.class, Scope.JAVA_FILE_SCOPE));
+    val ISSUE_LOG = Issue.create(
+      id = "LogNotTimber",
+      briefDescription = "Logging call to Log instead of Timber",
+      explanation = "Since Timber is included in the project, it is likely that calls to Log should instead be going to Timber.",
+      category = MESSAGES,
+      priority = 5,
+      severity = WARNING,
+      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
+    )
+    val ISSUE_FORMAT = Issue.create(
+      id = "StringFormatInTimber",
+      briefDescription = "Logging call with Timber contains String#format()",
+      explanation = "Since Timber handles String.format automatically, you may not use String#format().",
+      category = MESSAGES,
+      priority = 5,
+      severity = WARNING,
+      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
+    )
+    val ISSUE_THROWABLE = Issue.create(
+      id = "ThrowableNotAtBeginning",
+      briefDescription = "Exception in Timber not at the beginning",
+      explanation = "In Timber you have to pass a Throwable at the beginning of the call.",
+      category = MESSAGES,
+      priority = 5,
+      severity = WARNING,
+      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
+    )
+    val ISSUE_BINARY = Issue.create(
+      id = "BinaryOperationInTimber",
+      briefDescription = "Use String#format()",
+      explanation = "Since Timber handles String#format() automatically, use this instead of String concatenation.",
+      category = MESSAGES,
+      priority = 5,
+      severity = WARNING,
+      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
+    )
+    val ISSUE_ARG_COUNT = Issue.create(
+      id = "TimberArgCount",
+      briefDescription = "Formatting argument types incomplete or inconsistent",
+      explanation = "When a formatted string takes arguments, you need to pass at least that amount of arguments to the formatting call.",
+      category = MESSAGES,
+      priority = 9,
+      severity = ERROR,
+      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
+    )
+    val ISSUE_ARG_TYPES = Issue.create(
+      id = "TimberArgTypes",
+      briefDescription = "Formatting string doesn't match passed arguments",
+      explanation = "The argument types that you specified in your formatting string does not match the types of the arguments that you passed to your formatting call.",
+      category = MESSAGES,
+      priority = 9,
+      severity = ERROR,
+      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
+    )
+    val ISSUE_TAG_LENGTH = Issue.create(
+      id = "TimberTagLength",
+      briefDescription = "Too Long Log Tags",
+      explanation = "Log tags are only allowed to be at most" + " 23 tag characters long.",
+      category = CORRECTNESS,
+      priority = 5,
+      severity = ERROR,
+      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
+    )
+    val ISSUE_EXCEPTION_LOGGING = Issue.create(
+      id = "TimberExceptionLogging",
+      briefDescription = "Exception Logging",
+      explanation = "Explicitly including the exception message is redundant when supplying an exception to log.",
+      category = CORRECTNESS,
+      priority = 3,
+      severity = WARNING,
+      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
+    )
+
+    val issues = listOf(
+      ISSUE_LOG, ISSUE_FORMAT, ISSUE_THROWABLE, ISSUE_BINARY, ISSUE_ARG_COUNT, ISSUE_ARG_TYPES,
+      ISSUE_TAG_LENGTH, ISSUE_EXCEPTION_LOGGING
+    )
+  }
 }
