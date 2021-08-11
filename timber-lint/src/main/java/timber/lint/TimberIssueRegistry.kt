@@ -10,7 +10,7 @@ import com.google.auto.service.AutoService
 @AutoService(value = [IssueRegistry::class])
 class TimberIssueRegistry : IssueRegistry() {
   override val issues: List<Issue>
-    get() = WrongTimberUsageDetector.issues
+    get() = WrongTimberUsageDetector.issues + PlantATreeDetector.ISSUE
 
   override val api: Int
     get() = CURRENT_API
