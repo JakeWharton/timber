@@ -803,7 +803,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
     )
 
-    val issues = listOf(
+    val issues = arrayOf(
       ISSUE_LOG, ISSUE_FORMAT, ISSUE_THROWABLE, ISSUE_BINARY, ISSUE_ARG_COUNT, ISSUE_ARG_TYPES,
       ISSUE_TAG_LENGTH, ISSUE_EXCEPTION_LOGGING
     )
