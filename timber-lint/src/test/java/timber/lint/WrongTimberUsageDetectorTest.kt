@@ -435,6 +435,33 @@ class WrongTimberUsageDetectorTest {
         .expectClean()
   }
 
+  @Test fun validStringFormatExtracted() {
+    lint()
+      .files(TIMBER_STUB,
+          java("""
+              |package foo;
+              |import timber.log.Timber;
+              |public class Example {
+              |  public void log() {
+              |    String message = String.format("%s", "foo");
+              |    Timber.d(message);
+              |  }
+              |}""".trimMargin()),
+          kotlin("""
+              |package foo
+              |import timber.log.Timber
+              |class Example {
+              |  fun log() {
+              |    val message = String.format("%s", "foo")
+              |    Timber.d(message)
+              |  }
+              |}""".trimMargin()),
+      )
+      .issues(*issues)
+      .run()
+      .expectClean()
+  }
+
   @Test fun throwableNotAtBeginning() {
     lint()
         .files(TIMBER_STUB,
@@ -774,38 +801,6 @@ class WrongTimberUsageDetectorTest {
             |1 errors, 0 warnings""".trimMargin())
   }
 
-  @Test fun tagTooLongLiteralPlusField() {
-    lint()
-        .files(TIMBER_STUB,
-            java("""
-                |package foo;
-                |import timber.log.Timber;
-                |public class Example {
-                |  private final String field = "x";
-                |  public void log() {
-                |     Timber.tag("abcdefghijklmnopqrstuvw" + field);
-                |  }
-                |}""".trimMargin()),
-          kotlin("""
-                |package foo
-                |import timber.log.Timber
-                |class Example {
-                |  private val field = "x"
-                |  fun log() {
-                |     Timber.tag("abcdefghijklmnopqrstuvw${"$"}field")
-                |  }
-                |}""".trimMargin()),
-                manifest().minSdk(25)
-        )
-        .issues(*issues)
-        .run()
-        .expect("""
-            |src/foo/Example.java:6: Error: The logging tag can be at most 23 characters, was 24 (abcdefghijklmnopqrstuvwx) [TimberTagLength]
-            |     Timber.tag("abcdefghijklmnopqrstuvw" + field);
-            |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            |1 errors, 0 warnings""".trimMargin())
-  }
-
   @Test fun tagTooLongLiteralOnlyBeforeApi26() {
     lint()
         .files(TIMBER_STUB,
@@ -831,34 +826,6 @@ class WrongTimberUsageDetectorTest {
         .run()
         .expectClean()
   }
-
-  @Test fun tagTooLongLiteralPlusFieldOnlyBeforeApi26() {
-        lint()
-            .files(TIMBER_STUB,
-                java("""
-                    |package foo;
-                    |import timber.log.Timber;
-                    |public class Example {
-                    |  private final String field = "x";
-                    |  public void log() {
-                    |     Timber.tag("abcdefghijklmnopqrstuvw" + field);
-                    |  }
-                    |}""".trimMargin()),
-                kotlin("""
-                    |package foo
-                    |import timber.log.Timber
-                    |class Example {
-                    |  private val field = "x"
-                    |  fun log() {
-                    |     Timber.tag("abcdefghijklmnopqrstuvw${"$"}field")
-                    |  }
-                    |}""".trimMargin()),
-                    manifest().minSdk(26)
-                )
-                .issues(*issues)
-                .run()
-                .expectClean()
-    }
 
   @Test fun tooManyFormatArgsInTag() {
     lint()
