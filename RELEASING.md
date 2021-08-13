@@ -19,7 +19,7 @@
    ```
 
 5. Manually release and upload artifacts
-   1. Run `./gradlew -p mosaic clean publish`
+   1. Run `./gradlew clean publish`
    2. Visit [Sonatype Nexus](https://oss.sonatype.org/) and promote the artifact.
    3. If either fails, drop the Sonatype repo, fix the problem, commit, and restart this section.
 
