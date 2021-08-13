@@ -3,6 +3,13 @@
 ## [Unreleased]
 
 
+## [5.0.1] - 2021-08-13
+
+### Fixed
+
+- Fix TimberArgCount lint check false positive on some calls to `String.format`.
+
+
 ## [5.0.0] - 2021-08-10
 
 The library has been rewritten in Kotlin, but it remains binary-compatible with 4.x.
@@ -241,7 +248,8 @@ Initial cut. (Get it?)
 
 
 
-[Unreleased]: https://github.com/JakeWharton/timber/compare/5.0.0...HEAD
+[Unreleased]: https://github.com/JakeWharton/timber/compare/5.0.1...HEAD
+[5.0.1]: https://github.com/JakeWharton/timber/releases/tag/5.0.1
 [5.0.0]: https://github.com/JakeWharton/timber/releases/tag/5.0.0
 [4.7.1]: https://github.com/JakeWharton/timber/releases/tag/4.7.1
 [4.7.0]: https://github.com/JakeWharton/timber/releases/tag/4.7.0

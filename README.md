@@ -88,7 +88,7 @@ repositories {
 }
 
 dependencies {
-  implementation 'com.jakewharton.timber:timber:5.0.0'
+  implementation 'com.jakewharton.timber:timber:5.0.1'
 }
 ```
 
