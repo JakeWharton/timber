@@ -187,6 +187,85 @@ class TimberTest {
         .hasNoMoreMessages()
   }
 
+  @Suppress("ObjectLiteralToLambda") // Lambdas != anonymous classes.
+  @Test fun debugTreeTagGenerationStripsAnonymousClassMarkerWithInnerSAMLambda() {
+    Timber.plant(Timber.DebugTree())
+    object : Runnable {
+      override fun run() {
+        Timber.d("Hello, world!")
+
+        Runnable { Timber.d("Hello, world!") }.run()
+      }
+    }.run()
+
+    assertLog()
+        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+        .hasNoMoreMessages()
+  }
+
+  @Suppress("ObjectLiteralToLambda") // Lambdas != anonymous classes.
+  @Test fun debugTreeTagGenerationStripsAnonymousClassMarkerWithOuterSAMLambda() {
+    Timber.plant(Timber.DebugTree())
+
+    Runnable {
+      Timber.d("Hello, world!")
+
+      object : Runnable {
+        override fun run() {
+          Timber.d("Hello, world!")
+        }
+      }.run()
+    }.run()
+
+    assertLog()
+        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+        .hasNoMoreMessages()
+  }
+
+  // NOTE: this will fail on some future version of Kotlin when lambdas are compiled using invokedynamic
+  // Fix will be to expect the tag to be "TimberTest" as opposed to "TimberTest\$debugTreeTag"
+  @Test
+  fun debugTreeTagGenerationStripsAnonymousLambdaClassMarker() {
+    Timber.plant(Timber.DebugTree())
+
+    val outer = {
+      Timber.d("Hello, world!")
+
+      val inner = {
+        Timber.d("Hello, world!")
+      }
+
+      inner()
+    }
+
+    outer()
+
+    assertLog()
+        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+        .hasNoMoreMessages()
+  }
+
+  @Test
+  fun debugTreeTagGenerationForSAMLambdasUsesClassName() {
+    Timber.plant(Timber.DebugTree())
+
+    Runnable {
+      Timber.d("Hello, world!")
+
+      Runnable {
+        Timber.d("Hello, world!")
+      }.run()
+    }.run()
+
+    assertLog()
+        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasNoMoreMessages()
+  }
+
   private class ClassNameThatIsReallyReallyReallyLong {
     init {
       Timber.i("Hello, world!")
