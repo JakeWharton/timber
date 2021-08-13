@@ -81,13 +81,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       checkNestedStringFormat(context, node)
       return
     }
-    // As of API 26, Log tags are no longer limited to 23 chars.
-    if ("tag" == methodName
-      && evaluator.isMemberInClass(method, "timber.log.Timber")
-      && context.project.minSdk < 26
-    ) {
-      checkTagLength(context, node)
-      return
+    if ("tag" == methodName && evaluator.isMemberInClass(method, "timber.log.Timber")) {
+      checkTagLengthIfMinSdkLessThan26(context, node)
     }
     if (evaluator.isMemberInClass(method, "android.util.Log")) {
       context.report(
@@ -144,7 +139,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     }
   }
 
-  private fun checkTagLength(context: JavaContext, call: UCallExpression) {
+  private fun checkTagLengthIfMinSdkLessThan26(context: JavaContext, call: UCallExpression) {
     val argument = call.valueArguments[0]
     val tag = evaluateString(context, argument, true)
     if (tag != null && tag.length > 23) {
@@ -156,6 +151,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
           message = "The logging tag can be at most 23 characters, was ${tag.length} ($tag)",
           fix = quickFixIssueTagLength(argument, tag)
         ),
+        // As of API 26, Log tags are no longer limited to 23 chars.
         constraint = minSdkLessThan(26)
       )
     }
@@ -178,7 +174,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       startIndexOfArguments++
     }
 
-    val formatString = evaluateString(context, formatStringArg, true)
+    val formatString = evaluateString(context, formatStringArg, false)
       ?: return // We passed for example a method call
 
     val formatArgumentCount = getFormatArgumentCount(formatString)
@@ -803,7 +799,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
     )
 
-    val issues = listOf(
+    val issues = arrayOf(
       ISSUE_LOG, ISSUE_FORMAT, ISSUE_THROWABLE, ISSUE_BINARY, ISSUE_ARG_COUNT, ISSUE_ARG_TYPES,
       ISSUE_TAG_LENGTH, ISSUE_EXCEPTION_LOGGING
     )

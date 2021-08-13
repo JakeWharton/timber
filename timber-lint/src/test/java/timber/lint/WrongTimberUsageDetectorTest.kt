@@ -5,6 +5,7 @@ import com.android.tools.lint.checks.infrastructure.TestFiles.kotlin
 import com.android.tools.lint.checks.infrastructure.TestFiles.manifest
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import org.junit.Test
+import timber.lint.WrongTimberUsageDetector.Companion.issues
 
 class WrongTimberUsageDetectorTest {
   private val TIMBER_STUB = kotlin("""
@@ -41,7 +42,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_LOG)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:5: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
@@ -91,7 +92,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_LOG)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:5: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
@@ -139,7 +140,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_LOG)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:4: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
@@ -187,7 +188,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_LOG)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:4: Warning: Using 'Log' instead of 'Timber' [LogNotTimber]
@@ -237,7 +238,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:5: Warning: Using 'String#format' inside of 'Timber' [StringFormatInTimber]
@@ -284,7 +285,7 @@ class WrongTimberUsageDetectorTest {
         // Remove when AGP 7.1.0-alpha07 is out
         // https://groups.google.com/g/lint-dev/c/BigCO8sMhKU
         .allowCompilationErrors()
-        .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:6: Warning: Using 'String#format' inside of 'Timber' [StringFormatInTimber]
@@ -328,7 +329,7 @@ class WrongTimberUsageDetectorTest {
                 |  private fun id(s: String): String { return s }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:5: Warning: Using 'String#format' inside of 'Timber' [StringFormatInTimber]
@@ -354,7 +355,7 @@ class WrongTimberUsageDetectorTest {
                 |}""".trimMargin())
           // no kotlin equivalent, since nested assignments do not exist
         )
-        .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:6: Warning: Using 'String#format' inside of 'Timber' [StringFormatInTimber]
@@ -385,7 +386,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -408,7 +409,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -429,9 +430,36 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_FORMAT)
+        .issues(*issues)
         .run()
         .expectClean()
+  }
+
+  @Test fun validStringFormatExtracted() {
+    lint()
+      .files(TIMBER_STUB,
+          java("""
+              |package foo;
+              |import timber.log.Timber;
+              |public class Example {
+              |  public void log() {
+              |    String message = String.format("%s", "foo");
+              |    Timber.d(message);
+              |  }
+              |}""".trimMargin()),
+          kotlin("""
+              |package foo
+              |import timber.log.Timber
+              |class Example {
+              |  fun log() {
+              |    val message = String.format("%s", "foo")
+              |    Timber.d(message)
+              |  }
+              |}""".trimMargin()),
+      )
+      .issues(*issues)
+      .run()
+      .expectClean()
   }
 
   @Test fun throwableNotAtBeginning() {
@@ -456,7 +484,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_THROWABLE)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:6: Warning: Throwable should be first argument [ThrowableNotAtBeginning]
@@ -498,7 +526,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_BINARY)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -525,7 +553,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_BINARY)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:6: Warning: Replace String concatenation with Timber's string formatting [BinaryOperationInTimber]
@@ -562,7 +590,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_BINARY)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:6: Warning: Replace String concatenation with Timber's string formatting [BinaryOperationInTimber]
@@ -601,7 +629,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_BINARY)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:7: Warning: Replace String concatenation with Timber's string formatting [BinaryOperationInTimber]
@@ -638,7 +666,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_BINARY)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:6: Warning: Replace String concatenation with Timber's string formatting [BinaryOperationInTimber]
@@ -667,7 +695,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:5: Error: Wrong argument count, format string %s %s requires 2 but format call supplies 1 [TimberArgCount]
@@ -699,7 +727,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:5: Error: Wrong argument count, format string %s requires 1 but format call supplies 2 [TimberArgCount]
@@ -731,7 +759,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:5: Error: Wrong argument type for formatting argument '#1' in %d: conversion is 'd', received String (argument #2 in method call) [TimberArgTypes]
@@ -764,44 +792,12 @@ class WrongTimberUsageDetectorTest {
                 |}""".trimMargin()),
                 manifest().minSdk(25)
         )
-        .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:5: Error: The logging tag can be at most 23 characters, was 24 (abcdefghijklmnopqrstuvwx) [TimberTagLength]
             |     Timber.tag("abcdefghijklmnopqrstuvwx");
             |                ~~~~~~~~~~~~~~~~~~~~~~~~~~
-            |1 errors, 0 warnings""".trimMargin())
-  }
-
-  @Test fun tagTooLongLiteralPlusField() {
-    lint()
-        .files(TIMBER_STUB,
-            java("""
-                |package foo;
-                |import timber.log.Timber;
-                |public class Example {
-                |  private final String field = "x";
-                |  public void log() {
-                |     Timber.tag("abcdefghijklmnopqrstuvw" + field);
-                |  }
-                |}""".trimMargin()),
-          kotlin("""
-                |package foo
-                |import timber.log.Timber
-                |class Example {
-                |  private val field = "x"
-                |  fun log() {
-                |     Timber.tag("abcdefghijklmnopqrstuvw${"$"}field")
-                |  }
-                |}""".trimMargin()),
-                manifest().minSdk(25)
-        )
-        .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
-        .run()
-        .expect("""
-            |src/foo/Example.java:6: Error: The logging tag can be at most 23 characters, was 24 (abcdefghijklmnopqrstuvwx) [TimberTagLength]
-            |     Timber.tag("abcdefghijklmnopqrstuvw" + field);
-            |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             |1 errors, 0 warnings""".trimMargin())
   }
 
@@ -826,38 +822,10 @@ class WrongTimberUsageDetectorTest {
                 |}""".trimMargin()),
             manifest().minSdk(26)
         )
-        .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
+        .issues(*issues)
         .run()
         .expectClean()
   }
-
-  @Test fun tagTooLongLiteralPlusFieldOnlyBeforeApi26() {
-        lint()
-            .files(TIMBER_STUB,
-                java("""
-                    |package foo;
-                    |import timber.log.Timber;
-                    |public class Example {
-                    |  private final String field = "x";
-                    |  public void log() {
-                    |     Timber.tag("abcdefghijklmnopqrstuvw" + field);
-                    |  }
-                    |}""".trimMargin()),
-                kotlin("""
-                    |package foo
-                    |import timber.log.Timber
-                    |class Example {
-                    |  private val field = "x"
-                    |  fun log() {
-                    |     Timber.tag("abcdefghijklmnopqrstuvw${"$"}field")
-                    |  }
-                    |}""".trimMargin()),
-                    manifest().minSdk(26)
-                )
-                .issues(WrongTimberUsageDetector.ISSUE_TAG_LENGTH)
-                .run()
-                .expectClean()
-    }
 
   @Test fun tooManyFormatArgsInTag() {
     lint()
@@ -879,7 +847,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:5: Error: Wrong argument count, format string %s %s requires 2 but format call supplies 1 [TimberArgCount]
@@ -911,7 +879,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_ARG_COUNT)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:5: Error: Wrong argument count, format string %s requires 1 but format call supplies 2 [TimberArgCount]
@@ -943,7 +911,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:5: Error: Wrong argument type for formatting argument '#1' in %d: conversion is 'd', received String (argument #2 in method call) [TimberArgTypes]
@@ -977,7 +945,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:6: Warning: Explicitly logging exception message is redundant [TimberExceptionLogging]
@@ -1021,7 +989,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:6: Warning: Explicitly logging exception message is redundant [TimberExceptionLogging]
@@ -1067,7 +1035,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -1092,7 +1060,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -1123,7 +1091,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -1152,7 +1120,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -1181,7 +1149,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -1208,7 +1176,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:6: Warning: Use single-argument log method instead of null/empty message [TimberExceptionLogging]
@@ -1252,7 +1220,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .issues(*issues)
         .run()
         .expect("""
             |src/foo/Example.java:6: Warning: Use single-argument log method instead of null/empty message [TimberExceptionLogging]
@@ -1296,7 +1264,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -1321,7 +1289,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -1346,7 +1314,7 @@ class WrongTimberUsageDetectorTest {
                 |  }
                 |}""".trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -1364,7 +1332,7 @@ class WrongTimberUsageDetectorTest {
                 |}""".trimMargin()),
             // no kotlin equivalent, since primitive wrappers do not exist
         )
-        .issues(WrongTimberUsageDetector.ISSUE_ARG_TYPES)
+        .issues(*issues)
         .run()
         .expectClean()
   }
@@ -1399,7 +1367,7 @@ class WrongTimberUsageDetectorTest {
                 |}
                 """.trimMargin())
         )
-        .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+        .issues(*issues)
         .run()
         .expectClean()
   }
