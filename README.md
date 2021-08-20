@@ -100,7 +100,7 @@ Documentation is available at [jakewharton.github.io/timber/docs/5.x/](https://j
 
 ```groovy
 repositories {
-  mavenCental()
+  mavenCentral()
   maven {
     url 'https://oss.sonatype.org/content/repositories/snapshots/'
   }
