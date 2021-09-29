@@ -595,6 +595,7 @@ class Timber private constructor() {
       return Forest.forest()
     }
 
+    /** Return the number of planted trees */
     @get:[JvmStatic JvmName("treeCount")]
     val treeCount get() = Forest.treeCount
   }
