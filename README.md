@@ -84,7 +84,7 @@ Download
 
 ```groovy
 repositories {
-  mavenCental()
+  mavenCentral()
 }
 
 dependencies {
