@@ -25,6 +25,15 @@ Two easy steps:
  1. Install any `Tree` instances you want in the `onCreate` of your application class.
  2. Call `Timber`'s static methods everywhere throughout your app.
 
+Optional:
+--------
+
+To get clickable log source location in Logcat:
+
+ - Append extension `timberSource` (returns String) with log message.
+ - Append extension `TimberKt.getTimberSource()` (returns String) with log message.
+
+
 Check out the sample app in `timber-sample/` to see it in action.
 
 

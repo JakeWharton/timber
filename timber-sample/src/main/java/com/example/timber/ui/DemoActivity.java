@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.example.timber.databinding.DemoActivityBinding;
 
 import timber.log.Timber;
+import timber.log.TimberKt;
 
 public class DemoActivity extends Activity implements View.OnClickListener {
   @Override protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +20,8 @@ public class DemoActivity extends Activity implements View.OnClickListener {
     setContentView(binding.getRoot());
 
     Timber.tag("LifeCycles");
-    Timber.d("Activity Created");
+    //TimberKt.getTimberSource() to print clickable log location
+    Timber.d(TimberKt.getTimberSource() + " Activity Created");
 
     binding.hello.setOnClickListener(this);
     binding.hey.setOnClickListener(this);
@@ -28,7 +30,7 @@ public class DemoActivity extends Activity implements View.OnClickListener {
 
   @Override public void onClick(View v) {
     Button button = (Button) v;
-    Timber.i("A button with ID %s was clicked to say '%s'.", button.getId(), button.getText());
+    Timber.i(TimberKt.getTimberSource() + "A button with ID %s was clicked to say '%s'.", button.getId(), button.getText());
     Toast.makeText(this, "Check logcat for a greeting!", LENGTH_SHORT).show();
   }
 }

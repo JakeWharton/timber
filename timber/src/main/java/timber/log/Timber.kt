@@ -195,16 +195,16 @@ class Timber private constructor() {
   /** A [Tree] for debug builds. Automatically infers the tag from the calling class. */
   open class DebugTree : Tree() {
     private val fqcnIgnore = listOf(
-        Timber::class.java.name,
-        Timber.Forest::class.java.name,
-        Tree::class.java.name,
-        DebugTree::class.java.name
+      Timber::class.java.name,
+      Timber.Forest::class.java.name,
+      Tree::class.java.name,
+      DebugTree::class.java.name
     )
 
     override val tag: String?
       get() = super.tag ?: Throwable().stackTrace
-          .first { it.className !in fqcnIgnore }
-          .let(::createStackElementTag)
+        .first { it.className !in fqcnIgnore }
+        .let(::createStackElementTag)
 
     /**
      * Extract the tag which should be used for the message from the `element`. By default
@@ -212,7 +212,7 @@ class Timber private constructor() {
      * becomes `Foo`).
      *
      * Note: This will not be called if a [manual tag][.tag] was specified.
-    */
+     */
     protected open fun createStackElementTag(element: StackTraceElement): String? {
       var tag = element.className.substringAfterLast('.')
       val m = ANONYMOUS_CLASS.matcher(tag)
@@ -233,7 +233,7 @@ class Timber private constructor() {
      * [Log.wtf()][Log.wtf] for logging.
      *
      * {@inheritDoc}
-    */
+     */
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
       if (message.length < MAX_LOG_LENGTH) {
         if (priority == Log.ASSERT) {
@@ -385,10 +385,10 @@ class Timber private constructor() {
     /**
      * A view into Timber's planted trees as a tree itself. This can be used for injecting a logger
      * instance rather than using static methods or to facilitate testing.
-    */
+     */
     @Suppress(
-        "NOTHING_TO_INLINE", // Kotlin users should reference `Tree.Forest` directly.
-        "NON_FINAL_MEMBER_IN_OBJECT" // For japicmp check.
+      "NOTHING_TO_INLINE", // Kotlin users should reference `Tree.Forest` directly.
+      "NON_FINAL_MEMBER_IN_OBJECT" // For japicmp check.
     )
     @JvmStatic
     open inline fun asTree(): Tree = this
@@ -453,3 +453,12 @@ class Timber private constructor() {
     @Volatile private var treeArray = emptyArray<Tree>()
   }
 }
+
+/**
+ *  Returns Clickable Filename:LineNumber in logcat
+ */
+val timberSource: String
+  get() {
+    val stackTrace = Thread.currentThread().stackTrace[3]
+    return "(${stackTrace.fileName}:${stackTrace.lineNumber})"
+  }
