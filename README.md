@@ -30,8 +30,8 @@ Optional:
 
 To get clickable log source location in Logcat:
 
- - Append extension `timberSource` (returns String) with log message.
- - Append extension `TimberKt.getTimberSource()` (returns String) with log message.
+ - Kotlin: Append extension `timberSource` (returns String) with log message.
+ - Java: Append extension `TimberKt.getTimberSource()` (returns String) with log message.
 
 
 Check out the sample app in `timber-sample/` to see it in action.
