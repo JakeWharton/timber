@@ -193,13 +193,18 @@ class Timber private constructor() {
   }
 
   /** A [Tree] for debug builds. Automatically infers the tag from the calling class. */
-  open class DebugTree : Tree() {
-    private val fqcnIgnore = listOf(
-        Timber::class.java.name,
-        Timber.Forest::class.java.name,
-        Tree::class.java.name,
-        DebugTree::class.java.name
-    )
+  open class DebugTree(delegator: Class<*>? = null) : Tree() {
+
+    private val fqcnIgnore : MutableList<String> = listOf(
+      Timber::class.java.name,
+      Timber.Forest::class.java.name,
+      Tree::class.java.name,
+      DebugTree::class.java.name
+    ).toMutableList()
+
+    init {
+      delegator?.let { fqcnIgnore.add(it.name) }
+    }
 
     override val tag: String?
       get() = super.tag ?: Throwable().stackTrace
