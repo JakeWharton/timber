@@ -31,6 +31,9 @@ class Timber private constructor() {
         return tag
       }
 
+    @get:JvmSynthetic // Hide from public API.
+    internal open val source: String = ""
+
     /** Log a verbose message with optional format args. */
     open fun v(message: String?, vararg args: Any?) {
       prepareLog(Log.VERBOSE, null, message, *args)
@@ -193,18 +196,23 @@ class Timber private constructor() {
   }
 
   /** A [Tree] for debug builds. Automatically infers the tag from the calling class. */
-  open class DebugTree : Tree() {
+  open class DebugTree(private val clickableSourceEnabled: Boolean = true) : Tree() {
     private val fqcnIgnore = listOf(
-        Timber::class.java.name,
-        Timber.Forest::class.java.name,
-        Tree::class.java.name,
-        DebugTree::class.java.name
+      Timber::class.java.name,
+      Timber.Forest::class.java.name,
+      Tree::class.java.name,
+      DebugTree::class.java.name
     )
 
     override val tag: String?
       get() = super.tag ?: Throwable().stackTrace
-          .first { it.className !in fqcnIgnore }
-          .let(::createStackElementTag)
+        .first { it.className !in fqcnIgnore }
+        .let(::createStackElementTag)
+
+    override val source: String
+      get() = Throwable().stackTrace
+        .first { it.className !in fqcnIgnore }
+        .let(::createStackElementSource)
 
     /**
      * Extract the tag which should be used for the message from the `element`. By default
@@ -212,8 +220,8 @@ class Timber private constructor() {
      * becomes `Foo`).
      *
      * Note: This will not be called if a [manual tag][.tag] was specified.
-    */
-    protected open fun createStackElementTag(element: StackTraceElement): String? {
+     */
+    protected open fun createStackElementTag(element: StackTraceElement): String {
       var tag = element.className.substringAfterLast('.')
       val m = ANONYMOUS_CLASS.matcher(tag)
       if (m.find()) {
@@ -228,13 +236,25 @@ class Timber private constructor() {
     }
 
     /**
+     * Extract the source (File Name & Line Number)
+     */
+    protected open fun createStackElementSource(element: StackTraceElement) = with(element){
+      "($fileName:$lineNumber)"
+    }
+
+    /**
      * Break up `message` into maximum-length chunks (if needed) and send to either
      * [Log.println()][Log.println] or
      * [Log.wtf()][Log.wtf] for logging.
      *
      * {@inheritDoc}
-    */
+     */
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+      val message = if (clickableSourceEnabled) {
+        "$source $message"
+      } else {
+        message
+      }
       if (message.length < MAX_LOG_LENGTH) {
         if (priority == Log.ASSERT) {
           Log.wtf(tag, message)
@@ -385,10 +405,10 @@ class Timber private constructor() {
     /**
      * A view into Timber's planted trees as a tree itself. This can be used for injecting a logger
      * instance rather than using static methods or to facilitate testing.
-    */
+     */
     @Suppress(
-        "NOTHING_TO_INLINE", // Kotlin users should reference `Tree.Forest` directly.
-        "NON_FINAL_MEMBER_IN_OBJECT" // For japicmp check.
+      "NOTHING_TO_INLINE", // Kotlin users should reference `Tree.Forest` directly.
+      "NON_FINAL_MEMBER_IN_OBJECT" // For japicmp check.
     )
     @JvmStatic
     open inline fun asTree(): Tree = this
