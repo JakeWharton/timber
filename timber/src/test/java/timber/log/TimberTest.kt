@@ -16,6 +16,7 @@ import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.robolectric.shadows.ShadowLog.LogItem
@@ -543,6 +544,30 @@ class TimberTest {
 
     assertLog()
         .hasDebugMessage("TimberTest", "Test formatting: Test message logged. 100")
+  }
+
+  @Test fun staticRefUsage() {
+    fun invokeStaticRefWithException(funcRef: (Throwable?) -> Unit) {
+      funcRef(truncatedThrowable(Exception::class.java))
+    }
+
+    fun invokeStaticRefWithTree(funcRef: (Timber.Tree) -> Unit) {
+      funcRef(object : Timber.DebugTree() {
+        override fun formatMessage(message: String, vararg args: Any?): String {
+          return ""
+        }
+      })
+    }
+
+    invokeStaticRefWithTree(Timber::plant)
+
+    invokeStaticRefWithException(Timber::v)
+    invokeStaticRefWithException(Timber::d)
+    invokeStaticRefWithException(Timber::w)
+    invokeStaticRefWithException(Timber::e)
+    invokeStaticRefWithException(Timber::wtf)
+
+    assertEquals(5, getLogs().size)
   }
 
   private fun <T : Throwable> truncatedThrowable(throwableClass: Class<T>): T {
