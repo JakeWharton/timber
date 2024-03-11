@@ -22,7 +22,7 @@ class Timber private constructor() {
     internal val explicitTag = ThreadLocal<String>()
 
     @get:JvmSynthetic // Hide from public API.
-    internal open val tag: String?
+    protected open val tag: String?
       get() {
         val tag = explicitTag.get()
         if (tag != null) {
