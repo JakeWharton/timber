@@ -200,10 +200,11 @@ class Timber private constructor() {
         Tree::class.java.name,
         DebugTree::class.java.name
     )
+    protected open val customIgnoredClassNameList = emptyList<String>()
 
     override val tag: String?
       get() = super.tag ?: Throwable().stackTrace
-          .first { it.className !in fqcnIgnore }
+          .first { it.className !in (fqcnIgnore+customIgnoredClassNameList) }
           .let(::createStackElementTag)
 
     /**

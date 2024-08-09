@@ -19,6 +19,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.robolectric.shadows.ShadowLog.LogItem
+import timber.log.loggerfacade.LoggerFacade
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
@@ -26,7 +27,6 @@ class TimberTest {
   @Before @After fun setUpAndTearDown() {
     Timber.uprootAll()
   }
-
   // NOTE: This class references the line number. Keep it at the top so it does not change.
   @Test fun debugTreeCanAlterCreatedTag() {
     Timber.plant(object : Timber.DebugTree() {
@@ -303,6 +303,28 @@ class TimberTest {
         .hasDebugMessage("Custom", "Hello, world!")
         .hasNoMoreMessages()
   }
+
+  @Test fun debugTreeTagNameIsFacadeClassNameWhenTimberCallsAreCalledInsideFacadeClass() {
+    Timber.plant(Timber.DebugTree())
+    LoggerFacade.d("te%st")
+    assertLog()
+      .hasDebugMessage("LoggerFacade", "te%st") //tag name is LoggerFacade
+      .hasNoMoreMessages()
+  }
+
+  @Test fun debugTreeTagNameIsClassNameWhereFacadeClassIsCalled() {
+    val debugTree=object :Timber.DebugTree(){
+      override val customIgnoredClassNameList: List<String>
+        get() = listOf(LoggerFacade::class.java.name)
+    }
+    Timber.plant(debugTree)
+    LoggerFacade.d("te%st")
+    assertLog()
+      .hasDebugMessage("TimberTest", "te%st") //tag name is TimberTest
+      .hasNoMoreMessages()
+  }
+
+
 
   @Test fun messageWithException() {
     Timber.plant(Timber.DebugTree())
