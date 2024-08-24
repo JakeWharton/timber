@@ -13,6 +13,10 @@ The `DebugTree` implementation will automatically figure out from which class it
 use that class name as its tag. Since the tags vary, it works really well when coupled with a log
 reader like [Pidcat][1].
 
+The `DebugTree` implementation also supports clickable logs in logcat. It will provide a clickable
+location of the specific log statement in Android Studio Logcat (in format FILENAME:LINE_NUMBER).
+You can disable it by passing `clickableSourceEnabled = false` in `DebugTree` constructor.
+
 There are no `Tree` implementations installed by default because every time you log in production, a
 puppy dies.
 
