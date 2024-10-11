@@ -295,6 +295,17 @@ class TimberTest {
         .hasNoMoreMessages()
   }
 
+  @Test fun debugTreeDoesNotUseIgnoredClassForTag() {
+    val tree = Timber.DebugTree(ThisIsAReallyLongClassName::class.java)
+    Timber.plant(tree)
+
+    ThisIsAReallyLongClassName().run()
+
+    assertLog()
+        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasNoMoreMessages()
+  }
+
   @Test fun debugTreeCustomTag() {
     Timber.plant(Timber.DebugTree())
     Timber.tag("Custom").d("Hello, world!")

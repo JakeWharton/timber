@@ -193,13 +193,13 @@ class Timber private constructor() {
   }
 
   /** A [Tree] for debug builds. Automatically infers the tag from the calling class. */
-  open class DebugTree : Tree() {
-    private val fqcnIgnore = listOf(
+  open class DebugTree(vararg ignoredClasses: Class<*>) : Tree() {
+    private val fqcnIgnore = setOf(
         Timber::class.java.name,
         Timber.Forest::class.java.name,
         Tree::class.java.name,
         DebugTree::class.java.name
-    )
+    ).plus(ignoredClasses.map { it.name })
 
     override val tag: String?
       get() = super.tag ?: Throwable().stackTrace
