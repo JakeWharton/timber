@@ -6,7 +6,7 @@ buildscript {
       'compileSdk': 30,
 
       'kotlin': '1.5.21',
-      'autoService': '1.0-rc7',
+      'autoService': '1.1.1',
 
       // Update WrongTimberUsageDetectorTest#innerStringFormatWithStaticImport when >= 7.1.0-alpha07
       'androidPlugin': '7.0.0',
