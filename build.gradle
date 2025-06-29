@@ -6,7 +6,7 @@ buildscript {
       'kotlin': '2.2.0',
       'autoService': '1.1.1',
 
-      'androidPlugin': '8.10.0',
+      'androidPlugin': '8.11.0',
       'androidTools': '31.10.0',
   ]
 
