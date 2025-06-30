@@ -5,17 +5,20 @@ on:
     tags:
       - '**'
 
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false -Dkotlin.incremental=false  -Dorg.gradle.logging.stacktrace=full"
+
 jobs:
   release:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version-file: .github/workflows/.java-version
+      - uses: gradle/actions/setup-gradle@v4
 
 # TODO!
 #      - run: ./gradlew -p mosaic publish
