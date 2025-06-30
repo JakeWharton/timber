@@ -5,7 +5,7 @@ buildscript {
       'minSdk': 14,
       'compileSdk': 30,
 
-      'kotlin': '1.5.21',
+      'kotlin': '1.9.25',
       'autoService': '1.1.1',
 
       // Update WrongTimberUsageDetectorTest#innerStringFormatWithStaticImport when >= 7.1.0-alpha07
