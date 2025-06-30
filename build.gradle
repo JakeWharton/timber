@@ -27,7 +27,7 @@ buildscript {
           'service': "com.google.auto.service:auto-service:${versions.autoService}",
           'serviceAnnotations': "com.google.auto.service:auto-service-annotations:${versions.autoService}",
       ],
-      annotations: 'org.jetbrains:annotations:20.1.0',
+      annotations: 'org.jetbrains:annotations:26.0.2',
 
       junit: 'junit:junit:4.13.2',
       truth: 'com.google.truth:truth:1.4.4',
