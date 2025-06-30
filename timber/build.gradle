@@ -4,6 +4,7 @@ apply plugin: 'com.vanniktech.maven.publish'
 apply plugin: 'org.jetbrains.dokka' // Must be applied here for publish plugin.
 
 android {
+  namespace 'timber.log'
   compileSdkVersion versions.compileSdk
 
   defaultConfig {

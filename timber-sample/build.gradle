@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+  namespace 'com.example.timber'
   compileSdkVersion versions.compileSdk
 
   buildFeatures {
