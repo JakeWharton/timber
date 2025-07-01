@@ -1,0 +1,28 @@
+[versions]
+agp = "8.11.0"
+androidTools = "30.0.0" # Update this values in sync with agp.
+kotlin = "2.2.0"
+autoService = "1.1.1"
+minSdk = "14"
+compileSdk = "30"
+
+[libraries]
+gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+gradlePlugin-dokka = "org.jetbrains.dokka:dokka-gradle-plugin:2.0.0"
+gradlePlugin-japicmp = "me.champeau.gradle:japicmp-gradle-plugin:0.4.6"
+gradlePlugin-mavenPublish = "com.vanniktech:gradle-maven-publish-plugin:0.33.0"
+
+annotations = "org.jetbrains:annotations:20.1.0"
+auto-service = { module = "com.google.auto.service:auto-service", version.ref = "autoService" }
+auto-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoService" }
+
+lint-core = { module = "com.android.tools.lint:lint", version.ref = "androidTools" }
+lint-api = { module = "com.android.tools.lint:lint-api", version.ref = "androidTools" }
+lint-checks = { module = "com.android.tools.lint:lint-checks", version.ref = "androidTools" }
+lint-tests = { module = "com.android.tools.lint:lint-tests", version.ref = "androidTools" }
+
+junit = "junit:junit:4.13.2"
+
+truth = "com.google.truth:truth:1.4.4"
+robolectric = "org.robolectric:robolectric:4.15.1"

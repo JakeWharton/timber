@@ -1,39 +1,4 @@
 buildscript {
-  ext.versions = [
-      'minSdk': 14,
-      'compileSdk': 30,
-
-      'kotlin': '2.2.0',
-      'autoService': '1.1.1',
-
-      // Update WrongTimberUsageDetectorTest#innerStringFormatWithStaticImport when >= 7.1.0-alpha07
-      'androidPlugin': '8.11.0',
-      'androidTools': '30.0.0',
-  ]
-
-  ext.deps = [
-      androidPlugin: "com.android.tools.build:gradle:${versions.androidPlugin}",
-      'kotlin': [
-          'plugin': "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}",
-          'stdlib': "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}",
-      ],
-      'lint': [
-          'core': "com.android.tools.lint:lint:${versions.androidTools}",
-          'api': "com.android.tools.lint:lint-api:${versions.androidTools}",
-          'checks': "com.android.tools.lint:lint-checks:${versions.androidTools}",
-          'tests': "com.android.tools.lint:lint-tests:${versions.androidTools}",
-      ],
-      'auto': [
-          'service': "com.google.auto.service:auto-service:${versions.autoService}",
-          'serviceAnnotations': "com.google.auto.service:auto-service-annotations:${versions.autoService}",
-      ],
-      annotations: 'org.jetbrains:annotations:20.1.0',
-
-      junit: 'junit:junit:4.13.2',
-      truth: 'com.google.truth:truth:1.4.4',
-      robolectric: 'org.robolectric:robolectric:4.15.1',
-  ]
-
   repositories {
     mavenCentral()
     google()
@@ -41,11 +6,11 @@ buildscript {
   }
 
   dependencies {
-    classpath deps.androidPlugin
-    classpath deps.kotlin.plugin
-    classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.4.6'
-    classpath 'com.vanniktech:gradle-maven-publish-plugin:0.33.0'
-    classpath 'org.jetbrains.dokka:dokka-gradle-plugin:2.0.0'
+    classpath libs.gradlePlugin.android
+    classpath libs.gradlePlugin.kotlin
+    classpath libs.gradlePlugin.japicmp
+    classpath libs.gradlePlugin.mavenPublish
+    classpath libs.gradlePlugin.dokka
   }
 }
 
