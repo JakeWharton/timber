@@ -7,7 +7,7 @@ buildscript {
       'autoService': '1.1.1',
 
       // Update WrongTimberUsageDetectorTest#innerStringFormatWithStaticImport when >= 7.1.0-alpha07
-      'androidPlugin': '8.10.0',
+      'androidPlugin': '8.11.0',
       'androidTools': '30.0.0',
   ]
 
