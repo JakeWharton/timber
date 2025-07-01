@@ -224,8 +224,6 @@ class TimberTest {
         .hasNoMoreMessages()
   }
 
-  // NOTE: this will fail on some future version of Kotlin when lambdas are compiled using invokedynamic
-  // Fix will be to expect the tag to be "TimberTest" as opposed to "TimberTest\$debugTreeTag"
   @Test
   fun debugTreeTagGenerationStripsAnonymousLambdaClassMarker() {
     Timber.plant(Timber.DebugTree())
@@ -243,8 +241,8 @@ class TimberTest {
     outer()
 
     assertLog()
-        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
-        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+        .hasDebugMessage("TimberTest", "Hello, world!")
+        .hasDebugMessage("TimberTest", "Hello, world!")
         .hasNoMoreMessages()
   }
 

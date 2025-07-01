@@ -2,8 +2,13 @@ apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.kapt'
 apply plugin: 'com.android.lint'
 
-targetCompatibility = JavaVersion.VERSION_1_8
-sourceCompatibility = JavaVersion.VERSION_1_8
+kotlin {
+  jvmToolchain(17)
+}
+
+lint {
+  baseline = file("lint-baseline.xml")
+}
 
 dependencies {
   compileOnly deps.lint.api

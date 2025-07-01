@@ -1,0 +1,961 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.10.0" type="baseline" client="gradle" dependencies="false" name="AGP (8.10.0)" variant="all" version="8.10.0">
+
+    <issue
+        id="JavaPluginLanguageLevel"
+        message="no Java language level directives"
+        errorLine1="apply plugin: &apos;java-library&apos;"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="LintImplTextFormat"
+        message="&quot;format()&quot; looks like a call; surround with backtics in string to display as symbol, e.g. \`format()\`"
+        errorLine1="      explanation = &quot;Since Timber handles String.format automatically, you may not use String#format().&quot;,"
+        errorLine2="                                                                                              ~~~~~~~~">
+        <location
+            file="src/main/java/timber/lint/WrongTimberUsageDetector.kt"
+            line="741"
+            column="95"/>
+    </issue>
+
+    <issue
+        id="LintImplTextFormat"
+        message="&quot;format()&quot; looks like a call; surround with backtics in string to display as symbol, e.g. \`format()\`"
+        errorLine1="      explanation = &quot;Since Timber handles String#format() automatically, use this instead of String concatenation.&quot;,"
+        errorLine2="                                                 ~~~~~~~~">
+        <location
+            file="src/main/java/timber/lint/WrongTimberUsageDetector.kt"
+            line="759"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="LintImplDollarEscapes"
+        message="In unit tests, use the fullwidth dollar sign, `＄`, instead of `$`, to avoid having to use cumbersome escapes. Lint will treat a `＄` as a `$`."
+        errorLine1="                |     Timber.d(&quot;${&quot;$&quot;}{foo}bar&quot;)"
+        errorLine2="                                ~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="552"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="LintImplDollarEscapes"
+        message="In unit tests, use the fullwidth dollar sign, `＄`, instead of `$`, to avoid having to use cumbersome escapes. Lint will treat a `＄` as a `$`."
+        errorLine1="                |     Timber.d(&quot;foo${&quot;$&quot;}bar&quot;)"
+        errorLine2="                                   ~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="589"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="LintImplDollarEscapes"
+        message="In unit tests, use the fullwidth dollar sign, `＄`, instead of `$`, to avoid having to use cumbersome escapes. Lint will treat a `＄` as a `$`."
+        errorLine1="                |     Timber.d(&quot;${&quot;$&quot;}foo${&quot;$&quot;}bar&quot;)"
+        errorLine2="                                ~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="628"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="LintImplDollarEscapes"
+        message="In unit tests, use the fullwidth dollar sign, `＄`, instead of `$`, to avoid having to use cumbersome escapes. Lint will treat a `＄` as a `$`."
+        errorLine1="                |     Timber.d(if(true) &quot;Hello, ${&quot;$&quot;}s&quot; else &quot;Bye&quot;)"
+        errorLine2="                                                ~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="665"
+            column="49"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="35"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="43"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="85"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="93"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="134"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="141"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="182"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="189"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="231"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="239"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="274"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="283"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="321"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="330"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="355"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="378"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="387"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="403"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="410"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="424"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="431"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="              |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                    ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="449"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="              |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                    ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="458"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="476"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="485"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="519"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="527"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="545"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="554"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="582"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="591"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="620"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="630"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="658"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="667"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="688"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="696"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="720"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="728"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="752"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="760"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="784"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="792"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="814"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="822"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="840"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="848"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="872"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="880"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="904"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="912"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="937"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="946"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="981"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="990"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1026"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1036"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1053"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1061"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1081"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1092"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1111"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1121"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1140"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1150"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1168"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1177"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1212"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1221"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1256"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1265"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1282"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1290"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1307"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin())"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1315"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                |}&quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                      ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1332"
+            column="23"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `java()` test file construction"
+        errorLine1="                &quot;&quot;&quot;.trimMargin()),"
+        errorLine2="                    ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1355"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="LintImplTrimIndent"
+        message="No need to call `.trimMargin()` in issue registration strings; they are already trimmed by indent by lint when displaying to users. Instead, call `.indented()` on the surrounding `kotlin()` test file construction"
+        errorLine1="                &quot;&quot;&quot;.trimMargin())"
+        errorLine2="                    ~~~~~~~~~~~~">
+        <location
+            file="src/test/java/timber/lint/WrongTimberUsageDetectorTest.kt"
+            line="1368"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="UElementAsPsi"
+        message="Do not use `UElement` as `PsiElement`"
+        errorLine1="    if (expression is PsiMethodCallExpression) {"
+        errorLine2="        ~~~~~~~~~~">
+        <location
+            file="src/main/java/timber/lint/WrongTimberUsageDetector.kt"
+            line="279"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UElementAsPsi"
+        message="Do not use `UElement` as `PsiElement`"
+        errorLine1="    } else if (expression is PsiLiteralExpression) {"
+        errorLine2="               ~~~~~~~~~~">
+        <location
+            file="src/main/java/timber/lint/WrongTimberUsageDetector.kt"
+            line="286"
+            column="16"/>
+    </issue>
+
+</issues>

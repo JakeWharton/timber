@@ -3,11 +3,11 @@ buildscript {
       'minSdk': 14,
       'compileSdk': 30,
 
-      'kotlin': '1.5.21',
+      'kotlin': '2.2.0',
       'autoService': '1.1.1',
 
       // Update WrongTimberUsageDetectorTest#innerStringFormatWithStaticImport when >= 7.1.0-alpha07
-      'androidPlugin': '7.0.0',
+      'androidPlugin': '8.10.0',
       'androidTools': '30.0.0',
   ]
 
@@ -31,7 +31,7 @@ buildscript {
 
       junit: 'junit:junit:4.13.2',
       truth: 'com.google.truth:truth:1.4.4',
-      robolectric: 'org.robolectric:robolectric:4.6.1',
+      robolectric: 'org.robolectric:robolectric:4.15.1',
   ]
 
   repositories {
@@ -43,7 +43,7 @@ buildscript {
   dependencies {
     classpath deps.androidPlugin
     classpath deps.kotlin.plugin
-    classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.2.9'
+    classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.4.1'
     classpath 'com.vanniktech:gradle-maven-publish-plugin:0.14.2'
     classpath 'org.jetbrains.dokka:dokka-gradle-plugin:1.9.20'
   }
