@@ -44,7 +44,7 @@ buildscript {
     classpath deps.androidPlugin
     classpath deps.kotlin.plugin
     classpath 'me.champeau.gradle:japicmp-gradle-plugin:0.4.1'
-    classpath 'com.vanniktech:gradle-maven-publish-plugin:0.14.2'
+    classpath 'com.vanniktech:gradle-maven-publish-plugin:0.33.0'
     classpath 'org.jetbrains.dokka:dokka-gradle-plugin:1.9.20'
   }
 }
