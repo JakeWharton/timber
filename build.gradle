@@ -6,9 +6,8 @@ buildscript {
       'kotlin': '2.2.0',
       'autoService': '1.1.1',
 
-      // Update WrongTimberUsageDetectorTest#innerStringFormatWithStaticImport when >= 7.1.0-alpha07
       'androidPlugin': '8.11.0',
-      'androidTools': '30.0.0',
+      'androidTools': '31.10.0',
   ]
 
   ext.deps = [

@@ -14,6 +14,7 @@ import com.intellij.psi.PsiMethod
 import com.android.tools.lint.client.api.JavaEvaluator
 import com.android.tools.lint.detector.api.LintFix
 import org.jetbrains.uast.UElement
+import com.intellij.psi.PsiTypes
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.UExpression
 import com.android.tools.lint.detector.api.Incident
@@ -216,7 +217,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
 
       val type = getType(argument) ?: continue
       val last = formatType.last()
-      if (formatType.length >= 2 && formatType[formatType.length - 2].toLowerCase() == 't') {
+      if (formatType.length >= 2 && formatType[formatType.length - 2].lowercaseChar() == 't') {
         // Date time conversion.
         when (last) {
           'H', 'I', 'k', 'l', 'M', 'S', 'L', 'N', 'p', 'z', 'Z', 's', 'Q', // time
@@ -288,11 +289,11 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       val expressionType = literalExpression.type
       when {
         isString(expressionType!!) -> return String::class.java
-        expressionType === PsiType.INT -> return Integer.TYPE
-        expressionType === PsiType.FLOAT -> return java.lang.Float.TYPE
-        expressionType === PsiType.CHAR -> return Character.TYPE
-        expressionType === PsiType.BOOLEAN -> return java.lang.Boolean.TYPE
-        expressionType === PsiType.NULL -> return Any::class.java
+        expressionType === PsiTypes.intType() -> return Integer.TYPE
+        expressionType === PsiTypes.floatType() -> return java.lang.Float.TYPE
+        expressionType === PsiTypes.charType() -> return Character.TYPE
+        expressionType === PsiTypes.booleanType() -> return java.lang.Boolean.TYPE
+        expressionType === PsiTypes.nullType() -> return Any::class.java
       }
     }
 
