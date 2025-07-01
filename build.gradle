@@ -8,7 +8,7 @@ buildscript {
 
       // Update WrongTimberUsageDetectorTest#innerStringFormatWithStaticImport when >= 7.1.0-alpha07
       'androidPlugin': '8.11.0',
-      'androidTools': '30.0.0',
+      'androidTools': '31.11.0',
   ]
 
   ext.deps = [
