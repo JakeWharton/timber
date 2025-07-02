@@ -3,6 +3,14 @@
 	extends: [
 		'config:recommended',
 	],
+	packageRules: [
+		{
+			groupName: 'AGP',
+			matchPackagePatterns: [
+				'com.android.tools.*',
+			],
+		},
+	],
 	ignorePresets: [
 		// Ensure we get the latest version and are not pinned to old versions.
 		'workarounds:javaLTSVersions',
