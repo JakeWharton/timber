@@ -10,10 +10,10 @@ kotlin {
 
 android {
   namespace 'timber.log'
-  compileSdkVersion versions.compileSdk
+  compileSdkVersion libs.versions.compileSdk.get().toInteger()
 
   defaultConfig {
-    minSdkVersion versions.minSdk
+    minSdkVersion libs.versions.minSdk.get()
     consumerProguardFiles 'consumer-proguard-rules.pro'
   }
 
@@ -24,13 +24,12 @@ android {
 }
 
 dependencies {
-  api deps.kotlin.stdlib
-  implementation deps.annotations
+  implementation libs.annotations
 
-  testImplementation deps.annotations
-  testImplementation deps.junit
-  testImplementation deps.truth
-  testImplementation deps.robolectric
+  testImplementation libs.annotations
+  testImplementation libs.junit
+  testImplementation libs.truth
+  testImplementation libs.robolectric
 
   lintPublish project(':timber-lint')
 }

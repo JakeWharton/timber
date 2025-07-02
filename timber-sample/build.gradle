@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
   namespace 'com.example.timber'
-  compileSdkVersion versions.compileSdk
+  compileSdkVersion libs.versions.compileSdk.get().toInteger()
 
   buildFeatures {
     buildConfig = true
@@ -11,8 +11,8 @@ android {
 
   defaultConfig {
     applicationId 'com.example.timber'
-    minSdkVersion versions.minSdk
-    targetSdkVersion versions.compileSdk
+    minSdkVersion libs.versions.minSdk.get()
+    targetSdkVersion libs.versions.compileSdk.get().toInteger()
     versionCode 1
     versionName '1.0.0'
   }

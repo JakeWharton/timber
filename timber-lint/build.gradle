@@ -11,12 +11,12 @@ lint {
 }
 
 dependencies {
-  compileOnly deps.lint.api
-  compileOnly deps.lint.checks
-  compileOnly deps.auto.serviceAnnotations
-  kapt deps.auto.service
-  testImplementation deps.junit
-  testImplementation deps.lint.core
-  testImplementation deps.lint.tests
-  testImplementation deps.junit
+  compileOnly libs.lint.api
+  compileOnly libs.lint.checks
+  compileOnly libs.auto.annotations
+  kapt libs.auto.service
+  testImplementation libs.junit
+  testImplementation libs.lint.core
+  testImplementation libs.lint.tests
+  testImplementation libs.junit
 }
