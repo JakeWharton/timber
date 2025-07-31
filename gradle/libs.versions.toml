@@ -1,6 +1,6 @@
 [versions]
-agp = "8.11.1"
-androidTools = "31.11.1" # Update this values in sync with agp.
+agp = "8.12.0"
+androidTools = "31.12.0" # Update this values in sync with agp.
 kotlin = "2.2.0"
 autoService = "1.1.1"
 minSdk = "14"
