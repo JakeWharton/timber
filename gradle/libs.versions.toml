@@ -4,7 +4,7 @@ androidTools = "31.12.1" # Update this values in sync with agp.
 kotlin = "2.2.10"
 autoService = "1.1.1"
 minSdk = "14"
-compileSdk = "30"
+compileSdk = "36"
 
 [libraries]
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
