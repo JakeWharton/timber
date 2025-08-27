@@ -448,50 +448,63 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
   private fun checkExceptionLogging(context: JavaContext, call: UCallExpression) {
     val arguments = call.valueArguments
     val numArguments = arguments.size
-    if (numArguments > 1 && isSubclassOf(context, arguments[0], Throwable::class.java)) {
-      val messageArg = arguments[1]
 
-      if (isLoggingExceptionMessage(context, messageArg)) {
+    // Find the throwable and message arguments by their type, not by their position.
+    // This is required to correctly handle Kotlin's named and reordered arguments.
+    val throwableArgument = arguments.firstOrNull { isSubclassOf(context, it, Throwable::class.java) }
+    val messageArgument = arguments.firstOrNull {
+      val type = it.getExpressionType()
+      type != null && isString(type) && it != throwableArgument
+    }
+
+    // Handles overloads like Timber.d(t, "message").
+    if (throwableArgument != null && messageArgument != null) {
+      // Check for the common mistake of explicitly logging the exception's own message.
+      if (isLoggingExceptionMessage(context, messageArgument)) {
         context.report(
           Incident(
             issue = ISSUE_EXCEPTION_LOGGING,
-            scope = messageArg,
+            scope = messageArgument,
             location = context.getLocation(call),
             message = "Explicitly logging exception message is redundant",
-            fix = quickFixRemoveRedundantArgument(messageArg)
+            fix = quickFixRemoveRedundantArgument(messageArgument)
           )
         )
         return
       }
 
-      val s = evaluateString(context, messageArg, true)
-      if (s == null && !canEvaluateExpression(messageArg)) {
-        // Parameters and non-final fields can't be evaluated.
-        return
-      }
+      // Attempt to evaluate the message argument to a constant string at compile time.
+      val messageValue = evaluateString(context, messageArgument, true)
 
-      if (s == null || s.isEmpty()) {
-        context.report(
-          Incident(
-            issue = ISSUE_EXCEPTION_LOGGING,
-            scope = messageArg,
-            location = context.getLocation(call),
-            message = "Use single-argument log method instead of null/empty message",
-            fix = quickFixRemoveRedundantArgument(messageArg)
+      // If we could determine the string's value (i.e., it's a literal or constant)...
+      if (messageValue != null) {
+        // ...then we can safely check if it's empty and report an issue.
+        if (messageValue.isEmpty()) {
+          context.report(
+            Incident(
+              issue = ISSUE_EXCEPTION_LOGGING,
+              scope = messageArgument,
+              location = context.getLocation(call),
+              message = "Use single-argument log method instead of null/empty message",
+              fix = quickFixRemoveRedundantArgument(messageArgument)
+            )
           )
-        )
+        }
       }
-    } else if (numArguments == 1 && !isSubclassOf(context, arguments[0], Throwable::class.java)) {
-      val messageArg = arguments[0]
+      // If messageValue is null, the argument is a variable or method call. We intentionally
+      // do nothing in this case to avoid false positives, as we cannot determine its runtime
+      // value (e.g., it might be guarded by an `if` check). This fixes the reported issue.
 
-      if (isLoggingExceptionMessage(context, messageArg)) {
+      // Handles single-argument overloads like Timber.d("message").
+    } else if (numArguments == 1 && throwableArgument == null && messageArgument != null) {
+      if (isLoggingExceptionMessage(context, messageArgument)) {
         context.report(
           Incident(
             issue = ISSUE_EXCEPTION_LOGGING,
-            scope = messageArg,
+            scope = messageArgument,
             location = context.getLocation(call),
             message = "Explicitly logging exception message is redundant",
-            fix = quickFixReplaceMessageWithThrowable(messageArg)
+            fix = quickFixReplaceMessageWithThrowable(messageArgument)
           )
         )
       }
@@ -521,17 +534,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     )
   }
 
-  private fun canEvaluateExpression(expression: UExpression): Boolean {
-    // TODO - try using CallGraph?
-    if (expression is ULiteralExpression) {
-      return true
-    }
-    if (expression !is USimpleNameReferenceExpression) {
-      return false
-    }
-    val resolvedElement = expression.resolve()
-    return !(resolvedElement is PsiField || resolvedElement is PsiParameter)
-  }
+  // This function is no longer needed after changes and has been removed.
+  // private fun canEvaluateExpression(...) { ... }
 
   private fun isCallFromMethodInSubclassOf(
     context: JavaContext, call: UCallExpression, methodName: String, classType: Class<*>

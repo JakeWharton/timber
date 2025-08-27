@@ -1425,4 +1425,38 @@ class WrongTimberUsageDetectorTest {
         .run()
         .expectClean()
   }
+
+    @Test fun exceptionLoggingWithGuardedVariable() {
+        lint()
+            .files(TIMBER_STUB,
+                kotlin("""
+              |package foo
+              |import timber.log.Timber
+              |import java.lang.Exception
+              |
+              |// This is a fake class just for our test.
+              |interface ApiResponse {
+              |  fun getErrorMessage(): String
+              |}
+              |
+              |class Example {
+              |  fun log(apiResponse: ApiResponse) {
+              |     // Get a message from a method, so the value isn't known at compile time.
+              |     val errorMessage = apiResponse.getErrorMessage()
+              |
+              |     // IMPORTANT: The check that proves the string is not empty.
+              |     if (errorMessage.isNotEmpty()) {
+              |       // This line should NOT cause a lint warning.
+              |       Timber.d(Exception("API Error"), errorMessage)
+              |     }
+              |  }
+              |}
+              """.trimMargin())
+            )
+            .issues(WrongTimberUsageDetector.ISSUE_EXCEPTION_LOGGING)
+            .run()
+            // We expect this code to be perfectly clean with NO warnings.
+            .expectClean()
+    }
+
 }
