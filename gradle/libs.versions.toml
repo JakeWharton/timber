@@ -24,5 +24,5 @@ lint-tests = { module = "com.android.tools.lint:lint-tests", version.ref = "andr
 
 junit = "junit:junit:4.13.2"
 
-truth = "com.google.truth:truth:1.4.4"
+truth = "com.google.truth:truth:1.4.5"
 robolectric = "org.robolectric:robolectric:4.16"
