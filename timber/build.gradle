@@ -1,13 +1,42 @@
 apply plugin: 'org.jetbrains.kotlin.multiplatform'
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.kotlin.multiplatform.library'
 apply plugin: 'com.vanniktech.maven.publish'
 apply plugin: 'org.jetbrains.dokka' // Must be applied here for publish plugin.
 
-
 kotlin {
-  androidTarget()
+  androidLibrary {
+    namespace 'timber.log'
+    compileSdk libs.versions.compileSdk.get().toInteger()
+    minSdk libs.versions.minSdk.get().toInteger()
 
+    optimization {
+      // "it" --> https://issuetracker.google.com/issues/445115242
+      it.consumerKeepRules.file('consumer-keep-rules.pro')
+    }
+
+    lint {
+      it.textReport = true
+    }
+  }
+
+  // TODO Remove!
   jvmToolchain(17)
+
+  sourceSets {
+    commonMain {
+      dependencies {
+        implementation libs.annotations
+      }
+    }
+    commonTest {
+      dependencies {
+        implementation libs.annotations
+        implementation libs.junit
+        implementation libs.assertk
+        implementation libs.robolectric
+      }
+    }
+  }
 
   abiValidation {
     enabled = true
@@ -21,28 +50,6 @@ tasks.named('check') { check ->
   )
 }
 
-android {
-  namespace 'timber.log'
-  compileSdkVersion libs.versions.compileSdk.get().toInteger()
-
-  defaultConfig {
-    minSdkVersion libs.versions.minSdk.get()
-    consumerProguardFiles 'consumer-proguard-rules.pro'
-  }
-
-  lintOptions {
-    textReport true
-    textOutput 'stdout'
-  }
-}
-
 dependencies {
-  implementation libs.annotations
-
-  testImplementation libs.annotations
-  testImplementation libs.junit
-  testImplementation libs.assertk
-  testImplementation libs.robolectric
-
   lintPublish project(':timber-lint')
 }
