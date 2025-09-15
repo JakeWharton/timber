@@ -1,0 +1,104 @@
+public final class timber/log/Timber {
+	public static final field Forest Ltimber/log/Timber$Forest;
+	public static fun asTree ()Ltimber/log/Timber$Tree;
+	public static fun d (Ljava/lang/String;[Ljava/lang/Object;)V
+	public static fun d (Ljava/lang/Throwable;)V
+	public static fun d (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public static fun e (Ljava/lang/String;[Ljava/lang/Object;)V
+	public static fun e (Ljava/lang/Throwable;)V
+	public static fun e (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public static final fun forest ()Ljava/util/List;
+	public static fun i (Ljava/lang/String;[Ljava/lang/Object;)V
+	public static fun i (Ljava/lang/Throwable;)V
+	public static fun i (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public static fun log (ILjava/lang/String;[Ljava/lang/Object;)V
+	public static fun log (ILjava/lang/Throwable;)V
+	public static fun log (ILjava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public static final fun plant (Ltimber/log/Timber$Tree;)V
+	public static final fun plant ([Ltimber/log/Timber$Tree;)V
+	public static final fun tag (Ljava/lang/String;)Ltimber/log/Timber$Tree;
+	public static final fun treeCount ()I
+	public static final fun uproot (Ltimber/log/Timber$Tree;)V
+	public static final fun uprootAll ()V
+	public static fun v (Ljava/lang/String;[Ljava/lang/Object;)V
+	public static fun v (Ljava/lang/Throwable;)V
+	public static fun v (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public static fun w (Ljava/lang/String;[Ljava/lang/Object;)V
+	public static fun w (Ljava/lang/Throwable;)V
+	public static fun w (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public static fun wtf (Ljava/lang/String;[Ljava/lang/Object;)V
+	public static fun wtf (Ljava/lang/Throwable;)V
+	public static fun wtf (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+}
+
+public class timber/log/Timber$DebugTree : timber/log/Timber$Tree {
+	public static final field Companion Ltimber/log/Timber$DebugTree$Companion;
+	public fun <init> ()V
+	protected fun createStackElementTag (Ljava/lang/StackTraceElement;)Ljava/lang/String;
+	protected fun log (ILjava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+}
+
+public final class timber/log/Timber$DebugTree$Companion {
+}
+
+public final class timber/log/Timber$Forest : timber/log/Timber$Tree {
+	public fun asTree ()Ltimber/log/Timber$Tree;
+	public fun d (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun d (Ljava/lang/Throwable;)V
+	public fun d (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun e (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun e (Ljava/lang/Throwable;)V
+	public fun e (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public final fun forest ()Ljava/util/List;
+	public fun i (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun i (Ljava/lang/Throwable;)V
+	public fun i (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun log (ILjava/lang/String;[Ljava/lang/Object;)V
+	public fun log (ILjava/lang/Throwable;)V
+	public fun log (ILjava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public final fun plant (Ltimber/log/Timber$Tree;)V
+	public final fun plant ([Ltimber/log/Timber$Tree;)V
+	public final fun tag (Ljava/lang/String;)Ltimber/log/Timber$Tree;
+	public final fun treeCount ()I
+	public final fun uproot (Ltimber/log/Timber$Tree;)V
+	public final fun uprootAll ()V
+	public fun v (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun v (Ljava/lang/Throwable;)V
+	public fun v (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun w (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun w (Ljava/lang/Throwable;)V
+	public fun w (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun wtf (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun wtf (Ljava/lang/Throwable;)V
+	public fun wtf (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+}
+
+public abstract class timber/log/Timber$Tree {
+	public fun <init> ()V
+	public fun d (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun d (Ljava/lang/Throwable;)V
+	public fun d (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun e (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun e (Ljava/lang/Throwable;)V
+	public fun e (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	protected fun formatMessage (Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
+	public fun i (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun i (Ljava/lang/Throwable;)V
+	public fun i (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	protected fun isLoggable (I)Z
+	protected fun isLoggable (Ljava/lang/String;I)Z
+	protected abstract fun log (ILjava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+	public fun log (ILjava/lang/String;[Ljava/lang/Object;)V
+	public fun log (ILjava/lang/Throwable;)V
+	public fun log (ILjava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun v (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun v (Ljava/lang/Throwable;)V
+	public fun v (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun w (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun w (Ljava/lang/Throwable;)V
+	public fun w (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun wtf (Ljava/lang/String;[Ljava/lang/Object;)V
+	public fun wtf (Ljava/lang/Throwable;)V
+	public fun wtf (Ljava/lang/Throwable;Ljava/lang/String;[Ljava/lang/Object;)V
+}
+

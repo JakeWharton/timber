@@ -6,7 +6,19 @@ apply plugin: 'org.jetbrains.dokka' // Must be applied here for publish plugin.
 
 kotlin {
   androidTarget()
+
   jvmToolchain(17)
+
+  abiValidation {
+    enabled = true
+  }
+}
+
+tasks.named('check') { check ->
+  check.dependsOn(
+      // TODO: https://youtrack.jetbrains.com/issue/KT-78525
+      tasks.named('checkLegacyAbi'),
+  )
 }
 
 android {

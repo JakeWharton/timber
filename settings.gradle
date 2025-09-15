@@ -1,5 +1,4 @@
 include ':timber'
-include ':timber:japicmp'
 include ':timber-lint'
 include ':timber-sample'
 
