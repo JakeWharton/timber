@@ -9,7 +9,7 @@ compileSdk = "36"
 [libraries]
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-gradlePlugin-dokka = "org.jetbrains.dokka:dokka-gradle-plugin:2.0.0"
+gradlePlugin-dokka = "org.jetbrains.dokka:dokka-gradle-plugin:2.1.0"
 gradlePlugin-japicmp = "me.champeau.gradle:japicmp-gradle-plugin:0.4.6"
 gradlePlugin-mavenPublish = "com.vanniktech:gradle-maven-publish-plugin:0.34.0"
 
