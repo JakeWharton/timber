@@ -24,7 +24,7 @@ jobs:
           java-version-file: .github/workflows/.java-version
       - uses: gradle/actions/setup-gradle@v5
 
-      - run: ./gradlew build dokkaHtml
+      - run: ./gradlew build dokkaGenerate
 
       - run: ./gradlew publish
         if: ${{ github.ref == 'refs/heads/trunk' && github.repository == 'JakeWharton/timber' }}
