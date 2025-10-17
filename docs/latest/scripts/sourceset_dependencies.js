@@ -1,1 +1,1 @@
-sourceset_dependencies='{":timber:dokkaHtml/androidMain":[":timber:dokkaHtml/commonMain"],":timber:dokkaHtml/commonMain":[]}'
+sourceset_dependencies='{":timber/androidMain":[":timber/commonMain"],":timber/commonMain":[]}'
