@@ -1,32 +1,7 @@
 package timber.lint
 
-import com.android.tools.lint.detector.api.skipParentheses
-import org.jetbrains.uast.util.isMethodCall
-import com.android.tools.lint.detector.api.minSdkLessThan
-import com.android.tools.lint.detector.api.isString
-import com.android.tools.lint.detector.api.isKotlin
-import org.jetbrains.uast.isInjectionHost
-import org.jetbrains.uast.evaluateString
-import com.android.tools.lint.detector.api.Detector
-import com.android.tools.lint.detector.api.JavaContext
-import org.jetbrains.uast.UCallExpression
-import com.intellij.psi.PsiMethod
-import com.android.tools.lint.client.api.JavaEvaluator
-import com.android.tools.lint.detector.api.LintFix
-import org.jetbrains.uast.UElement
-import com.intellij.psi.PsiTypes
-import org.jetbrains.uast.UMethod
-import org.jetbrains.uast.UExpression
-import com.android.tools.lint.detector.api.Incident
-import org.jetbrains.uast.UQualifiedReferenceExpression
-import org.jetbrains.uast.UBinaryExpression
-import org.jetbrains.uast.UastBinaryOperator
-import org.jetbrains.uast.UIfExpression
-import com.intellij.psi.PsiMethodCallExpression
-import com.intellij.psi.PsiLiteralExpression
-import com.intellij.psi.PsiType
-import com.intellij.psi.PsiClassType
 import com.android.tools.lint.checks.StringFormatDetector
+import com.android.tools.lint.client.api.JavaEvaluator
 import com.android.tools.lint.client.api.TYPE_BOOLEAN
 import com.android.tools.lint.client.api.TYPE_BOOLEAN_WRAPPER
 import com.android.tools.lint.client.api.TYPE_BYTE
@@ -48,16 +23,38 @@ import com.android.tools.lint.client.api.TYPE_STRING
 import com.android.tools.lint.detector.api.Category.Companion.CORRECTNESS
 import com.android.tools.lint.detector.api.Category.Companion.MESSAGES
 import com.android.tools.lint.detector.api.ConstantEvaluator.evaluateString
+import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Detector.UastScanner
 import com.android.tools.lint.detector.api.Implementation
+import com.android.tools.lint.detector.api.Incident
 import com.android.tools.lint.detector.api.Issue
+import com.android.tools.lint.detector.api.JavaContext
+import com.android.tools.lint.detector.api.LintFix
 import com.android.tools.lint.detector.api.Scope.Companion.JAVA_FILE_SCOPE
 import com.android.tools.lint.detector.api.Severity.ERROR
 import com.android.tools.lint.detector.api.Severity.WARNING
+import com.android.tools.lint.detector.api.isKotlin
+import com.android.tools.lint.detector.api.isString
+import com.android.tools.lint.detector.api.minSdkLessThan
+import com.android.tools.lint.detector.api.skipParentheses
+import com.intellij.psi.PsiClassType
+import com.intellij.psi.PsiLiteralExpression
+import com.intellij.psi.PsiMethod
+import com.intellij.psi.PsiMethodCallExpression
+import com.intellij.psi.PsiType
+import com.intellij.psi.PsiTypes
+import org.jetbrains.uast.UBinaryExpression
+import org.jetbrains.uast.UCallExpression
+import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.UIfExpression
 import org.jetbrains.uast.ULiteralExpression
-import org.jetbrains.uast.USimpleNameReferenceExpression
-import com.intellij.psi.PsiField
-import com.intellij.psi.PsiParameter
+import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.UQualifiedReferenceExpression
+import org.jetbrains.uast.UastBinaryOperator
+import org.jetbrains.uast.evaluateString
+import org.jetbrains.uast.isInjectionHost
+import org.jetbrains.uast.util.isMethodCall
 import java.lang.Byte
 import java.lang.Double
 import java.lang.Float
@@ -67,6 +64,12 @@ import java.lang.Short
 import java.util.Calendar
 import java.util.Date
 import java.util.regex.Pattern
+import kotlin.Any
+import kotlin.Boolean
+import kotlin.Number
+import kotlin.String
+import kotlin.Throwable
+import kotlin.arrayOf
 
 class WrongTimberUsageDetector : Detector(), UastScanner {
   override fun getApplicableMethodNames() = listOf("tag", "format", "v", "d", "i", "w", "e", "wtf")
@@ -77,7 +80,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
 
     if ("format" == methodName &&
       (evaluator.isMemberInClass(method, "java.lang.String") ||
-          evaluator.isMemberInClass(method, "kotlin.text.StringsKt__StringsJVMKt"))
+        evaluator.isMemberInClass(method, "kotlin.text.StringsKt__StringsJVMKt"))
     ) {
       checkNestedStringFormat(context, node)
       return
@@ -106,9 +109,9 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
   }
 
   private fun isTimberLogMethod(method: PsiMethod, evaluator: JavaEvaluator): Boolean {
-    return evaluator.isMemberInClass(method, "timber.log.Timber")
-        || evaluator.isMemberInClass(method, "timber.log.Timber.Companion")
-        || evaluator.isMemberInClass(method, "timber.log.Timber.Tree")
+    return evaluator.isMemberInClass(method, "timber.log.Timber") ||
+      evaluator.isMemberInClass(method, "timber.log.Timber.Companion") ||
+      evaluator.isMemberInClass(method, "timber.log.Timber.Tree")
   }
 
   private fun checkNestedStringFormat(context: JavaContext, call: UCallExpression) {
@@ -122,8 +125,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       if (current.isMethodCall()) {
         val psiMethod = (current as UCallExpression).resolve()
         if (psiMethod != null &&
-          Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.name)
-          && isTimberLogMethod(psiMethod, context.evaluator)
+          Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.name) &&
+          isTimberLogMethod(psiMethod, context.evaluator)
         ) {
           context.report(
             Incident(
@@ -224,7 +227,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
           'B', 'b', 'h', 'A', 'a', 'C', 'Y', 'y', 'j', 'm', 'd', 'e', // date
           'R', 'T', 'r', 'D', 'F', 'c' -> { // date/time
             valid =
-              type == Integer.TYPE || type == Calendar::class.java || type == Date::class.java || type == java.lang.Long.TYPE
+              type == Integer.TYPE || type == Calendar::class.java || type == Date::class.java || type == Long.TYPE
             if (!valid) {
               context.report(
                 Incident(
@@ -253,7 +256,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       valid = when (last) {
         'b', 'B' -> type == java.lang.Boolean.TYPE
         'x', 'X', 'd', 'o', 'e', 'E', 'f', 'g', 'G', 'a', 'A' -> {
-          type == Integer.TYPE || type == java.lang.Float.TYPE || type == java.lang.Double.TYPE || type == java.lang.Long.TYPE || type == java.lang.Byte.TYPE || type == java.lang.Short.TYPE
+          type == Integer.TYPE || type == Float.TYPE || type == Double.TYPE || type == Long.TYPE || type == Byte.TYPE || type == Short.TYPE
         }
         'c', 'C' -> type == Character.TYPE
         'h', 'H' -> type != java.lang.Boolean.TYPE && !Number::class.java.isAssignableFrom(type)
@@ -290,7 +293,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       when {
         isString(expressionType!!) -> return String::class.java
         expressionType === PsiTypes.intType() -> return Integer.TYPE
-        expressionType === PsiTypes.floatType() -> return java.lang.Float.TYPE
+        expressionType === PsiTypes.floatType() -> return Float.TYPE
         expressionType === PsiTypes.charType() -> return Character.TYPE
         expressionType === PsiTypes.booleanType() -> return java.lang.Boolean.TYPE
         expressionType === PsiTypes.nullType() -> return Any::class.java
@@ -450,11 +453,12 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     val numArguments = arguments.size
 
     // Find the throwable and message arguments by their type, not by their position.
-    // This is required to correctly handle Kotlin's named and reordered arguments.
     val throwableArgument = arguments.firstOrNull { isSubclassOf(context, it, Throwable::class.java) }
+
+    // Find an argument that is either a String OR a literal null expression.
     val messageArgument = arguments.firstOrNull {
       val type = it.getExpressionType()
-      type != null && isString(type) && it != throwableArgument
+      (type != null && isString(type)) || (it is ULiteralExpression && it.isNull)
     }
 
     // Handles overloads like Timber.d(t, "message").
@@ -473,7 +477,21 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
         return
       }
 
-      // Attempt to evaluate the message argument to a constant string at compile time.
+      // Check if the argument is a literal null, which is a clear issue.
+      if (messageArgument is ULiteralExpression && messageArgument.isNull) {
+        context.report(
+          Incident(
+            issue = ISSUE_EXCEPTION_LOGGING,
+            scope = messageArgument,
+            location = context.getLocation(call),
+            message = "Use single-argument log method instead of null/empty message",
+            fix = quickFixRemoveRedundantArgument(messageArgument)
+          )
+        )
+        return
+      }
+
+      // If it's not null, then try to evaluate it as a string.
       val messageValue = evaluateString(context, messageArgument, true)
 
       // If we could determine the string's value (i.e., it's a literal or constant)...
@@ -492,8 +510,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
         }
       }
       // If messageValue is null, the argument is a variable or method call. We intentionally
-      // do nothing in this case to avoid false positives, as we cannot determine its runtime
-      // value (e.g., it might be guarded by an `if` check). This fixes the reported issue.
+      // do nothing in this case to avoid false positives.
 
       // Handles single-argument overloads like Timber.d("message").
     } else if (numArguments == 1 && throwableArgument == null && messageArgument != null) {
@@ -534,16 +551,13 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     )
   }
 
-  // This function is no longer needed after changes and has been removed.
-  // private fun canEvaluateExpression(...) { ... }
-
   private fun isCallFromMethodInSubclassOf(
     context: JavaContext, call: UCallExpression, methodName: String, classType: Class<*>
   ): Boolean {
     val method = call.resolve()
-    return method != null
-        && methodName == call.methodName
-        && context.evaluator.isMemberInSubClassOf(method, classType.canonicalName, false)
+    return method != null &&
+      methodName == call.methodName &&
+      context.evaluator.isMemberInSubClassOf(method, classType.canonicalName, false)
   }
 
   private fun isPropertyOnSubclassOf(
@@ -552,8 +566,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     propertyName: String,
     classType: Class<*>
   ): Boolean {
-    return isSubclassOf(context, expression.receiver, classType)
-        && expression.selector.asSourceString() == propertyName
+    return isSubclassOf(context, expression.receiver, classType) &&
+      expression.selector.asSourceString() == propertyName
   }
 
   private fun checkElement(
@@ -564,8 +578,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       if (operator === UastBinaryOperator.PLUS || operator === UastBinaryOperator.PLUS_ASSIGN) {
         val argumentType = getType(element)
         if (argumentType == String::class.java) {
-          if (element.leftOperand.isInjectionHost()
-            && element.rightOperand.isInjectionHost()
+          if (element.leftOperand.isInjectionHost() &&
+            element.rightOperand.isInjectionHost()
           ) {
             return false
           }
