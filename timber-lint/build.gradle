@@ -2,10 +2,6 @@ apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.kapt'
 apply plugin: 'com.android.lint'
 
-kotlin {
-  jvmToolchain(17)
-}
-
 lint {
   baseline = file("lint-baseline.xml")
 }
