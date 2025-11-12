@@ -11,6 +11,7 @@ buildscript {
     classpath libs.gradlePlugin.japicmp
     classpath libs.gradlePlugin.mavenPublish
     classpath libs.gradlePlugin.dokka
+    classpath libs.compatPlugin
   }
 }
 
