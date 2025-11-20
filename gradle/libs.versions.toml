@@ -26,3 +26,6 @@ lint-tests = { module = "com.android.tools.lint:lint-tests", version.ref = "andr
 junit = "junit:junit:4.13.2"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 robolectric = "org.robolectric:robolectric:4.16"
+
+spotlessPlugin = "com.diffplug.spotless:spotless-plugin-gradle:8.1.0"
+ktfmt = "com.facebook:ktfmt:0.59"

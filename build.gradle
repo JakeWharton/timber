@@ -12,6 +12,7 @@ buildscript {
     classpath libs.gradlePlugin.mavenPublish
     classpath libs.gradlePlugin.dokka
     classpath libs.compatPlugin
+    classpath libs.spotlessPlugin
   }
 }
 
@@ -19,6 +20,14 @@ subprojects {
   repositories {
     mavenCentral()
     google()
+  }
+
+  apply plugin: 'com.diffplug.spotless'
+  spotless {
+    kotlin {
+      ktfmt(libs.ktfmt.get().version).googleStyle()
+      target('**/*.kt')
+    }
   }
 
   tasks.withType(Test) {
