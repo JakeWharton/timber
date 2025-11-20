@@ -4,17 +4,17 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import android.util.Log
-import timber.log.Timber
 import java.lang.Exception
 import java.lang.String.format
+import timber.log.Timber
 
 @SuppressLint("Registered")
 class KotlinLintActivity : Activity() {
   /**
    * Below are some examples of how NOT to use Timber.
    *
-   * To see how a particular lint issue behaves, comment/remove its corresponding id from the set
-   * of SuppressLint ids below.
+   * To see how a particular lint issue behaves, comment/remove its corresponding id from the set of
+   * SuppressLint ids below.
    */
   @SuppressLint(
     "LogNotTimber",
@@ -24,7 +24,7 @@ class KotlinLintActivity : Activity() {
     "TimberArgCount",
     "TimberArgTypes",
     "TimberTagLength",
-    "TimberExceptionLogging"
+    "TimberExceptionLogging",
   )
   @Suppress("RemoveRedundantQualifierName")
   override fun onCreate(savedInstanceState: Bundle?) {

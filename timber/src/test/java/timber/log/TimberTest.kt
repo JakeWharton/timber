@@ -19,55 +19,59 @@ import java.net.UnknownHostException
 import java.util.ArrayList
 import java.util.concurrent.CountDownLatch
 import org.junit.After
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
-
-import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
 import org.robolectric.shadows.ShadowLog.LogItem
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
 class TimberTest {
-  @Before @After fun setUpAndTearDown() {
+  @Before
+  @After
+  fun setUpAndTearDown() {
     Timber.uprootAll()
   }
 
   // NOTE: This class references the line number. Keep it at the top so it does not change.
-  @Test fun debugTreeCanAlterCreatedTag() {
-    Timber.plant(object : Timber.DebugTree() {
-      override fun createStackElementTag(element: StackTraceElement): String? {
-        return super.createStackElementTag(element) + ':'.toString() + element.lineNumber
+  @Test
+  fun debugTreeCanAlterCreatedTag() {
+    Timber.plant(
+      object : Timber.DebugTree() {
+        override fun createStackElementTag(element: StackTraceElement): String? {
+          return super.createStackElementTag(element) + ':'.toString() + element.lineNumber
+        }
       }
-    })
+    )
 
     Timber.d("Test")
 
-    assertLog()
-        .hasDebugMessage("TimberTest:48", "Test")
-        .hasNoMoreMessages()
+    assertLog().hasDebugMessage("TimberTest:48", "Test").hasNoMoreMessages()
   }
 
-  @Test fun recursion() {
+  @Test
+  fun recursion() {
     val timber = Timber.asTree()
 
-    assertFailure {
-      Timber.plant(timber)
-    }.isInstanceOf<IllegalArgumentException>()
+    assertFailure { Timber.plant(timber) }
+      .isInstanceOf<IllegalArgumentException>()
       .hasMessage("Cannot plant Timber into itself.")
 
     assertFailure {
-      @Suppress("RemoveRedundantSpreadOperator") // Explicitly calling vararg overload.
-      Timber.plant(*arrayOf(timber))
-    }.isInstanceOf<IllegalArgumentException>()
+        @Suppress("RemoveRedundantSpreadOperator") // Explicitly calling vararg overload.
+        Timber.plant(*arrayOf(timber))
+      }
+      .isInstanceOf<IllegalArgumentException>()
       .hasMessage("Cannot plant Timber into itself.")
   }
 
-  @Test fun treeCount() {
+  @Test
+  fun treeCount() {
     // inserts trees and checks if the amount of returned trees matches.
     assertThat(Timber.treeCount).isEqualTo(0)
     for (i in 1 until 50) {
@@ -78,7 +82,8 @@ class TimberTest {
     assertThat(Timber.treeCount).isEqualTo(0)
   }
 
-  @Test fun forestReturnsAllPlanted() {
+  @Test
+  fun forestReturnsAllPlanted() {
     val tree1 = Timber.DebugTree()
     val tree2 = Timber.DebugTree()
     Timber.plant(tree1)
@@ -87,7 +92,8 @@ class TimberTest {
     assertThat(Timber.forest()).containsExactly(tree1, tree2)
   }
 
-  @Test fun forestReturnsAllTreesPlanted() {
+  @Test
+  fun forestReturnsAllTreesPlanted() {
     val tree1 = Timber.DebugTree()
     val tree2 = Timber.DebugTree()
     Timber.plant(tree1, tree2)
@@ -95,16 +101,17 @@ class TimberTest {
     assertThat(Timber.forest()).containsExactly(tree1, tree2)
   }
 
-  @Test fun uprootThrowsIfMissing() {
-    assertFailure {
-      Timber.uproot(Timber.DebugTree())
-    }.isInstanceOf<IllegalArgumentException>()
+  @Test
+  fun uprootThrowsIfMissing() {
+    assertFailure { Timber.uproot(Timber.DebugTree()) }
+      .isInstanceOf<IllegalArgumentException>()
       .message()
       .isNotNull()
       .startsWith("Cannot uproot tree which is not planted: ")
   }
 
-  @Test fun uprootRemovesTree() {
+  @Test
+  fun uprootRemovesTree() {
     val tree1 = Timber.DebugTree()
     val tree2 = Timber.DebugTree()
     Timber.plant(tree1)
@@ -114,13 +121,14 @@ class TimberTest {
     Timber.d("Second")
 
     assertLog()
-        .hasDebugMessage("TimberTest", "First")
-        .hasDebugMessage("TimberTest", "First")
-        .hasDebugMessage("TimberTest", "Second")
-        .hasNoMoreMessages()
+      .hasDebugMessage("TimberTest", "First")
+      .hasDebugMessage("TimberTest", "First")
+      .hasDebugMessage("TimberTest", "Second")
+      .hasNoMoreMessages()
   }
 
-  @Test fun uprootAllRemovesAll() {
+  @Test
+  fun uprootAllRemovesAll() {
     val tree1 = Timber.DebugTree()
     val tree2 = Timber.DebugTree()
     Timber.plant(tree1)
@@ -130,27 +138,25 @@ class TimberTest {
     Timber.d("Second")
 
     assertLog()
-        .hasDebugMessage("TimberTest", "First")
-        .hasDebugMessage("TimberTest", "First")
-        .hasNoMoreMessages()
+      .hasDebugMessage("TimberTest", "First")
+      .hasDebugMessage("TimberTest", "First")
+      .hasNoMoreMessages()
   }
 
-  @Test fun noArgsDoesNotFormat() {
+  @Test
+  fun noArgsDoesNotFormat() {
     Timber.plant(Timber.DebugTree())
     Timber.d("te%st")
 
-    assertLog()
-        .hasDebugMessage("TimberTest", "te%st")
-        .hasNoMoreMessages()
+    assertLog().hasDebugMessage("TimberTest", "te%st").hasNoMoreMessages()
   }
 
-  @Test fun debugTreeTagGeneration() {
+  @Test
+  fun debugTreeTagGeneration() {
     Timber.plant(Timber.DebugTree())
     Timber.d("Hello, world!")
 
-    assertLog()
-        .hasDebugMessage("TimberTest", "Hello, world!")
-        .hasNoMoreMessages()
+    assertLog().hasDebugMessage("TimberTest", "Hello, world!").hasNoMoreMessages()
   }
 
   internal inner class ThisIsAReallyLongClassName {
@@ -160,83 +166,91 @@ class TimberTest {
   }
 
   @Config(sdk = [25])
-  @Test fun debugTreeTagTruncation() {
+  @Test
+  fun debugTreeTagTruncation() {
     Timber.plant(Timber.DebugTree())
 
     ThisIsAReallyLongClassName().run()
 
-    assertLog()
-        .hasDebugMessage("TimberTest\$ThisIsAReall", "Hello, world!")
-        .hasNoMoreMessages()
+    assertLog().hasDebugMessage("TimberTest\$ThisIsAReall", "Hello, world!").hasNoMoreMessages()
   }
 
   @Config(sdk = [26])
-  @Test fun debugTreeTagNoTruncation() {
+  @Test
+  fun debugTreeTagNoTruncation() {
     Timber.plant(Timber.DebugTree())
 
     ThisIsAReallyLongClassName().run()
 
     assertLog()
-        .hasDebugMessage("TimberTest\$ThisIsAReallyLongClassName", "Hello, world!")
-        .hasNoMoreMessages()
+      .hasDebugMessage("TimberTest\$ThisIsAReallyLongClassName", "Hello, world!")
+      .hasNoMoreMessages()
   }
 
   @Suppress("ObjectLiteralToLambda") // Lambdas != anonymous classes.
-  @Test fun debugTreeTagGenerationStripsAnonymousClassMarker() {
+  @Test
+  fun debugTreeTagGenerationStripsAnonymousClassMarker() {
     Timber.plant(Timber.DebugTree())
     object : Runnable {
-      override fun run() {
-        Timber.d("Hello, world!")
+        override fun run() {
+          Timber.d("Hello, world!")
 
-        object : Runnable {
-          override fun run() {
-            Timber.d("Hello, world!")
-          }
-        }.run()
+          object : Runnable {
+              override fun run() {
+                Timber.d("Hello, world!")
+              }
+            }
+            .run()
+        }
       }
-    }.run()
+      .run()
 
     assertLog()
-        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
-        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
-        .hasNoMoreMessages()
+      .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+      .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+      .hasNoMoreMessages()
   }
 
   @Suppress("ObjectLiteralToLambda") // Lambdas != anonymous classes.
-  @Test fun debugTreeTagGenerationStripsAnonymousClassMarkerWithInnerSAMLambda() {
+  @Test
+  fun debugTreeTagGenerationStripsAnonymousClassMarkerWithInnerSAMLambda() {
     Timber.plant(Timber.DebugTree())
     object : Runnable {
-      override fun run() {
-        Timber.d("Hello, world!")
+        override fun run() {
+          Timber.d("Hello, world!")
 
-        Runnable { Timber.d("Hello, world!") }.run()
+          Runnable { Timber.d("Hello, world!") }.run()
+        }
       }
-    }.run()
+      .run()
 
     assertLog()
-        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
-        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
-        .hasNoMoreMessages()
+      .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+      .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+      .hasNoMoreMessages()
   }
 
   @Suppress("ObjectLiteralToLambda") // Lambdas != anonymous classes.
-  @Test fun debugTreeTagGenerationStripsAnonymousClassMarkerWithOuterSAMLambda() {
+  @Test
+  fun debugTreeTagGenerationStripsAnonymousClassMarkerWithOuterSAMLambda() {
     Timber.plant(Timber.DebugTree())
 
     Runnable {
-      Timber.d("Hello, world!")
+        Timber.d("Hello, world!")
 
-      object : Runnable {
-        override fun run() {
-          Timber.d("Hello, world!")
-        }
-      }.run()
-    }.run()
+        object : Runnable {
+            override fun run() {
+              Timber.d("Hello, world!")
+            }
+          }
+          .run()
+      }
+      .run()
 
     assertLog()
-        .hasDebugMessage("TimberTest", "Hello, world!")
-        .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
-        .hasNoMoreMessages()
+      .hasDebugMessage("TimberTest", "Hello, world!")
+      .hasDebugMessage("TimberTest\$debugTreeTag", "Hello, world!")
+      .hasNoMoreMessages()
   }
 
   @Test
@@ -246,9 +260,7 @@ class TimberTest {
     val outer = {
       Timber.d("Hello, world!")
 
-      val inner = {
-        Timber.d("Hello, world!")
-      }
+      val inner = { Timber.d("Hello, world!") }
 
       inner()
     }
@@ -256,9 +268,9 @@ class TimberTest {
     outer()
 
     assertLog()
-        .hasDebugMessage("TimberTest", "Hello, world!")
-        .hasDebugMessage("TimberTest", "Hello, world!")
-        .hasNoMoreMessages()
+      .hasDebugMessage("TimberTest", "Hello, world!")
+      .hasDebugMessage("TimberTest", "Hello, world!")
+      .hasNoMoreMessages()
   }
 
   @Test
@@ -266,17 +278,16 @@ class TimberTest {
     Timber.plant(Timber.DebugTree())
 
     Runnable {
-      Timber.d("Hello, world!")
-
-      Runnable {
         Timber.d("Hello, world!")
-      }.run()
-    }.run()
+
+        Runnable { Timber.d("Hello, world!") }.run()
+      }
+      .run()
 
     assertLog()
-        .hasDebugMessage("TimberTest", "Hello, world!")
-        .hasDebugMessage("TimberTest", "Hello, world!")
-        .hasNoMoreMessages()
+      .hasDebugMessage("TimberTest", "Hello, world!")
+      .hasDebugMessage("TimberTest", "Hello, world!")
+      .hasNoMoreMessages()
   }
 
   private class ClassNameThatIsReallyReallyReallyLong {
@@ -285,39 +296,40 @@ class TimberTest {
     }
   }
 
-  @Test fun debugTreeGeneratedTagIsLoggable() {
-    Timber.plant(object : Timber.DebugTree() {
-      private val MAX_TAG_LENGTH = 23
+  @Test
+  fun debugTreeGeneratedTagIsLoggable() {
+    Timber.plant(
+      object : Timber.DebugTree() {
+        private val MAX_TAG_LENGTH = 23
 
-      override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        try {
-          assertTrue(Log.isLoggable(tag, priority))
-          if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            assertTrue(tag!!.length <= MAX_TAG_LENGTH)
+        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+          try {
+            assertTrue(Log.isLoggable(tag, priority))
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+              assertTrue(tag!!.length <= MAX_TAG_LENGTH)
+            }
+          } catch (e: IllegalArgumentException) {
+            fail(e.message)
           }
-        } catch (e: IllegalArgumentException) {
-          fail(e.message)
-        }
 
-        super.log(priority, tag, message, t)
+          super.log(priority, tag, message, t)
+        }
       }
-    })
+    )
     ClassNameThatIsReallyReallyReallyLong()
-    assertLog()
-        .hasInfoMessage("TimberTest\$ClassNameTha", "Hello, world!")
-        .hasNoMoreMessages()
+    assertLog().hasInfoMessage("TimberTest\$ClassNameTha", "Hello, world!").hasNoMoreMessages()
   }
 
-  @Test fun debugTreeCustomTag() {
+  @Test
+  fun debugTreeCustomTag() {
     Timber.plant(Timber.DebugTree())
     Timber.tag("Custom").d("Hello, world!")
 
-    assertLog()
-        .hasDebugMessage("Custom", "Hello, world!")
-        .hasNoMoreMessages()
+    assertLog().hasDebugMessage("Custom", "Hello, world!").hasNoMoreMessages()
   }
 
-  @Test fun messageWithException() {
+  @Test
+  fun messageWithException() {
     Timber.plant(Timber.DebugTree())
     val datThrowable = truncatedThrowable(NullPointerException::class.java)
     Timber.e(datThrowable, "OMFG!")
@@ -325,7 +337,8 @@ class TimberTest {
     assertExceptionLogged(Log.ERROR, "OMFG!", "java.lang.NullPointerException")
   }
 
-  @Test fun exceptionOnly() {
+  @Test
+  fun exceptionOnly() {
     Timber.plant(Timber.DebugTree())
 
     Timber.v(truncatedThrowable(IllegalArgumentException::class.java))
@@ -335,8 +348,13 @@ class TimberTest {
     assertExceptionLogged(Log.INFO, null, "java.lang.NullPointerException", "TimberTest", 1)
 
     Timber.d(truncatedThrowable(UnsupportedOperationException::class.java))
-    assertExceptionLogged(Log.DEBUG, null, "java.lang.UnsupportedOperationException", "TimberTest",
-        2)
+    assertExceptionLogged(
+      Log.DEBUG,
+      null,
+      "java.lang.UnsupportedOperationException",
+      "TimberTest",
+      2,
+    )
 
     Timber.w(truncatedThrowable(UnknownHostException::class.java))
     assertExceptionLogged(Log.WARN, null, "java.net.UnknownHostException", "TimberTest", 3)
@@ -348,7 +366,8 @@ class TimberTest {
     assertExceptionLogged(Log.ASSERT, null, "java.lang.AssertionError", "TimberTest", 5)
   }
 
-  @Test fun exceptionOnlyCustomTag() {
+  @Test
+  fun exceptionOnlyCustomTag() {
     Timber.plant(Timber.DebugTree())
 
     Timber.tag("Custom").v(truncatedThrowable(IllegalArgumentException::class.java))
@@ -370,21 +389,29 @@ class TimberTest {
     assertExceptionLogged(Log.ASSERT, null, "java.lang.AssertionError", "Custom", 5)
   }
 
-  @Test fun exceptionFromSpawnedThread() {
+  @Test
+  fun exceptionFromSpawnedThread() {
     Timber.plant(Timber.DebugTree())
     val datThrowable = truncatedThrowable(NullPointerException::class.java)
     val latch = CountDownLatch(1)
     object : Thread() {
-      override fun run() {
-        Timber.e(datThrowable, "OMFG!")
-        latch.countDown()
+        override fun run() {
+          Timber.e(datThrowable, "OMFG!")
+          latch.countDown()
+        }
       }
-    }.start()
+      .start()
     latch.await()
-    assertExceptionLogged(Log.ERROR, "OMFG!", "java.lang.NullPointerException", "TimberTest\$exceptionFro")
+    assertExceptionLogged(
+      Log.ERROR,
+      "OMFG!",
+      "java.lang.NullPointerException",
+      "TimberTest\$exceptionFro",
+    )
   }
 
-  @Test fun nullMessageWithThrowable() {
+  @Test
+  fun nullMessageWithThrowable() {
     Timber.plant(Timber.DebugTree())
     val datThrowable = truncatedThrowable(NullPointerException::class.java)
     Timber.e(datThrowable, null)
@@ -392,33 +419,39 @@ class TimberTest {
     assertExceptionLogged(Log.ERROR, "", "java.lang.NullPointerException")
   }
 
-  @Test fun chunkAcrossNewlinesAndLimit() {
+  @Test
+  fun chunkAcrossNewlinesAndLimit() {
     Timber.plant(Timber.DebugTree())
     Timber.d(
-        'a'.repeat(3000) + '\n'.toString() + 'b'.repeat(6000) + '\n'.toString() + 'c'.repeat(3000))
+      'a'.repeat(3000) + '\n'.toString() + 'b'.repeat(6000) + '\n'.toString() + 'c'.repeat(3000)
+    )
 
     assertLog()
-        .hasDebugMessage("TimberTest", 'a'.repeat(3000))
-        .hasDebugMessage("TimberTest", 'b'.repeat(4000))
-        .hasDebugMessage("TimberTest", 'b'.repeat(2000))
-        .hasDebugMessage("TimberTest", 'c'.repeat(3000))
-        .hasNoMoreMessages()
+      .hasDebugMessage("TimberTest", 'a'.repeat(3000))
+      .hasDebugMessage("TimberTest", 'b'.repeat(4000))
+      .hasDebugMessage("TimberTest", 'b'.repeat(2000))
+      .hasDebugMessage("TimberTest", 'c'.repeat(3000))
+      .hasNoMoreMessages()
   }
 
-  @Test fun nullMessageWithoutThrowable() {
+  @Test
+  fun nullMessageWithoutThrowable() {
     Timber.plant(Timber.DebugTree())
     Timber.d(null as String?)
 
     assertLog().hasNoMoreMessages()
   }
 
-  @Test fun logMessageCallback() {
+  @Test
+  fun logMessageCallback() {
     val logs = ArrayList<String>()
-    Timber.plant(object : Timber.DebugTree() {
-      override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        logs.add("$priority $tag $message")
+    Timber.plant(
+      object : Timber.DebugTree() {
+        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+          logs.add("$priority $tag $message")
+        }
       }
-    })
+    )
 
     Timber.v("Verbose")
     Timber.tag("Custom").v("Verbose")
@@ -433,7 +466,8 @@ class TimberTest {
     Timber.wtf("Assert")
     Timber.tag("Custom").wtf("Assert")
 
-    assertThat(logs).containsExactly( //
+    assertThat(logs)
+      .containsExactly( //
         "2 TimberTest Verbose", //
         "2 Custom Verbose", //
         "3 TimberTest Debug", //
@@ -445,11 +479,12 @@ class TimberTest {
         "6 TimberTest Error", //
         "6 Custom Error", //
         "7 TimberTest Assert", //
-        "7 Custom Assert" //
-    )
+        "7 Custom Assert", //
+      )
   }
 
-  @Test fun logAtSpecifiedPriority() {
+  @Test
+  fun logAtSpecifiedPriority() {
     Timber.plant(Timber.DebugTree())
 
     Timber.log(Log.VERBOSE, "Hello, World!")
@@ -460,16 +495,17 @@ class TimberTest {
     Timber.log(Log.ASSERT, "Hello, World!")
 
     assertLog()
-        .hasVerboseMessage("TimberTest", "Hello, World!")
-        .hasDebugMessage("TimberTest", "Hello, World!")
-        .hasInfoMessage("TimberTest", "Hello, World!")
-        .hasWarnMessage("TimberTest", "Hello, World!")
-        .hasErrorMessage("TimberTest", "Hello, World!")
-        .hasAssertMessage("TimberTest", "Hello, World!")
-        .hasNoMoreMessages()
+      .hasVerboseMessage("TimberTest", "Hello, World!")
+      .hasDebugMessage("TimberTest", "Hello, World!")
+      .hasInfoMessage("TimberTest", "Hello, World!")
+      .hasWarnMessage("TimberTest", "Hello, World!")
+      .hasErrorMessage("TimberTest", "Hello, World!")
+      .hasAssertMessage("TimberTest", "Hello, World!")
+      .hasNoMoreMessages()
   }
 
-  @Test fun formatting() {
+  @Test
+  fun formatting() {
     Timber.plant(Timber.DebugTree())
     Timber.v("Hello, %s!", "World")
     Timber.d("Hello, %s!", "World")
@@ -479,22 +515,25 @@ class TimberTest {
     Timber.wtf("Hello, %s!", "World")
 
     assertLog()
-        .hasVerboseMessage("TimberTest", "Hello, World!")
-        .hasDebugMessage("TimberTest", "Hello, World!")
-        .hasInfoMessage("TimberTest", "Hello, World!")
-        .hasWarnMessage("TimberTest", "Hello, World!")
-        .hasErrorMessage("TimberTest", "Hello, World!")
-        .hasAssertMessage("TimberTest", "Hello, World!")
-        .hasNoMoreMessages()
+      .hasVerboseMessage("TimberTest", "Hello, World!")
+      .hasDebugMessage("TimberTest", "Hello, World!")
+      .hasInfoMessage("TimberTest", "Hello, World!")
+      .hasWarnMessage("TimberTest", "Hello, World!")
+      .hasErrorMessage("TimberTest", "Hello, World!")
+      .hasAssertMessage("TimberTest", "Hello, World!")
+      .hasNoMoreMessages()
   }
 
-  @Test fun isLoggableControlsLogging() {
-    Timber.plant(object : Timber.DebugTree() {
-      @Suppress("OverridingDeprecatedMember") // Explicitly testing deprecated variant.
-      override fun isLoggable(priority: Int): Boolean {
-        return priority == Log.INFO
+  @Test
+  fun isLoggableControlsLogging() {
+    Timber.plant(
+      object : Timber.DebugTree() {
+        @Suppress("OverridingDeprecatedMember") // Explicitly testing deprecated variant.
+        override fun isLoggable(priority: Int): Boolean {
+          return priority == Log.INFO
+        }
       }
-    })
+    )
     Timber.v("Hello, World!")
     Timber.d("Hello, World!")
     Timber.i("Hello, World!")
@@ -502,17 +541,18 @@ class TimberTest {
     Timber.e("Hello, World!")
     Timber.wtf("Hello, World!")
 
-    assertLog()
-        .hasInfoMessage("TimberTest", "Hello, World!")
-        .hasNoMoreMessages()
+    assertLog().hasInfoMessage("TimberTest", "Hello, World!").hasNoMoreMessages()
   }
 
-  @Test fun isLoggableTagControlsLogging() {
-    Timber.plant(object : Timber.DebugTree() {
-      override fun isLoggable(tag: String?, priority: Int): Boolean {
-        return "FILTER" == tag
+  @Test
+  fun isLoggableTagControlsLogging() {
+    Timber.plant(
+      object : Timber.DebugTree() {
+        override fun isLoggable(tag: String?, priority: Int): Boolean {
+          return "FILTER" == tag
+        }
       }
-    })
+    )
     Timber.tag("FILTER").v("Hello, World!")
     Timber.d("Hello, World!")
     Timber.i("Hello, World!")
@@ -520,42 +560,44 @@ class TimberTest {
     Timber.e("Hello, World!")
     Timber.wtf("Hello, World!")
 
-    assertLog()
-        .hasVerboseMessage("FILTER", "Hello, World!")
-        .hasNoMoreMessages()
+    assertLog().hasVerboseMessage("FILTER", "Hello, World!").hasNoMoreMessages()
   }
 
-  @Test fun logsUnknownHostExceptions() {
+  @Test
+  fun logsUnknownHostExceptions() {
     Timber.plant(Timber.DebugTree())
     Timber.e(truncatedThrowable(UnknownHostException::class.java), null)
 
     assertExceptionLogged(Log.ERROR, "", "UnknownHostException")
   }
 
-  @Test fun tagIsClearedWhenNotLoggable() {
-    Timber.plant(object : Timber.DebugTree() {
-      override fun isLoggable(tag: String?, priority: Int): Boolean {
-        return priority >= Log.WARN
+  @Test
+  fun tagIsClearedWhenNotLoggable() {
+    Timber.plant(
+      object : Timber.DebugTree() {
+        override fun isLoggable(tag: String?, priority: Int): Boolean {
+          return priority >= Log.WARN
+        }
       }
-    })
+    )
     Timber.tag("NotLogged").i("Message not logged")
     Timber.w("Message logged")
 
-    assertLog()
-        .hasWarnMessage("TimberTest", "Message logged")
-        .hasNoMoreMessages()
+    assertLog().hasWarnMessage("TimberTest", "Message logged").hasNoMoreMessages()
   }
 
-  @Test fun logsWithCustomFormatter() {
-    Timber.plant(object : Timber.DebugTree() {
-      override fun formatMessage(message: String, vararg args: Any?): String {
-        return String.format("Test formatting: $message", *args)
+  @Test
+  fun logsWithCustomFormatter() {
+    Timber.plant(
+      object : Timber.DebugTree() {
+        override fun formatMessage(message: String, vararg args: Any?): String {
+          return String.format("Test formatting: $message", *args)
+        }
       }
-    })
+    )
     Timber.d("Test message logged. %d", 100)
 
-    assertLog()
-        .hasDebugMessage("TimberTest", "Test formatting: Test message logged. 100")
+    assertLog().hasDebugMessage("TimberTest", "Test formatting: Test message logged. 100")
   }
 
   private fun <T : Throwable> truncatedThrowable(throwableClass: Class<T>): T {
@@ -573,7 +615,7 @@ class TimberTest {
     message: String?,
     exceptionClassname: String,
     tag: String? = null,
-    index: Int = 0
+    index: Int = 0,
   ) {
     val logs = getLogs()
     assertThat(logs).hasSize(index + 1)

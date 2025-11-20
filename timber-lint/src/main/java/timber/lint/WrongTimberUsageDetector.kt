@@ -43,18 +43,6 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.PsiTypes
-import org.jetbrains.uast.UBinaryExpression
-import org.jetbrains.uast.UCallExpression
-import org.jetbrains.uast.UElement
-import org.jetbrains.uast.UExpression
-import org.jetbrains.uast.UIfExpression
-import org.jetbrains.uast.ULiteralExpression
-import org.jetbrains.uast.UMethod
-import org.jetbrains.uast.UQualifiedReferenceExpression
-import org.jetbrains.uast.UastBinaryOperator
-import org.jetbrains.uast.evaluateString
-import org.jetbrains.uast.isInjectionHost
-import org.jetbrains.uast.util.isMethodCall
 import java.lang.Byte
 import java.lang.Double
 import java.lang.Float
@@ -70,6 +58,18 @@ import kotlin.Number
 import kotlin.String
 import kotlin.Throwable
 import kotlin.arrayOf
+import org.jetbrains.uast.UBinaryExpression
+import org.jetbrains.uast.UCallExpression
+import org.jetbrains.uast.UElement
+import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.UIfExpression
+import org.jetbrains.uast.ULiteralExpression
+import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.UQualifiedReferenceExpression
+import org.jetbrains.uast.UastBinaryOperator
+import org.jetbrains.uast.evaluateString
+import org.jetbrains.uast.isInjectionHost
+import org.jetbrains.uast.util.isMethodCall
 
 class WrongTimberUsageDetector : Detector(), UastScanner {
   override fun getApplicableMethodNames() = listOf("tag", "format", "v", "d", "i", "w", "e", "wtf")
@@ -78,9 +78,10 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     val methodName = node.methodName
     val evaluator = context.evaluator
 
-    if ("format" == methodName &&
-      (evaluator.isMemberInClass(method, "java.lang.String") ||
-        evaluator.isMemberInClass(method, "kotlin.text.StringsKt__StringsJVMKt"))
+    if (
+      "format" == methodName &&
+        (evaluator.isMemberInClass(method, "java.lang.String") ||
+          evaluator.isMemberInClass(method, "kotlin.text.StringsKt__StringsJVMKt"))
     ) {
       checkNestedStringFormat(context, node)
       return
@@ -95,7 +96,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
           scope = node,
           location = context.getLocation(node),
           message = "Using 'Log' instead of 'Timber'",
-          fix = quickFixIssueLog(node)
+          fix = quickFixIssueLog(node),
         )
       )
       return
@@ -124,9 +125,10 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       }
       if (current.isMethodCall()) {
         val psiMethod = (current as UCallExpression).resolve()
-        if (psiMethod != null &&
-          Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.name) &&
-          isTimberLogMethod(psiMethod, context.evaluator)
+        if (
+          psiMethod != null &&
+            Pattern.matches(TIMBER_TREE_LOG_METHOD_REGEXP, psiMethod.name) &&
+            isTimberLogMethod(psiMethod, context.evaluator)
         ) {
           context.report(
             Incident(
@@ -134,7 +136,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
               scope = call,
               location = context.getLocation(call),
               message = "Using 'String#format' inside of 'Timber'",
-              fix = quickFixIssueFormat(call)
+              fix = quickFixIssueFormat(call),
             )
           )
           return
@@ -153,10 +155,10 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
           scope = argument,
           location = context.getLocation(argument),
           message = "The logging tag can be at most 23 characters, was ${tag.length} ($tag)",
-          fix = quickFixIssueTagLength(argument, tag)
+          fix = quickFixIssueTagLength(argument, tag),
         ),
         // As of API 26, Log tags are no longer limited to 23 chars.
-        constraint = minSdkLessThan(26)
+        constraint = minSdkLessThan(26),
       )
     }
   }
@@ -178,8 +180,9 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       startIndexOfArguments++
     }
 
-    val formatString = evaluateString(context, formatStringArg, false)
-      ?: return // We passed for example a method call
+    val formatString =
+      evaluateString(context, formatStringArg, false)
+        ?: return // We passed for example a method call
 
     val formatArgumentCount = getFormatArgumentCount(formatString)
     val passedArgCount = numArguments - startIndexOfArguments
@@ -189,7 +192,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
           issue = ISSUE_ARG_COUNT,
           scope = call,
           location = context.getLocation(call),
-          message = "Wrong argument count, format string `${formatString}` requires `${formatArgumentCount}` but format call supplies `${passedArgCount}`"
+          message =
+            "Wrong argument count, format string `${formatString}` requires `${formatArgumentCount}` but format call supplies `${passedArgCount}`",
         )
       )
       return
@@ -213,7 +217,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
             issue = ISSUE_ARG_COUNT,
             scope = call,
             location = context.getLocation(call),
-            message = "Wrong argument count, format string `${formatString}` requires `${formatArgumentCount}` but format call supplies `${passedArgCount}`"
+            message =
+              "Wrong argument count, format string `${formatString}` requires `${formatArgumentCount}` but format call supplies `${passedArgCount}`",
           )
         )
       }
@@ -223,18 +228,50 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       if (formatType.length >= 2 && formatType[formatType.length - 2].lowercaseChar() == 't') {
         // Date time conversion.
         when (last) {
-          'H', 'I', 'k', 'l', 'M', 'S', 'L', 'N', 'p', 'z', 'Z', 's', 'Q', // time
-          'B', 'b', 'h', 'A', 'a', 'C', 'Y', 'y', 'j', 'm', 'd', 'e', // date
-          'R', 'T', 'r', 'D', 'F', 'c' -> { // date/time
+          'H',
+          'I',
+          'k',
+          'l',
+          'M',
+          'S',
+          'L',
+          'N',
+          'p',
+          'z',
+          'Z',
+          's',
+          'Q', // time
+          'B',
+          'b',
+          'h',
+          'A',
+          'a',
+          'C',
+          'Y',
+          'y',
+          'j',
+          'm',
+          'd',
+          'e', // date
+          'R',
+          'T',
+          'r',
+          'D',
+          'F',
+          'c' -> { // date/time
             valid =
-              type == Integer.TYPE || type == Calendar::class.java || type == Date::class.java || type == Long.TYPE
+              type == Integer.TYPE ||
+                type == Calendar::class.java ||
+                type == Date::class.java ||
+                type == Long.TYPE
             if (!valid) {
               context.report(
                 Incident(
                   issue = ISSUE_ARG_TYPES,
                   scope = call,
                   location = context.getLocation(argument),
-                  message = "Wrong argument type for date formatting argument '#${i + 1}' in `${formatString}`: conversion is '`${formatType}`', received `${type.simpleName}` (argument #${startIndexOfArguments + i + 1} in method call)"
+                  message =
+                    "Wrong argument type for date formatting argument '#${i + 1}' in `${formatString}`: conversion is '`${formatType}`', received `${type.simpleName}` (argument #${startIndexOfArguments + i + 1} in method call)",
                 )
               )
             }
@@ -245,7 +282,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
                 issue = ISSUE_FORMAT,
                 scope = call,
                 location = context.getLocation(argument),
-                message = "Wrong suffix for date format '#${i + 1}' in `${formatString}`: conversion is '`${formatType}`', received `${type.simpleName}` (argument #${startIndexOfArguments + i + 1} in method call)"
+                message =
+                  "Wrong suffix for date format '#${i + 1}' in `${formatString}`: conversion is '`${formatType}`', received `${type.simpleName}` (argument #${startIndexOfArguments + i + 1} in method call)",
               )
             )
           }
@@ -253,23 +291,44 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
         continue
       }
 
-      valid = when (last) {
-        'b', 'B' -> type == java.lang.Boolean.TYPE
-        'x', 'X', 'd', 'o', 'e', 'E', 'f', 'g', 'G', 'a', 'A' -> {
-          type == Integer.TYPE || type == Float.TYPE || type == Double.TYPE || type == Long.TYPE || type == Byte.TYPE || type == Short.TYPE
+      valid =
+        when (last) {
+          'b',
+          'B' -> type == java.lang.Boolean.TYPE
+          'x',
+          'X',
+          'd',
+          'o',
+          'e',
+          'E',
+          'f',
+          'g',
+          'G',
+          'a',
+          'A' -> {
+            type == Integer.TYPE ||
+              type == Float.TYPE ||
+              type == Double.TYPE ||
+              type == Long.TYPE ||
+              type == Byte.TYPE ||
+              type == Short.TYPE
+          }
+          'c',
+          'C' -> type == Character.TYPE
+          'h',
+          'H' -> type != java.lang.Boolean.TYPE && !Number::class.java.isAssignableFrom(type)
+          's',
+          'S' -> true
+          else -> true
         }
-        'c', 'C' -> type == Character.TYPE
-        'h', 'H' -> type != java.lang.Boolean.TYPE && !Number::class.java.isAssignableFrom(type)
-        's', 'S' -> true
-        else -> true
-      }
       if (!valid) {
         context.report(
           Incident(
             issue = ISSUE_ARG_TYPES,
             scope = call,
             location = context.getLocation(argument),
-            message = "Wrong argument type for formatting argument '#${i + 1}' in `${formatString}`: conversion is '`${formatType}`', received `${type.simpleName}` (argument #${startIndexOfArguments + i + 1} in method call)"
+            message =
+              "Wrong argument type for formatting argument '#${i + 1}' in `${formatString}`: conversion is '`${formatType}`', received `${type.simpleName}` (argument #${startIndexOfArguments + i + 1} in method call)",
           )
         )
       }
@@ -312,7 +371,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
   private fun getTypeClass(type: PsiType?): Class<*>? {
     return when (type?.canonicalText) {
       null -> null
-      TYPE_STRING, "String" -> String::class.java
+      TYPE_STRING,
+      "String" -> String::class.java
       TYPE_INT -> Integer.TYPE
       TYPE_BOOLEAN -> java.lang.Boolean.TYPE
       TYPE_NULL -> Object::class.java
@@ -321,22 +381,28 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
       TYPE_DOUBLE -> Double.TYPE
       TYPE_CHAR -> Character.TYPE
       TYPE_OBJECT -> null
-      TYPE_INTEGER_WRAPPER, TYPE_SHORT_WRAPPER, TYPE_BYTE_WRAPPER, TYPE_LONG_WRAPPER -> Integer.TYPE
-      TYPE_FLOAT_WRAPPER, TYPE_DOUBLE_WRAPPER -> Float.TYPE
+      TYPE_INTEGER_WRAPPER,
+      TYPE_SHORT_WRAPPER,
+      TYPE_BYTE_WRAPPER,
+      TYPE_LONG_WRAPPER -> Integer.TYPE
+      TYPE_FLOAT_WRAPPER,
+      TYPE_DOUBLE_WRAPPER -> Float.TYPE
       TYPE_BOOLEAN_WRAPPER -> java.lang.Boolean.TYPE
       TYPE_BYTE -> Byte.TYPE
       TYPE_SHORT -> Short.TYPE
-      "Date", "java.util.Date" -> Date::class.java
-      "Calendar", "java.util.Calendar" -> Calendar::class.java
-      "BigDecimal", "java.math.BigDecimal" -> Float.TYPE
-      "BigInteger", "java.math.BigInteger" -> Integer.TYPE
+      "Date",
+      "java.util.Date" -> Date::class.java
+      "Calendar",
+      "java.util.Calendar" -> Calendar::class.java
+      "BigDecimal",
+      "java.math.BigDecimal" -> Float.TYPE
+      "BigInteger",
+      "java.math.BigInteger" -> Integer.TYPE
       else -> null
     }
   }
 
-  private fun isSubclassOf(
-    context: JavaContext, expression: UExpression, cls: Class<*>
-  ): Boolean {
+  private fun isSubclassOf(context: JavaContext, expression: UExpression, cls: Class<*>): Boolean {
     val expressionType = expression.getExpressionType()
     if (expressionType is PsiClassType) {
       return context.evaluator.extendsClass(expressionType.resolve(), cls.name, false)
@@ -371,11 +437,12 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
           continue
         }
         val time = matcher.group(5)
-        types += if ("t".equals(time, ignoreCase = true)) {
-          time + matcher.group(6)
-        } else {
-          matcher.group(6)
-        }
+        types +=
+          if ("t".equals(time, ignoreCase = true)) {
+            time + matcher.group(6)
+          } else {
+            matcher.group(6)
+          }
       } else {
         break
       }
@@ -441,7 +508,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
             scope = call,
             location = context.getLocation(call),
             message = "Throwable should be first argument",
-            fix = quickFixIssueThrowable(call, call.valueArguments, argument)
+            fix = quickFixIssueThrowable(call, call.valueArguments, argument),
           )
         )
       }
@@ -453,13 +520,15 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     val numArguments = arguments.size
 
     // Find the throwable and message arguments by their type, not by their position.
-    val throwableArgument = arguments.firstOrNull { isSubclassOf(context, it, Throwable::class.java) }
+    val throwableArgument =
+      arguments.firstOrNull { isSubclassOf(context, it, Throwable::class.java) }
 
     // Find an argument that is either a String OR a literal null expression.
-    val messageArgument = arguments.firstOrNull {
-      val type = it.getExpressionType()
-      (type != null && isString(type)) || (it is ULiteralExpression && it.isNull)
-    }
+    val messageArgument =
+      arguments.firstOrNull {
+        val type = it.getExpressionType()
+        (type != null && isString(type)) || (it is ULiteralExpression && it.isNull)
+      }
 
     // Handles overloads like Timber.d(t, "message").
     if (throwableArgument != null && messageArgument != null) {
@@ -471,7 +540,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
             scope = messageArgument,
             location = context.getLocation(call),
             message = "Explicitly logging exception message is redundant",
-            fix = quickFixRemoveRedundantArgument(messageArgument)
+            fix = quickFixRemoveRedundantArgument(messageArgument),
           )
         )
         return
@@ -485,7 +554,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
             scope = messageArgument,
             location = context.getLocation(call),
             message = "Use single-argument log method instead of null/empty message",
-            fix = quickFixRemoveRedundantArgument(messageArgument)
+            fix = quickFixRemoveRedundantArgument(messageArgument),
           )
         )
         return
@@ -504,7 +573,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
               scope = messageArgument,
               location = context.getLocation(call),
               message = "Use single-argument log method instead of null/empty message",
-              fix = quickFixRemoveRedundantArgument(messageArgument)
+              fix = quickFixRemoveRedundantArgument(messageArgument),
             )
           )
         }
@@ -521,7 +590,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
             scope = messageArgument,
             location = context.getLocation(call),
             message = "Explicitly logging exception message is redundant",
-            fix = quickFixReplaceMessageWithThrowable(messageArgument)
+            fix = quickFixReplaceMessageWithThrowable(messageArgument),
           )
         )
       }
@@ -543,16 +612,20 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     // what other UExpressions could be a selector?
     return if (selector !is UCallExpression) {
       false
-    } else isCallFromMethodInSubclassOf(
-      context = context,
-      call = selector,
-      methodName = "getMessage",
-      classType = Throwable::class.java
-    )
+    } else
+      isCallFromMethodInSubclassOf(
+        context = context,
+        call = selector,
+        methodName = "getMessage",
+        classType = Throwable::class.java,
+      )
   }
 
   private fun isCallFromMethodInSubclassOf(
-    context: JavaContext, call: UCallExpression, methodName: String, classType: Class<*>
+    context: JavaContext,
+    call: UCallExpression,
+    methodName: String,
+    classType: Class<*>,
   ): Boolean {
     val method = call.resolve()
     return method != null &&
@@ -564,23 +637,23 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     context: JavaContext,
     expression: UQualifiedReferenceExpression,
     propertyName: String,
-    classType: Class<*>
+    classType: Class<*>,
   ): Boolean {
     return isSubclassOf(context, expression.receiver, classType) &&
       expression.selector.asSourceString() == propertyName
   }
 
   private fun checkElement(
-    context: JavaContext, call: UCallExpression, element: UElement?
+    context: JavaContext,
+    call: UCallExpression,
+    element: UElement?,
   ): Boolean {
     if (element is UBinaryExpression) {
       val operator = element.operator
       if (operator === UastBinaryOperator.PLUS || operator === UastBinaryOperator.PLUS_ASSIGN) {
         val argumentType = getType(element)
         if (argumentType == String::class.java) {
-          if (element.leftOperand.isInjectionHost() &&
-            element.rightOperand.isInjectionHost()
-          ) {
+          if (element.leftOperand.isInjectionHost() && element.rightOperand.isInjectionHost()) {
             return false
           }
           context.report(
@@ -589,7 +662,7 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
               scope = call,
               location = context.getLocation(element),
               message = "Replace String concatenation with Timber's string formatting",
-              fix = quickFixIssueBinary(element)
+              fix = quickFixIssueBinary(element),
             )
           )
           return true
@@ -602,7 +675,9 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
   }
 
   private fun checkConditionalUsage(
-    context: JavaContext, call: UCallExpression, element: UElement
+    context: JavaContext,
+    call: UCallExpression,
+    element: UElement,
   ): Boolean {
     return if (element is UIfExpression) {
       if (checkElement(context, call, element.thenExpression)) {
@@ -643,7 +718,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     }
 
     val logCallSource = logCall.uastParent!!.sourcePsi?.text
-    return fix().group()
+    return fix()
+      .group()
       .add(
         fix().replace().text(logCallSource).shortenNames().reformat(true).with(fixSource1).build()
       )
@@ -661,15 +737,20 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     var callSourceString = if (callReceiver == null) "" else "${callReceiver.asSourceString()}."
     callSourceString += stringFormatCall.methodName
 
-    return fix().name("Remove String.format(...)").composite() //
+    return fix()
+      .name("Remove String.format(...)")
+      .composite() //
       // Delete closing parenthesis of String.format(...)
       .add(fix().replace().pattern("$callSourceString\\(.*(\\))").with("").build())
       // Delete "String.format("
-      .add(fix().replace().text("$callSourceString(").with("").build()).build()
+      .add(fix().replace().text("$callSourceString(").with("").build())
+      .build()
   }
 
   private fun quickFixIssueThrowable(
-    call: UCallExpression, arguments: List<UExpression>, throwable: UExpression
+    call: UCallExpression,
+    arguments: List<UExpression>,
+    throwable: UExpression,
   ): LintFix {
     val rearrangedArgs = buildString {
       append(throwable.asSourceString())
@@ -694,29 +775,32 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
 
     // "a" + "b" => "ab"
     if (isLeftLiteral && isRightLiteral) {
-      return fix().replace()
+      return fix()
+        .replace()
         .text(binaryExpression.asSourceString())
         .with("\"${binaryExpression.evaluateString()}\"")
         .build()
     }
 
-    val args: String = when {
-      isLeftLiteral -> {
-        "\"${leftOperand.evaluateString()}%s\", ${rightOperand.asSourceString()}"
+    val args: String =
+      when {
+        isLeftLiteral -> {
+          "\"${leftOperand.evaluateString()}%s\", ${rightOperand.asSourceString()}"
+        }
+        isRightLiteral -> {
+          "\"%s${rightOperand.evaluateString()}\", ${leftOperand.asSourceString()}"
+        }
+        else -> {
+          "\"%s%s\", ${leftOperand.asSourceString()}, ${rightOperand.asSourceString()}"
+        }
       }
-      isRightLiteral -> {
-        "\"%s${rightOperand.evaluateString()}\", ${leftOperand.asSourceString()}"
-      }
-      else -> {
-        "\"%s%s\", ${leftOperand.asSourceString()}, ${rightOperand.asSourceString()}"
-      }
-    }
     return fix().replace().text(binaryExpression.asSourceString()).with(args).build()
   }
 
   private fun quickFixIssueTagLength(argument: UExpression, tag: String): LintFix {
     val numCharsToTrim = tag.length - 23
-    return fix().replace()
+    return fix()
+      .replace()
       .name("Strip last " + if (numCharsToTrim == 1) "char" else "$numCharsToTrim chars")
       .text(argument.asSourceString())
       .with("\"${tag.substring(0, 23)}\"")
@@ -724,7 +808,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
   }
 
   private fun quickFixRemoveRedundantArgument(arg: UExpression): LintFix {
-    return fix().replace()
+    return fix()
+      .replace()
       .name("Remove redundant argument")
       .text(", ${arg.asSourceString()}")
       .with("")
@@ -734,7 +819,8 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
   private fun quickFixReplaceMessageWithThrowable(arg: UExpression): LintFix {
     // guaranteed based on callers of this method
     val receiver = (arg as UQualifiedReferenceExpression).receiver
-    return fix().replace()
+    return fix()
+      .replace()
       .name("Replace message with throwable")
       .text(arg.asSourceString())
       .with(receiver.asSourceString())
@@ -745,82 +831,103 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     private const val GET_STRING_METHOD = "getString"
     private const val TIMBER_TREE_LOG_METHOD_REGEXP = "(v|d|i|w|e|wtf)"
 
-    val ISSUE_LOG = Issue.create(
-      id = "LogNotTimber",
-      briefDescription = "Logging call to Log instead of Timber",
-      explanation = "Since Timber is included in the project, it is likely that calls to Log should instead be going to Timber.",
-      category = MESSAGES,
-      priority = 5,
-      severity = WARNING,
-      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
-    )
-    val ISSUE_FORMAT = Issue.create(
-      id = "StringFormatInTimber",
-      briefDescription = "Logging call with Timber contains String#format()",
-      explanation = "Since Timber handles String.format automatically, you may not use String#format().",
-      category = MESSAGES,
-      priority = 5,
-      severity = WARNING,
-      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
-    )
-    val ISSUE_THROWABLE = Issue.create(
-      id = "ThrowableNotAtBeginning",
-      briefDescription = "Exception in Timber not at the beginning",
-      explanation = "In Timber you have to pass a Throwable at the beginning of the call.",
-      category = MESSAGES,
-      priority = 5,
-      severity = WARNING,
-      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
-    )
-    val ISSUE_BINARY = Issue.create(
-      id = "BinaryOperationInTimber",
-      briefDescription = "Use String#format()",
-      explanation = "Since Timber handles String#format() automatically, use this instead of String concatenation.",
-      category = MESSAGES,
-      priority = 5,
-      severity = WARNING,
-      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
-    )
-    val ISSUE_ARG_COUNT = Issue.create(
-      id = "TimberArgCount",
-      briefDescription = "Formatting argument types incomplete or inconsistent",
-      explanation = "When a formatted string takes arguments, you need to pass at least that amount of arguments to the formatting call.",
-      category = MESSAGES,
-      priority = 9,
-      severity = ERROR,
-      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
-    )
-    val ISSUE_ARG_TYPES = Issue.create(
-      id = "TimberArgTypes",
-      briefDescription = "Formatting string doesn't match passed arguments",
-      explanation = "The argument types that you specified in your formatting string does not match the types of the arguments that you passed to your formatting call.",
-      category = MESSAGES,
-      priority = 9,
-      severity = ERROR,
-      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
-    )
-    val ISSUE_TAG_LENGTH = Issue.create(
-      id = "TimberTagLength",
-      briefDescription = "Too Long Log Tags",
-      explanation = "Log tags are only allowed to be at most" + " 23 tag characters long.",
-      category = CORRECTNESS,
-      priority = 5,
-      severity = ERROR,
-      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
-    )
-    val ISSUE_EXCEPTION_LOGGING = Issue.create(
-      id = "TimberExceptionLogging",
-      briefDescription = "Exception Logging",
-      explanation = "Explicitly including the exception message is redundant when supplying an exception to log.",
-      category = CORRECTNESS,
-      priority = 3,
-      severity = WARNING,
-      implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE)
-    )
+    val ISSUE_LOG =
+      Issue.create(
+        id = "LogNotTimber",
+        briefDescription = "Logging call to Log instead of Timber",
+        explanation =
+          "Since Timber is included in the project, it is likely that calls to Log should instead be going to Timber.",
+        category = MESSAGES,
+        priority = 5,
+        severity = WARNING,
+        implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE),
+      )
+    val ISSUE_FORMAT =
+      Issue.create(
+        id = "StringFormatInTimber",
+        briefDescription = "Logging call with Timber contains String#format()",
+        explanation =
+          "Since Timber handles String.format automatically, you may not use String#format().",
+        category = MESSAGES,
+        priority = 5,
+        severity = WARNING,
+        implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE),
+      )
+    val ISSUE_THROWABLE =
+      Issue.create(
+        id = "ThrowableNotAtBeginning",
+        briefDescription = "Exception in Timber not at the beginning",
+        explanation = "In Timber you have to pass a Throwable at the beginning of the call.",
+        category = MESSAGES,
+        priority = 5,
+        severity = WARNING,
+        implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE),
+      )
+    val ISSUE_BINARY =
+      Issue.create(
+        id = "BinaryOperationInTimber",
+        briefDescription = "Use String#format()",
+        explanation =
+          "Since Timber handles String#format() automatically, use this instead of String concatenation.",
+        category = MESSAGES,
+        priority = 5,
+        severity = WARNING,
+        implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE),
+      )
+    val ISSUE_ARG_COUNT =
+      Issue.create(
+        id = "TimberArgCount",
+        briefDescription = "Formatting argument types incomplete or inconsistent",
+        explanation =
+          "When a formatted string takes arguments, you need to pass at least that amount of arguments to the formatting call.",
+        category = MESSAGES,
+        priority = 9,
+        severity = ERROR,
+        implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE),
+      )
+    val ISSUE_ARG_TYPES =
+      Issue.create(
+        id = "TimberArgTypes",
+        briefDescription = "Formatting string doesn't match passed arguments",
+        explanation =
+          "The argument types that you specified in your formatting string does not match the types of the arguments that you passed to your formatting call.",
+        category = MESSAGES,
+        priority = 9,
+        severity = ERROR,
+        implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE),
+      )
+    val ISSUE_TAG_LENGTH =
+      Issue.create(
+        id = "TimberTagLength",
+        briefDescription = "Too Long Log Tags",
+        explanation = "Log tags are only allowed to be at most" + " 23 tag characters long.",
+        category = CORRECTNESS,
+        priority = 5,
+        severity = ERROR,
+        implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE),
+      )
+    val ISSUE_EXCEPTION_LOGGING =
+      Issue.create(
+        id = "TimberExceptionLogging",
+        briefDescription = "Exception Logging",
+        explanation =
+          "Explicitly including the exception message is redundant when supplying an exception to log.",
+        category = CORRECTNESS,
+        priority = 3,
+        severity = WARNING,
+        implementation = Implementation(WrongTimberUsageDetector::class.java, JAVA_FILE_SCOPE),
+      )
 
-    val issues = arrayOf(
-      ISSUE_LOG, ISSUE_FORMAT, ISSUE_THROWABLE, ISSUE_BINARY, ISSUE_ARG_COUNT, ISSUE_ARG_TYPES,
-      ISSUE_TAG_LENGTH, ISSUE_EXCEPTION_LOGGING
-    )
+    val issues =
+      arrayOf(
+        ISSUE_LOG,
+        ISSUE_FORMAT,
+        ISSUE_THROWABLE,
+        ISSUE_BINARY,
+        ISSUE_ARG_COUNT,
+        ISSUE_ARG_TYPES,
+        ISSUE_TAG_LENGTH,
+        ISSUE_EXCEPTION_LOGGING,
+      )
   }
 }
