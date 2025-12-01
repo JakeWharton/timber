@@ -12,7 +12,7 @@ gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 gradlePlugin-dokka = "org.jetbrains.dokka:dokka-gradle-plugin:2.1.0"
 gradlePlugin-japicmp = "me.champeau.gradle:japicmp-gradle-plugin:0.4.6"
 gradlePlugin-mavenPublish = "com.vanniktech:gradle-maven-publish-plugin:0.35.0"
-compatPlugin = "com.gradleup.compat.patrouille:compat-patrouille-gradle-plugin:0.1.0"
+compatPlugin = "com.gradleup.tapmoc:tapmoc-gradle-plugin:0.2.0"
 
 annotations = "org.jetbrains:annotations:26.0.2-1"
 auto-service = { module = "com.google.auto.service:auto-service", version.ref = "autoService" }

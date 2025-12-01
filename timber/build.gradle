@@ -1,10 +1,10 @@
-import compat.patrouille.Severity
+import tapmoc.Severity
 
 apply plugin: 'org.jetbrains.kotlin.multiplatform'
 apply plugin: 'com.android.kotlin.multiplatform.library'
 apply plugin: 'com.vanniktech.maven.publish'
 apply plugin: 'org.jetbrains.dokka' // Must be applied here for publish plugin.
-apply plugin: 'com.gradleup.compat.patrouille'
+apply plugin: 'com.gradleup.tapmoc'
 
 kotlin {
   androidLibrary {
@@ -43,7 +43,7 @@ kotlin {
   }
 }
 
-compatPatrouille {
+tapmoc {
   java(8)
   kotlin('2.0.0')
   checkApiDependencies(Severity.ERROR)

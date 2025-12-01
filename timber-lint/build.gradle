@@ -1,9 +1,9 @@
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'org.jetbrains.kotlin.kapt'
 apply plugin: 'com.android.lint'
-apply plugin: 'com.gradleup.compat.patrouille'
+apply plugin: 'com.gradleup.tapmoc'
 
-compatPatrouille {
+tapmoc {
   java(17)
 }
 
