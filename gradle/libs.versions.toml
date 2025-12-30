@@ -28,4 +28,4 @@ assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 robolectric = "org.robolectric:robolectric:4.16"
 
 spotlessPlugin = "com.diffplug.spotless:spotless-plugin-gradle:8.1.0"
-ktfmt = "com.facebook:ktfmt:0.60"
+ktfmt = "com.facebook:ktfmt:0.61"
