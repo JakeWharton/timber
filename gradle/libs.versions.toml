@@ -27,5 +27,5 @@ junit = "junit:junit:4.13.2"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
 robolectric = "org.robolectric:robolectric:4.16.1"
 
-spotlessPlugin = "com.diffplug.spotless:spotless-plugin-gradle:8.1.0"
+spotlessPlugin = "com.diffplug.spotless:spotless-plugin-gradle:8.2.0"
 ktfmt = "com.facebook:ktfmt:0.61"
