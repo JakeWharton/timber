@@ -46,8 +46,7 @@ kotlin {
 tapmoc {
   java(8)
   kotlin('2.0.0')
-  checkApiDependencies(Severity.ERROR)
-  checkRuntimeDependencies(Severity.ERROR)
+  checkDependencies(Severity.ERROR)
 }
 
 tasks.named('check') { check ->
