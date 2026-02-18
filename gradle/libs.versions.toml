@@ -14,7 +14,7 @@ gradlePlugin-japicmp = "me.champeau.gradle:japicmp-gradle-plugin:0.4.6"
 gradlePlugin-mavenPublish = "com.vanniktech:gradle-maven-publish-plugin:0.36.0"
 compatPlugin = "com.gradleup.tapmoc:tapmoc-gradle-plugin:0.4.0"
 
-annotations = "org.jetbrains:annotations:26.0.2-1"
+annotations = "org.jetbrains:annotations:26.1.0"
 auto-service = { module = "com.google.auto.service:auto-service", version.ref = "autoService" }
 auto-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoService" }
 
