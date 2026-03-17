@@ -520,15 +520,15 @@ class WrongTimberUsageDetector : Detector(), UastScanner {
     val numArguments = arguments.size
 
     // Find the throwable and message arguments by their type, not by their position.
-    val throwableArgument =
-      arguments.firstOrNull { isSubclassOf(context, it, Throwable::class.java) }
+    val throwableArgument = arguments.firstOrNull {
+      isSubclassOf(context, it, Throwable::class.java)
+    }
 
     // Find an argument that is either a String OR a literal null expression.
-    val messageArgument =
-      arguments.firstOrNull {
-        val type = it.getExpressionType()
-        (type != null && isString(type)) || (it is ULiteralExpression && it.isNull)
-      }
+    val messageArgument = arguments.firstOrNull {
+      val type = it.getExpressionType()
+      (type != null && isString(type)) || (it is ULiteralExpression && it.isNull)
+    }
 
     // Handles overloads like Timber.d(t, "message").
     if (throwableArgument != null && messageArgument != null) {
