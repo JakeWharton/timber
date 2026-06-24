@@ -236,15 +236,15 @@ class TimberTest {
     Timber.plant(Timber.DebugTree())
 
     Runnable {
-        Timber.d("Hello, world!")
+      Timber.d("Hello, world!")
 
-        object : Runnable {
-            override fun run() {
-              Timber.d("Hello, world!")
-            }
+      object : Runnable {
+          override fun run() {
+            Timber.d("Hello, world!")
           }
-          .run()
-      }
+        }
+        .run()
+    }
       .run()
 
     assertLog()
@@ -278,10 +278,10 @@ class TimberTest {
     Timber.plant(Timber.DebugTree())
 
     Runnable {
-        Timber.d("Hello, world!")
+      Timber.d("Hello, world!")
 
-        Runnable { Timber.d("Hello, world!") }.run()
-      }
+      Runnable { Timber.d("Hello, world!") }.run()
+    }
       .run()
 
     assertLog()
