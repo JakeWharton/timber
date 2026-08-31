@@ -116,7 +116,40 @@ Snapshot documentation is available at [jakewharton.github.io/timber/docs/latest
 </p>
 </details>
 
+Set Up
+------
+I added more details on the existing ReadMe file , focusing on setting up Timber once the dependencies have been downloaded. 
 
+### Step 1 :  Create an Application class that inherits from Application class . 
+```
+open class MyProjectApplication : Application() {
+}
+``` 
+
+### Step 2 :  import the application package
+    import android.app.Application
+
+### Step 3 : override the onCreate() method and initialize the Timber class
+override the onCreate() method in your Application class
+```
+open class MyProjectApplication : Application() {
+    if (BuildConfig.DEBUG) {
+      Timber.plant(new DebugTree());
+    } else {
+      Timber.plant(new CrashReportingTree());
+    }
+}
+```
+### Step 4 : Finally Define it in your Android Manifest , Application tag
+In your application tag, add it as a name attribute : 
+ ```
+<application  
+        ....
+        android:name=".MyProjectApplication"
+        android:theme="@style/AppTheme"
+       .... >
+```  
+ 
 License
 -------
 
