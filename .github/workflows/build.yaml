@@ -35,10 +35,9 @@ jobs:
 
       - name: Deploy docs to website
         if: ${{ github.ref == 'refs/heads/trunk' && github.repository == 'JakeWharton/timber' }}
-        uses: JamesIves/github-pages-deploy-action@132898c54c57c7cc6b80eb3a89968de8fc283505 # 3.7.1
+        uses: JamesIves/github-pages-deploy-action@fa24774553152dd7873cd16ebd8d959b010c5445 # v4.9.0
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: site
-          FOLDER: timber/build/dokka/html/
-          TARGET_FOLDER: docs/latest/
-          CLEAN: true
+          branch: site
+          folder: timber/build/dokka/html/
+          target-folder: docs/latest/
+          clean: true
