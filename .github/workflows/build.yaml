@@ -35,7 +35,7 @@ jobs:
 
       - name: Deploy docs to website
         if: ${{ github.ref == 'refs/heads/trunk' && github.repository == 'JakeWharton/timber' }}
-        uses: JamesIves/github-pages-deploy-action@132898c54c57c7cc6b80eb3a89968de8fc283505 # 3.6.1
+        uses: JamesIves/github-pages-deploy-action@132898c54c57c7cc6b80eb3a89968de8fc283505 # 3.7.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: site
