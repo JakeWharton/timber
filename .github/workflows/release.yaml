@@ -40,7 +40,7 @@ jobs:
       - run: ./gradlew dokkaGenerate
 
       - name: Deploy docs to website
-        uses: JamesIves/github-pages-deploy-action@132898c54c57c7cc6b80eb3a89968de8fc283505 # 3.6.1
+        uses: JamesIves/github-pages-deploy-action@a3c1ca2efabea1134d51bc167444fab4fab78b64 # 3.6.1
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: site
