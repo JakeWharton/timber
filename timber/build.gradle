@@ -28,9 +28,11 @@ kotlin {
     commonMain {
       dependencies {
         implementation libs.annotations
-        implementation libs.atomicfu
       }
     }
+    jvmAndroidMain { dependsOn(commonMain) }
+    androidMain    { dependsOn(jvmAndroidMain) }
+    jvmMain        { dependsOn(jvmAndroidMain) }
     commonTest {
       dependencies {
         implementation libs.annotations
@@ -39,6 +41,10 @@ kotlin {
         implementation libs.robolectric
       }
     }
+
+    jvmAndroidTest { dependsOn(commonTest) }
+    androidUnitTest { dependsOn(jvmAndroidTest) }
+    jvmTest         { dependsOn(jvmAndroidTest) }
   }
 
   abiValidation {

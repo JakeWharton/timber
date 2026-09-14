@@ -3,7 +3,7 @@ package timber.log
 
 import kotlin.jvm.JvmName
 
-internal expect fun writeLog(priority: Priority, tag: String?, message: String)
+internal expect fun writeLog(priority: Int, tag: String?, message: String)
 
 internal expect fun getStackTraceString(t: Throwable): String
 

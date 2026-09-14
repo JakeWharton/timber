@@ -1,6 +1,6 @@
 package timber.log
 
-internal actual class ThreadLocalRef<T> {
+internal actual class ThreadLocalRef<T> actual constructor() {
   private val delegate = ThreadLocal<T>()
   actual fun get(): T? = delegate.get()
 

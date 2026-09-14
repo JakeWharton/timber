@@ -1,12 +1,12 @@
 package timber.log
 
 
+import java.util.Collections
 import kotlin.concurrent.Volatile
+import java.util.Collections.unmodifiableList
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
-import kotlinx.atomicfu.locks.SynchronizedObject
-import kotlinx.atomicfu.locks.synchronized
 import org.jetbrains.annotations.NonNls
 
 /** Logging for lazy people. */
@@ -20,7 +20,7 @@ class Timber private constructor() {
   abstract class Tree {
 
     @get:JvmSynthetic // Hide from public API.
-    internal val explicitTag = ThreadLocalRef<String>()
+    internal val explicitTag = ThreadLocalRef<String>() // TODO: Have a test cover this thread safety
 
     @get:JvmSynthetic // Hide from public API.
     internal open val tag: String?
@@ -123,28 +123,28 @@ class Timber private constructor() {
     }
 
     /** Log at `priority` a message with optional format args. */
-    open fun log(priority: Priority, message: String?, vararg args: Any?) {
+    open fun log(priority: Int, message: String?, vararg args: Any?) {
       prepareLog(priority, null, message, *args)
     }
 
     /** Log at `priority` an exception and a message with optional format args. */
-    open fun log(priority: Priority, t: Throwable?, message: String?, vararg args: Any?) {
+    open fun log(priority: Int, t: Throwable?, message: String?, vararg args: Any?) {
       prepareLog(priority, t, message, *args)
     }
 
     /** Log at `priority` an exception. */
-    open fun log(priority: Priority, t: Throwable?) {
+    open fun log(priority: Int, t: Throwable?) {
       prepareLog(priority, t, null)
     }
 
     /** Return whether a message at `priority` should be logged. */
     @Deprecated("Use isLoggable(String, int)", ReplaceWith("this.isLoggable(null, priority)"))
-    protected open fun isLoggable(priority: Priority) = true
+    protected open fun isLoggable(priority: Int) = true
 
     /** Return whether a message at `priority` or `tag` should be logged. */
-    protected open fun isLoggable(tag: String?, priority: Priority) = isLoggable(priority)
+    protected open fun isLoggable(tag: String?, priority: Int) = isLoggable(priority)
 
-    private fun prepareLog(priority: Priority, t: Throwable?, message: String?, vararg args: Any?) {
+    private fun prepareLog(priority: Int, t: Throwable?, message: String?, vararg args: Any?) {
       // Consume tag even when message is not loggable so that next message is correctly tagged.
       val tag = tag
       if (!isLoggable(tag, priority)) {
@@ -181,7 +181,7 @@ class Timber private constructor() {
      * @param message Formatted log message.
      * @param t Accompanying exceptions. May be `null`.
      */
-    protected abstract fun log(priority: Priority, tag: String?, message: String, t: Throwable?)
+    protected abstract fun log(priority: Int, tag: String?, message: String, t: Throwable?)
   }
 
   companion object Forest : Tree() {
@@ -276,22 +276,22 @@ class Timber private constructor() {
     }
 
     /** Log at `priority` a message with optional format args. */
-    @JvmStatic override fun log(priority: Priority, @NonNls message: String?, vararg args: Any?) {
+    @JvmStatic override fun log(priority: Int, @NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.log(priority, message, *args) }
     }
 
     /** Log at `priority` an exception and a message with optional format args. */
     @JvmStatic
-    override fun log(priority: Priority, t: Throwable?, @NonNls message: String?, vararg args: Any?) {
+    override fun log(priority: Int, t: Throwable?, @NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.log(priority, t, message, *args) }
     }
 
     /** Log at `priority` an exception. */
-    @JvmStatic override fun log(priority: Priority, t: Throwable?) {
+    @JvmStatic override fun log(priority: Int, t: Throwable?) {
       treeArray.forEach { it.log(priority, t) }
     }
 
-    override fun log(priority: Priority, tag: String?, message: String, t: Throwable?) {
+    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
       throw AssertionError() // Missing override for log method.
     }
 
@@ -317,7 +317,7 @@ class Timber private constructor() {
     /** Add a new logging tree. */
     @JvmStatic fun plant(tree: Tree) {
       require(tree !== this) { "Cannot plant Timber into itself." }
-      synchronized(lock) {
+      synchronized(trees) {
         trees.add(tree)
         treeArray = trees.toTypedArray()
       }
@@ -329,24 +329,23 @@ class Timber private constructor() {
         requireNotNull(tree) { "trees contained null" }
         require(tree !== this) { "Cannot plant Timber into itself." }
       }
-      synchronized(lock) {
-        this.trees.addAll(trees)
+      synchronized(this.trees) {
+        Collections.addAll(this.trees, *trees)
         treeArray = this.trees.toTypedArray()
       }
     }
 
     /** Remove a planted tree. */
     @JvmStatic fun uproot(tree: Tree) {
-      synchronized(lock) {
+      synchronized(trees) {
         require(trees.remove(tree)) { "Cannot uproot tree which is not planted: $tree" }
         treeArray = trees.toTypedArray()
       }
     }
 
     /** Remove all planted trees. */
-    @JvmStatic
-    fun uprootAll() {
-      synchronized(lock) {
+    @JvmStatic fun uprootAll() {
+      synchronized(trees) {
         trees.clear()
         treeArray = emptyArray()
       }
@@ -354,19 +353,16 @@ class Timber private constructor() {
 
     /** Return a copy of all planted [trees][Tree]. */
     @JvmStatic fun forest(): List<Tree> {
-      synchronized(lock) {
-        return trees.toList()
+      synchronized(trees) {
+        return unmodifiableList(trees.toList())
       }
     }
 
     @get:[JvmStatic JvmName("treeCount")]
     val treeCount get() = treeArray.size
 
-    private val lock = SynchronizedObject()
-
-    // Both fields guarded by 'lock'.
+    // Both fields guarded by 'trees'.
     private val trees = ArrayList<Tree>()
-    @Volatile
-    private var treeArray = emptyArray<Tree>()
+    @Volatile private var treeArray = emptyArray<Tree>()
   }
 }
