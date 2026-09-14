@@ -5,6 +5,8 @@ package timber.log
  */
 internal expect class ThreadLocalRef<T>() {
   fun get(): T?
+
   fun set(value: T?)
+
   fun remove()
 }

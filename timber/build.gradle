@@ -7,10 +7,14 @@ apply plugin: 'org.jetbrains.dokka' // Must be applied here for publish plugin.
 apply plugin: 'com.gradleup.tapmoc'
 
 kotlin {
+  applyDefaultHierarchyTemplate()
   androidLibrary {
     namespace = 'timber.log'
     compileSdk = libs.versions.compileSdk.get().toInteger()
     minSdk = libs.versions.minSdk.get().toInteger()
+
+    withHostTest {}
+    withJava()
 
     optimization {
       // "it" --> https://issuetracker.google.com/issues/445115242
@@ -31,20 +35,20 @@ kotlin {
       }
     }
     jvmAndroidMain { dependsOn(commonMain) }
-    androidMain    { dependsOn(jvmAndroidMain) }
-    jvmMain        { dependsOn(jvmAndroidMain) }
+    androidMain { dependsOn(jvmAndroidMain) }
+    jvmMain { dependsOn(jvmAndroidMain) }
     commonTest {
       dependencies {
         implementation libs.annotations
-        implementation libs.junit
         implementation libs.assertk
+      }
+    }
+    androidHostTest {
+      dependencies {
+        implementation libs.junit
         implementation libs.robolectric
       }
     }
-
-    jvmAndroidTest { dependsOn(commonTest) }
-    androidUnitTest { dependsOn(jvmAndroidTest) }
-    jvmTest         { dependsOn(jvmAndroidTest) }
   }
 
   abiValidation {
@@ -60,8 +64,8 @@ tapmoc {
 
 tasks.named('check') { check ->
   check.dependsOn(
-      // TODO: https://youtrack.jetbrains.com/issue/KT-78525
-      tasks.named('checkLegacyAbi'),
+    // TODO: https://youtrack.jetbrains.com/issue/KT-78525
+    tasks.named('checkLegacyAbi'),
   )
 }
 

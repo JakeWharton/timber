@@ -1,12 +1,12 @@
 package timber.log
 
-
 import java.util.Collections
-import kotlin.concurrent.Volatile
 import java.util.Collections.unmodifiableList
+import kotlin.concurrent.Volatile
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmStatic
 import kotlin.jvm.JvmSynthetic
+import kotlin.math.min
 import org.jetbrains.annotations.NonNls
 
 /** Logging for lazy people. */
@@ -20,7 +20,7 @@ class Timber private constructor() {
   abstract class Tree {
 
     @get:JvmSynthetic // Hide from public API.
-    internal val explicitTag = ThreadLocalRef<String>() // TODO: Have a test cover this thread safety
+    internal val explicitTag = ThreadLocalRef<String>()
 
     @get:JvmSynthetic // Hide from public API.
     internal open val tag: String?
@@ -154,7 +154,7 @@ class Timber private constructor() {
       var message = message
       if (message.isNullOrEmpty()) {
         if (t == null) {
-          return  // Swallow message if it's null and there's no throwable.
+          return // Swallow message if it's null and there's no throwable.
         }
         message = getStackTraceString(t)
       } else {
@@ -172,7 +172,6 @@ class Timber private constructor() {
     /** Formats a log message with optional arguments. */
     protected open fun formatMessage(message: String, args: Array<out Any?>) = message.format(args)
 
-
     /**
      * Write a log message to its destination. Called for all level-specific methods by default.
      *
@@ -184,99 +183,166 @@ class Timber private constructor() {
     protected abstract fun log(priority: Int, tag: String?, message: String, t: Throwable?)
   }
 
+  /** A [Tree] for debug builds. Automatically infers the tag from the calling class. */
+  open class DebugTree : Tree() {
+
+    override val tag: String?
+      get() = super.tag ?: callerStackElement()?.let(::createStackElementTag)
+
+    /**
+     * Extract the tag which should be used for the message from the `element`. By default this will
+     * use the class name without any anonymous class suffixes (e.g., `Foo$1` becomes `Foo`).
+     *
+     * Note: This will not be called if a [manual tag][tag] was specified.
+     */
+    protected open fun createStackElementTag(element: StackTraceElement): String? {
+      val tag =
+        element.className().substringAfterLast(".").let {
+          ANONYMOUS_CLASS.replace(it, "")
+        }
+      return if (tag.length <= maxTagLength()) tag else tag.substring(0, maxTagLength())
+    }
+
+    /** Break up `message` into maximum-length chunks (if needed) and send for logging. */
+    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+      if (message.length < maxLogLength()) {
+        writeLog(priority, tag, message)
+        return
+      }
+
+      // Split by line, then ensure each line can fit into the platform's maximum length.
+      var i = 0
+      val length = message.length
+      while (i < length) {
+        var newline = message.indexOf('\n', i)
+        newline = if (newline != -1) newline else length
+        do {
+          val end = min(newline, i + maxLogLength())
+          val part = message.substring(i, end)
+          writeLog(priority, tag, part)
+          i = end
+        } while (i < newline)
+        i++
+      }
+    }
+
+    companion object {
+      private val ANONYMOUS_CLASS = Regex("(\\\$\\d+)+$")
+    }
+  }
+
   companion object Forest : Tree() {
     /** Log a verbose message with optional format args. */
-    @JvmStatic override fun v(@NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun v(@NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.v(message, *args) }
     }
 
     /** Log a verbose exception and a message with optional format args. */
-    @JvmStatic override fun v(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun v(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.v(t, message, *args) }
     }
 
     /** Log a verbose exception. */
-    @JvmStatic override fun v(t: Throwable?) {
+    @JvmStatic
+    override fun v(t: Throwable?) {
       treeArray.forEach { it.v(t) }
     }
 
     /** Log a debug message with optional format args. */
-    @JvmStatic override fun d(@NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun d(@NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.d(message, *args) }
     }
 
     /** Log a debug exception and a message with optional format args. */
-    @JvmStatic override fun d(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun d(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.d(t, message, *args) }
     }
 
     /** Log a debug exception. */
-    @JvmStatic override fun d(t: Throwable?) {
+    @JvmStatic
+    override fun d(t: Throwable?) {
       treeArray.forEach { it.d(t) }
     }
 
     /** Log an info message with optional format args. */
-    @JvmStatic override fun i(@NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun i(@NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.i(message, *args) }
     }
 
     /** Log an info exception and a message with optional format args. */
-    @JvmStatic override fun i(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun i(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.i(t, message, *args) }
     }
 
     /** Log an info exception. */
-    @JvmStatic override fun i(t: Throwable?) {
+    @JvmStatic
+    override fun i(t: Throwable?) {
       treeArray.forEach { it.i(t) }
     }
 
     /** Log a warning message with optional format args. */
-    @JvmStatic override fun w(@NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun w(@NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.w(message, *args) }
     }
 
     /** Log a warning exception and a message with optional format args. */
-    @JvmStatic override fun w(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun w(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.w(t, message, *args) }
     }
 
     /** Log a warning exception. */
-    @JvmStatic override fun w(t: Throwable?) {
+    @JvmStatic
+    override fun w(t: Throwable?) {
       treeArray.forEach { it.w(t) }
     }
 
     /** Log an error message with optional format args. */
-    @JvmStatic override fun e(@NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun e(@NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.e(message, *args) }
     }
 
     /** Log an error exception and a message with optional format args. */
-    @JvmStatic override fun e(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun e(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.e(t, message, *args) }
     }
 
     /** Log an error exception. */
-    @JvmStatic override fun e(t: Throwable?) {
+    @JvmStatic
+    override fun e(t: Throwable?) {
       treeArray.forEach { it.e(t) }
     }
 
     /** Log an assert message with optional format args. */
-    @JvmStatic override fun wtf(@NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun wtf(@NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.wtf(message, *args) }
     }
 
     /** Log an assert exception and a message with optional format args. */
-    @JvmStatic override fun wtf(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun wtf(t: Throwable?, @NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.wtf(t, message, *args) }
     }
 
     /** Log an assert exception. */
-    @JvmStatic override fun wtf(t: Throwable?) {
+    @JvmStatic
+    override fun wtf(t: Throwable?) {
       treeArray.forEach { it.wtf(t) }
     }
 
     /** Log at `priority` a message with optional format args. */
-    @JvmStatic override fun log(priority: Int, @NonNls message: String?, vararg args: Any?) {
+    @JvmStatic
+    override fun log(priority: Int, @NonNls message: String?, vararg args: Any?) {
       treeArray.forEach { it.log(priority, message, *args) }
     }
 
@@ -287,7 +353,8 @@ class Timber private constructor() {
     }
 
     /** Log at `priority` an exception. */
-    @JvmStatic override fun log(priority: Int, t: Throwable?) {
+    @JvmStatic
+    override fun log(priority: Int, t: Throwable?) {
       treeArray.forEach { it.log(priority, t) }
     }
 
@@ -301,13 +368,14 @@ class Timber private constructor() {
      */
     @Suppress(
       "NOTHING_TO_INLINE", // Kotlin users should reference `Tree.Forest` directly.
-      "NON_FINAL_MEMBER_IN_OBJECT" // For japicmp check.
+      "NON_FINAL_MEMBER_IN_OBJECT", // For japicmp check.
     )
     @JvmStatic
     open inline fun asTree(): Tree = this
 
     /** Set a one-time tag for use on the next logging call. */
-    @JvmStatic fun tag(tag: String): Tree {
+    @JvmStatic
+    fun tag(tag: String): Tree {
       for (tree in treeArray) {
         tree.explicitTag.set(tag)
       }
@@ -315,7 +383,8 @@ class Timber private constructor() {
     }
 
     /** Add a new logging tree. */
-    @JvmStatic fun plant(tree: Tree) {
+    @JvmStatic
+    fun plant(tree: Tree) {
       require(tree !== this) { "Cannot plant Timber into itself." }
       synchronized(trees) {
         trees.add(tree)
@@ -324,7 +393,8 @@ class Timber private constructor() {
     }
 
     /** Adds new logging trees. */
-    @JvmStatic fun plant(vararg trees: Tree) {
+    @JvmStatic
+    fun plant(vararg trees: Tree) {
       for (tree in trees) {
         requireNotNull(tree) { "trees contained null" }
         require(tree !== this) { "Cannot plant Timber into itself." }
@@ -336,7 +406,8 @@ class Timber private constructor() {
     }
 
     /** Remove a planted tree. */
-    @JvmStatic fun uproot(tree: Tree) {
+    @JvmStatic
+    fun uproot(tree: Tree) {
       synchronized(trees) {
         require(trees.remove(tree)) { "Cannot uproot tree which is not planted: $tree" }
         treeArray = trees.toTypedArray()
@@ -344,7 +415,8 @@ class Timber private constructor() {
     }
 
     /** Remove all planted trees. */
-    @JvmStatic fun uprootAll() {
+    @JvmStatic
+    fun uprootAll() {
       synchronized(trees) {
         trees.clear()
         treeArray = emptyArray()
@@ -352,14 +424,16 @@ class Timber private constructor() {
     }
 
     /** Return a copy of all planted [trees][Tree]. */
-    @JvmStatic fun forest(): List<Tree> {
+    @JvmStatic
+    fun forest(): List<Tree> {
       synchronized(trees) {
         return unmodifiableList(trees.toList())
       }
     }
 
     @get:[JvmStatic JvmName("treeCount")]
-    val treeCount get() = treeArray.size
+    val treeCount
+      get() = treeArray.size
 
     // Both fields guarded by 'trees'.
     private val trees = ArrayList<Tree>()
