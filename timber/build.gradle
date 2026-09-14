@@ -22,10 +22,13 @@ kotlin {
     }
   }
 
+  jvm()
+
   sourceSets {
     commonMain {
       dependencies {
         implementation libs.annotations
+        implementation libs.atomicfu
       }
     }
     commonTest {
