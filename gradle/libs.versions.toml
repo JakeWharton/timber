@@ -1,7 +1,7 @@
 [versions]
 agp = "9.4.0"
 androidTools = "32.4.0" # Update this values in sync with agp.
-kotlin = "2.4.10"
+kotlin = "2.4.20"
 autoService = "1.1.1"
 minSdk = "14"
 compileSdk = "36"
