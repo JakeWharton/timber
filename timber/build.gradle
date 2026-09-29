@@ -1,3 +1,4 @@
+import com.android.build.api.KotlinMultiplatformHierarchyDsl
 import tapmoc.Severity
 
 apply plugin: 'org.jetbrains.kotlin.multiplatform'
@@ -7,7 +8,14 @@ apply plugin: 'org.jetbrains.dokka' // Must be applied here for publish plugin.
 apply plugin: 'com.gradleup.tapmoc'
 
 kotlin {
-  applyDefaultHierarchyTemplate()
+  applyDefaultHierarchyTemplate {
+    it.group('common') {
+      it.group('jvmAndroid') {
+        it.withJvm()
+        KotlinMultiplatformHierarchyDsl.withAndroid(it)
+      }
+    }
+  }
   androidLibrary {
     namespace = 'timber.log'
     compileSdk = libs.versions.compileSdk.get().toInteger()
@@ -34,9 +42,6 @@ kotlin {
         implementation libs.annotations
       }
     }
-    jvmAndroidMain { dependsOn(commonMain) }
-    androidMain { dependsOn(jvmAndroidMain) }
-    jvmMain { dependsOn(jvmAndroidMain) }
     commonTest {
       dependencies {
         implementation libs.annotations
