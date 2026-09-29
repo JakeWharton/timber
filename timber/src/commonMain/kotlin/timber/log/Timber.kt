@@ -20,7 +20,7 @@ class Timber private constructor() {
   abstract class Tree {
 
     @get:JvmSynthetic // Hide from public API.
-    internal val explicitTag = ThreadLocalRef<String>()
+    internal val explicitTag = ThreadLocal<String>()
 
     @get:JvmSynthetic // Hide from public API.
     internal open val tag: String?
