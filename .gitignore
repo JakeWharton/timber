@@ -19,7 +19,9 @@ obj
 
 # Gradle
 .gradle
+.kotlin
 jniLibs
 build
 local.properties
 reports
+/gradle/gradle-daemon-jvm.properties
