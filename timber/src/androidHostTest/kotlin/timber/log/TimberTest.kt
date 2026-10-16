@@ -51,7 +51,7 @@ class TimberTest {
 
     Timber.d("Test")
 
-    assertLog().hasDebugMessage("TimberTest:48", "Test").hasNoMoreMessages()
+    assertLog().hasDebugMessage("TimberTest:52", "Test").hasNoMoreMessages()
   }
 
   @Test

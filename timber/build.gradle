@@ -1,3 +1,4 @@
+import com.android.build.api.KotlinMultiplatformHierarchyDsl
 import tapmoc.Severity
 
 apply plugin: 'org.jetbrains.kotlin.multiplatform'
@@ -7,10 +8,21 @@ apply plugin: 'org.jetbrains.dokka' // Must be applied here for publish plugin.
 apply plugin: 'com.gradleup.tapmoc'
 
 kotlin {
+  applyDefaultHierarchyTemplate {
+    it.group('common') {
+      it.group('jvmAndroid') {
+        it.withJvm()
+        KotlinMultiplatformHierarchyDsl.withAndroid(it)
+      }
+    }
+  }
   androidLibrary {
     namespace = 'timber.log'
     compileSdk = libs.versions.compileSdk.get().toInteger()
     minSdk = libs.versions.minSdk.get().toInteger()
+
+    withHostTest {}
+    withJava()
 
     optimization {
       // "it" --> https://issuetracker.google.com/issues/445115242
@@ -22,6 +34,8 @@ kotlin {
     }
   }
 
+  jvm()
+
   sourceSets {
     commonMain {
       dependencies {
@@ -31,8 +45,12 @@ kotlin {
     commonTest {
       dependencies {
         implementation libs.annotations
-        implementation libs.junit
         implementation libs.assertk
+      }
+    }
+    androidHostTest {
+      dependencies {
+        implementation libs.junit
         implementation libs.robolectric
       }
     }
@@ -51,8 +69,8 @@ tapmoc {
 
 tasks.named('check') { check ->
   check.dependsOn(
-      // TODO: https://youtrack.jetbrains.com/issue/KT-78525
-      tasks.named('checkLegacyAbi'),
+    // TODO: https://youtrack.jetbrains.com/issue/KT-78525
+    tasks.named('checkLegacyAbi'),
   )
 }
 
