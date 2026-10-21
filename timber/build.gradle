@@ -1,4 +1,4 @@
-import tapmoc.Severity
+import com.gradleup.tapmoc.Severity
 
 apply plugin: 'org.jetbrains.kotlin.multiplatform'
 apply plugin: 'com.android.kotlin.multiplatform.library'
